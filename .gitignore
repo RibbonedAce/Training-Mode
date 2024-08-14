@@ -30,7 +30,11 @@ ASM/Misc/Overwrite Compile Date.asm
 Build\ TM\ Codeset/mac/gecko
 Additional\ ISO\ Files/codes.gct
 Additional\ ISO\ Files/Start.dol
-
+patch/**/output/**
+.vscode
 
 # Mac files
 .DS_Store
+
+# Extra files for testing
+gcr
