@@ -1,17 +1,34 @@
-SET "ASSETS=labData"
-SET "SOURCEFILE=lab"
-SET "OUTPUT=EvLab"
+SET "MEX_DIR=..\..\..\MexTK"
 
-xcopy /s /y "assets\%ASSETS%.dat" "output\%OUTPUT%.dat"
-"..\..\..\MexTK\MexTK.exe" -ff -i "source\%SOURCEFILE%.c" -s evFunction -dat "output\%OUTPUT%.dat" -t "..\..\..\MexTK\evFunction.txt" -q -ow -w -c -l "..\..\..\MexTK\melee.link" -op 1
-"..\..\..\MexTK\MexTK.exe" -trim "output\%OUTPUT%.dat"
+SET "ASSETS=assets\labData.dat"
+SET "SOURCEFILE=source\lab.c"
+SET "OUTPUT=output\EvLab.dat"
 
-SET "ASSETS=importData"
-SET "SOURCEFILE=lab_css"
-SET "OUTPUT=EvLabCSS"
+echo Copying base assets file "%ASSETS%" to "%OUTPUT%".
+xcopy /s /y %ASSETS% %OUTPUT%
 
-xcopy /s /y "assets\%ASSETS%.dat" "output\%OUTPUT%.dat"
-"..\..\..\MexTK\MexTK.exe" -ff -i "source\%SOURCEFILE%.c" -s evFunction -dat "output\%OUTPUT%.dat" -t "..\..\..\MexTK\evFunction.txt" -q -ow -w -c -l "..\..\..\MexTK\melee.link" -op 1
-"..\..\..\MexTK\MexTK.exe" -trim "output\%OUTPUT%.dat"
+echo Injecting symbols from "%SOURCEFILE%" into "%OUTPUT%".
+"%MEX_DIR%\MexTK.exe" -ff -i %SOURCEFILE% -s evFunction -dat %OUTPUT% -t "%MEX_DIR%\evFunction.txt" -q -ow -w -c -l "%MEX_DIR%\melee.link" -op 1
 
+echo Trimming "%OUTPUT%".
+"%MEX_DIR%\MexTK.exe" -trim %OUTPUT%
+
+echo.
+echo Next.
+echo.
+
+SET "ASSETS=assets\importData.dat"
+SET "SOURCEFILE=source\lab_css.c"
+SET "OUTPUT=output\EvLabCSS.dat"
+
+echo Copying base assets file "%ASSETS%" to "%OUTPUT%".
+xcopy /s /y %ASSETS% %OUTPUT%
+
+echo Injecting symbols from "%SOURCEFILE%" into "%OUTPUT%".
+"%MEX_DIR%\MexTK.exe" -ff -i %SOURCEFILE% -s evFunction -dat %OUTPUT% -t "%MEX_DIR%\evFunction.txt" -q -ow -w -c -l "%MEX_DIR%\melee.link" -op 1
+
+echo Trimming "%OUTPUT%".
+"%MEX_DIR%\MexTK.exe" -trim %OUTPUT%
+
+echo.
 pause

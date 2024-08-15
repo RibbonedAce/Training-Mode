@@ -1,9 +1,16 @@
-SET "ASSETS=ldshData"
-SET "SOURCEFILE=ledgedash"
-SET "OUTPUT=EvLdsh"
+SET "MEX_DIR=..\..\..\MexTK"
+SET "ASSETS=assets\ldshData.dat"
+SET "SOURCEFILE=source\ledgedash.c"
+SET "OUTPUT=output\EvLdsh.dat"
 
-xcopy /s /y "assets\%ASSETS%.dat" "output\%OUTPUT%.dat"
-"..\..\..\MexTK\MexTK.exe" -ff -i "source\%SOURCEFILE%.c" -s evFunction -dat "output\%OUTPUT%.dat" -t "..\..\..\MexTK\evFunction.txt" -q -ow -w -c -l "..\..\..\MexTK\melee.link" -op 1
-"..\..\..\MexTK\MexTK.exe" -trim "output\%OUTPUT%.dat"
+echo Copying base assets file "%ASSETS%" to "%OUTPUT%".
+xcopy /s /y %ASSETS% %OUTPUT%
 
+echo Injecting symbols from "%SOURCEFILE%" into "%OUTPUT%".
+"%MEX_DIR%\MexTK.exe" -ff -i %SOURCEFILE% -s evFunction -dat %OUTPUT% -t "%MEX_DIR%\evFunction.txt" -q -ow -w -c -l "%MEX_DIR%\melee.link" -op 1
+
+echo Trimming "%OUTPUT%".
+"%MEX_DIR%\MexTK.exe" -trim %OUTPUT%
+
+echo.
 pause
