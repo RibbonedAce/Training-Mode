@@ -34,6 +34,3 @@ patch/**/output/**
 
 # Mac files
 .DS_Store
-
-# Extra files for testing
-gcr
