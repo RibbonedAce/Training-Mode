@@ -14,10 +14,25 @@ echo.
 
 cd /d %~dp0
 
-xdelta.exe -d -f -s %1 "patch.xdelta" "..\Additional ISO Files\Start.dol"
+if exist "..\Additional ISO Files" (
+    echo Found "Additional ISO Files" directory.
+) else (
+    mkdir "..\Additional ISO Files"
+    echo Created "Additional ISO Files" directory.
+)
+
+if exist "..\Additional ISO Files\&&systemdata" (
+    echo Found "systemdata" directory.
+) else (
+    mkdir "..\Additional ISO Files\&&systemdata"
+    echo FouCreatednd "systemdata" directory.
+)
+
+xdelta.exe -d -f -s "..\gcr\root\&&systemdata\Start.dol" "patch.xdelta" "..\Additional ISO Files\&&SystemData\Start.dol"
 
 echo.
 echo Done!
-echo The file is located in the "Additional ISO Files" folder!
+echo The file is located in the "Additional ISO Files\&&systemdata" directory!
 
+echo.
 pause
