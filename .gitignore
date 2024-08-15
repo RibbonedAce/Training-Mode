@@ -31,6 +31,7 @@ Build\ TM\ Codeset/mac/gecko
 Additional\ ISO\ Files
 patch/**/output/**
 .vscode
+cmake-build-debug
 
 # Mac files
 .DS_Store
