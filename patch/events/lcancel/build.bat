@@ -1,16 +1,9 @@
-SET "MEX_DIR=..\..\..\MexTK"
-SET "ASSETS=assets\lclData.dat"
-SET "SOURCEFILE=source\lcancel.c"
-SET "OUTPUT=output\EvLCl.dat"
+call "..\..\safe-mkdir.bat" "..\..\..\Additional ISO Files"
+call "..\..\safe-mkdir.bat" "..\..\..\Additional ISO Files\TM"
 
-echo Copying base assets file "%ASSETS%" to "%OUTPUT%".
-xcopy /s /y %ASSETS% %OUTPUT%
-
-echo Injecting symbols from "%SOURCEFILE%" into "%OUTPUT%".
-"%MEX_DIR%\MexTK.exe" -ff -i %SOURCEFILE% -s evFunction -dat %OUTPUT% -t "%MEX_DIR%\evFunction.txt" -q -ow -w -c -l "%MEX_DIR%\melee.link" -op 1
-
-echo Trimming "%OUTPUT%".
-"%MEX_DIR%\MexTK.exe" -trim %OUTPUT%
-
-echo.
-pause
+call "..\..\build-core.bat"^
+ assets\lclData.dat^
+ source\lcancel.c^
+ output\EvLCl.dat^
+ ..\..\..\MexTK^
+ "..\..\..\Additional ISO Files\TM\EvLCl.dat"

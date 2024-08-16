@@ -1,16 +1,9 @@
-SET "MEX_DIR=..\..\MexTK"
-SET "ASSETS=assets\evMenu.dat"
-SET "SOURCEFILE=source\events.c"
-SET "OUTPUT=output\TmDt.dat"
+call "..\safe-mkdir.bat" "..\..\Additional ISO Files"
+call "..\safe-mkdir.bat" "..\..\Additional ISO Files\TM"
 
-echo Copying base assets file "%ASSETS%" to "%OUTPUT%".
-xcopy /s /y %ASSETS% %OUTPUT%
-
-echo Injecting symbols from "%SOURCEFILE%" into "%OUTPUT%".
-"%MEX_DIR%\MexTK.exe" -ff -i %SOURCEFILE% -s evFunction -dat %OUTPUT% -t "%MEX_DIR%\evFunction.txt" -q -ow -w -c -l "%MEX_DIR%\melee.link" -op 1
-
-echo Trimming "%OUTPUT%".
-"%MEX_DIR%\MexTK.exe" -trim %OUTPUT%
-
-echo.
-pause
+call "..\build-core.bat"^
+ assets\evMenu.dat^
+ source\events.c^
+ output\TmDt.dat^
+ ..\..\MexTK^
+ "..\..\Additional ISO Files\TM\TmDt.dat"
