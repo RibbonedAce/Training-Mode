@@ -1,3 +1,4 @@
+@echo off
 @rem Function that performs the basic build mechanics
 
 echo Copying base assets file %1 to %3.

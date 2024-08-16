@@ -1,3 +1,5 @@
+@echo off
+
 cd tmdata
 call "build.bat"
 cd ..

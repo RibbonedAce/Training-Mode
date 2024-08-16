@@ -1,3 +1,5 @@
+@echo off
+
 echo Building codeset.
 cd "Build TM Codeset"
 call "Build Training Mode Codeset.bat"
