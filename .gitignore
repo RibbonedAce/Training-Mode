@@ -29,7 +29,7 @@ ASM/Misc/Overwrite Compile Date.asm
 # ==========================
 Build\ TM\ Codeset/mac/gecko
 Additional\ ISO\ Files
-patch/**/output/**
+patch/**/output
 .vscode
 cmake-build-debug
 
