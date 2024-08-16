@@ -9,11 +9,12 @@ echo ##                                 ##
 echo #####################################
 echo.
 
-if exist %TM_GCR_ROOT% (
-    echo TM_GCR_ROOT = %TM_GCR_ROOT%
-) else (
-    echo You must set the TM_GCR_ROOT variable to the location of the root of your TM ISO.
-    exit
+call "..\check-var.bat" TM_GCR_ROOT
+set "code=%ERRORLEVEL%"
+
+if %code% gtr 0 (
+  echo Need to set TM_GCR_ROOT to the directory path of your TM root.
+  exit
 )
 
 echo Creating Training Mode Start.dol...

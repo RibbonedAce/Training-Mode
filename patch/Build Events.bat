@@ -1,8 +1,9 @@
 @echo off
 
-cd tmdata
-call "build.bat"
-cd ..
+@rem TODO: fix build of tmdata
+@rem cd tmdata
+@rem call "build.bat"
+@rem cd ..
 
 for /D %%e in (events\*) do (
   cd %%e
