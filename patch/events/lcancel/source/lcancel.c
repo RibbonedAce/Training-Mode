@@ -1,5 +1,4 @@
 #include "lcancel.h"
-static char nullString[] = " ";
 
 // Main Menu
 static char **LcOptions_Barrel[] = {"Off", "Stationary", "Move"};
@@ -62,6 +61,83 @@ static EventOption LcOptions_Main[] = {
     },
 };
 
+void Barrel_Break(GOBJ *barrel_gobj) {
+    ItemData *barrel_data = barrel_gobj->userdata;
+    Effect_SpawnSync(1063, barrel_gobj, &barrel_data->pos);
+    SFX_Play(251);
+    ScreenRumble_Execute(2, &barrel_data->pos);
+    JOBJ *barrel_jobj = barrel_gobj->hsd_object;
+    JOBJ_SetFlagsAll(barrel_jobj, JOBJ_HIDDEN);
+    barrel_data->xd0c = 2;
+    barrel_data->self_vel.X = 0;
+    barrel_data->self_vel.Y = 0;
+    barrel_data->itemVar1 = 1;
+    barrel_data->itemVar2 = 40;
+    barrel_data->xdcf3 = 1;
+    ItemStateChange(barrel_gobj, 7, 2);
+
+    return;
+}
+
+int Barrel_OnHurt(GOBJ *barrel_gobj) {
+    // get event data
+    LCancelData *event_data = event_vars->event_gobj->userdata;
+
+    switch (LcOptions_Main[0].option_val) {
+        // off
+        case (0): {
+            break;
+        }
+        // stationary
+        case (1): {
+            break;
+        }
+        // move
+        case (2): {
+            // Break this barrel
+            Barrel_Break(event_data->barrel_gobj);
+
+            // spawn new barrel at a random position
+            barrel_gobj = Barrel_Spawn(1);
+            event_data->barrel_gobj = barrel_gobj;
+            break;
+        }
+    }
+
+    return 0;
+}
+
+int Barrel_OnDestroy(GOBJ *barrel_gobj) {
+    // get event data
+    LCancelData *event_data = event_vars->event_gobj->userdata;
+
+    // if this barrel is still the current barrel
+    if (barrel_gobj == event_data->barrel_gobj)
+        event_data->barrel_gobj = 0;
+
+    return 0;
+}
+
+static void *item_callbacks[] = {
+    0x803f58e0,
+    0x80287458,
+    Barrel_OnDestroy, // onDestroy
+    0x80287e68,
+    0x80287ea8,
+    0x80287ec8,
+    0x80288818,
+    Barrel_OnHurt, // onhurt
+    0x802889f8,
+    0x802888b8,
+    0x00000000,
+    0x00000000,
+    0x80288958,
+    0x80288c68,
+    0x803f5988,
+};
+
+static char nullString[] = " ";
+
 static EventMenu LClMenu_Main = {
     .name = "L-Cancel Training", // the name of this menu
     .option_num = sizeof(LcOptions_Main) / sizeof(EventOption), // number of options this menu contains
@@ -72,61 +148,9 @@ static EventMenu LClMenu_Main = {
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
-// Init Function
-void Event_Init(GOBJ *gobj) {
-    LCancelData *event_data = gobj->userdata;
-    EventDesc *event_desc = event_data->event_desc;
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-    //GOBJ *cpu = Fighter_GetGObj(1);
-    //FighterData *cpu_data = cpu->userdata;
-
-    // theres got to be a better way to do this...
-    event_vars = *event_vars_ptr;
-
-    // get l-cancel assets
-    event_data->lcancel_assets = File_GetSymbol(event_vars->event_archive, "lclData");
-
-    // create HUD
-    LCancel_Init(event_data);
-
-    // set CPU AI to no_act 15
-    //cpu_data->cpu.ai = 0;
-
-    return;
-}
-
-// Think Function
-void Event_Think(GOBJ *event) {
-    LCancelData *event_data = event->userdata;
-
-    // get fighter data
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-    //GOBJ *cpu = Fighter_GetGObj(1);
-    //FighterData *cpu_data = cpu->userdata;
-    HSD_Pad *pad = PadGet(hmn_data->player_controller_number, PADGET_ENGINE);
-
-    LCancel_Think(event_data, hmn_data);
-    Barrel_Think(event_data);
-
-    return;
-}
-
-void Event_Exit() {
-    Match *match = MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = HSD_UPDATE;
-    update->pause_develop = 0;
-    return;
-}
+// Initial Menu
+static EventMenu *Event_Menu = &LClMenu_Main;
+EventMenu **menu_start = &Event_Menu;
 
 // L-Cancel functions
 void LCancel_Init(LCancelData *event_data) {
@@ -203,134 +227,26 @@ void LCancel_Init(LCancelData *event_data) {
     return 0;
 }
 
-void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
-    // run tip logic
-    Tips_Think(event_data, hmn_data);
+// Init Function
+void Event_Init(GOBJ *gobj) {
+    LCancelData *event_data = gobj->userdata;
+    EventDesc *event_desc = event_data->event_desc;
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+    //GOBJ *cpu = Fighter_GetGObj(1);
+    //FighterData *cpu_data = cpu->userdata;
 
-    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
+    // theres got to be a better way to do this...
+    event_vars = *event_vars_ptr;
 
-    // log fastfall frame
-    // if im in a fastfall-able state
-    int state = hmn_data->state;
-    /*if ((state == ASID_JUMPF) || (state == ASID_JUMPB) || (state == ASID_JUMPAERIALF) || (state == ASID_JUMPAERIALB) || (state == ASID_FALL) || (state == ASID_FALLAERIAL) || ((state >= ASID_ATTACKAIRN) && (state <= ASID_ATTACKAIRLW))*/ {
-        if (hmn_data->phys.self_vel.Y < 0) {
-            // can i fastfall?
-            // did i fastfall yet?
-            if (hmn_data->flags.is_fastfall)
-                event_data->is_fastfall = 1; // set as fastfall this session
-            else
-                event_data->fastfall_frame++; // increment frames
-        } else {
-            // cant fastfall, reset frames
-            event_data->fastfall_frame = 0;
-        }
-    }
+    // get l-cancel assets
+    event_data->lcancel_assets = File_GetSymbol(event_vars->event_archive, "lclData");
 
-    // if aerial landing
-    if (((hmn_data->state >= ASID_LANDINGAIRN) && (hmn_data->state <= ASID_LANDINGAIRLW)) && (
-            hmn_data->TM.state_frame == 0)) {
-        // increment total lcls
-        event_data->hud.lcl_total++;
+    // create HUD
+    LCancel_Init(event_data);
 
-        // determine succession
-        int is_fail = 1;
-        if (hmn_data->input.timer_trigger_any_ignore_hitlag < 7) {
-            is_fail = 0;
-            event_data->hud.lcl_success++;
-        }
-        event_data->is_fail = is_fail; // save l-cancel bool
-
-        // Play appropriate sfx
-        if (is_fail == 0)
-            SFX_PlayRaw(303, 255, 128, 20, 3);
-        else
-            SFX_PlayCommon(3);
-
-        // update timing text
-        int frame_box_id;
-        if (hmn_data->input.timer_trigger_any_ignore_hitlag >= 30) {
-            // update text
-            Text_SetText(event_data->hud.text_time, 0, "No Press");
-            frame_box_id = 29;
-        } else {
-            Text_SetText(event_data->hud.text_time, 0, "%df/7f", hmn_data->input.timer_trigger_any_ignore_hitlag + 1);
-            frame_box_id = hmn_data->input.timer_trigger_any_ignore_hitlag;
-        }
-
-        // update arrow
-        JOBJ *arrow_jobj;
-        JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1);
-        event_data->hud.arrow_prevpos = arrow_jobj->trans.X;
-        event_data->hud.arrow_nextpos = event_data->hud.arrow_base_x - (frame_box_id * LCLARROW_OFFSET);
-        JOBJ_ClearFlags(arrow_jobj, JOBJ_HIDDEN);
-        event_data->hud.arrow_timer = LCLARROW_ANIMFRAMES;
-
-        // Print airborne frames
-        if (event_data->is_fastfall)
-            Text_SetText(event_data->hud.text_air, 0, "%df", event_data->fastfall_frame - 1);
-        else
-            Text_SetText(event_data->hud.text_air, 0, "-");
-        event_data->is_fastfall = 0; // reset fastfall bool
-
-        // Print succession
-        float succession = ((float) event_data->hud.lcl_success / (float) event_data->hud.lcl_total) * 100.0;
-        Text_SetText(event_data->hud.text_scs, 0, "%.1f%%", succession);
-
-        // Play HUD anim
-        JOBJ_RemoveAnimAll(hud_jobj);
-        JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[is_fail], 0);
-        JOBJ_ReqAnimAll(hud_jobj, 0);
-    }
-
-    // if autocancel landing
-    // came from aerial attack
-    if (((hmn_data->state == ASID_LANDING) && (hmn_data->TM.state_frame == 0)) && // if first frame of landing
-        ((hmn_data->TM.state_prev[0] >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW))) {
-        // state as autocancelled
-        Text_SetText(event_data->hud.text_time, 0, "Auto-canceled");
-
-        // Play HUD anim
-        JOBJ_RemoveAnimAll(hud_jobj);
-        JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[2], 0);
-        JOBJ_ReqAnimAll(hud_jobj, 0);
-    }
-
-    // update arrow animation
-    if (event_data->hud.arrow_timer > 0) {
-        // decrement timer
-        event_data->hud.arrow_timer--;
-
-        // get this frames position
-        float time = 1 - ((float) event_data->hud.arrow_timer / (float) LCLARROW_ANIMFRAMES);
-        float xpos = Bezier(time, event_data->hud.arrow_prevpos, event_data->hud.arrow_nextpos);
-
-        // update position
-        JOBJ *arrow_jobj;
-        JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1); // get timing bar jobj
-        arrow_jobj->trans.X = xpos;
-        JOBJ_SetMtxDirtySub(arrow_jobj);
-    }
-
-    // update HUD anim
-    JOBJ_AnimAll(hud_jobj);
-
-    return;
-}
-
-void LCancel_HUDCamThink(GOBJ *gobj) {
-    // if HUD enabled and not paused
-    if ((LcOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
-        CObjThink_Common(gobj);
-    }
-
-    return;
-}
-
-// Tips Functions
-void Tips_Toggle(GOBJ *menu_gobj, int value) {
-    // destroy existing tips when disabling
-    if (value == 1)
-        event_vars->Tip_Destroy();
+    // set CPU AI to no_act 15
+    //cpu_data->cpu.ai = 0;
 
     return;
 }
@@ -473,6 +389,170 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             }
         }
     }
+    return;
+}
+
+void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
+    // run tip logic
+    Tips_Think(event_data, hmn_data);
+
+    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
+
+    // log fastfall frame
+    // if im in a fastfall-able state
+    int state = hmn_data->state;
+    /*if ((state == ASID_JUMPF) || (state == ASID_JUMPB) || (state == ASID_JUMPAERIALF) || (state == ASID_JUMPAERIALB) || (state == ASID_FALL) || (state == ASID_FALLAERIAL) || ((state >= ASID_ATTACKAIRN) && (state <= ASID_ATTACKAIRLW))*/ {
+        if (hmn_data->phys.self_vel.Y < 0) {
+            // can i fastfall?
+            // did i fastfall yet?
+            if (hmn_data->flags.is_fastfall)
+                event_data->is_fastfall = 1; // set as fastfall this session
+            else
+                event_data->fastfall_frame++; // increment frames
+        } else {
+            // cant fastfall, reset frames
+            event_data->fastfall_frame = 0;
+        }
+    }
+
+    // if aerial landing
+    if (((hmn_data->state >= ASID_LANDINGAIRN) && (hmn_data->state <= ASID_LANDINGAIRLW)) && (
+            hmn_data->TM.state_frame == 0)) {
+        // increment total lcls
+        event_data->hud.lcl_total++;
+
+        // determine succession
+        int is_fail = 1;
+        if (hmn_data->input.timer_trigger_any_ignore_hitlag < 7) {
+            is_fail = 0;
+            event_data->hud.lcl_success++;
+        }
+        event_data->is_fail = is_fail; // save l-cancel bool
+
+        // Play appropriate sfx
+        if (is_fail == 0)
+            SFX_PlayRaw(303, 255, 128, 20, 3);
+        else
+            SFX_PlayCommon(3);
+
+        // update timing text
+        int frame_box_id;
+        if (hmn_data->input.timer_trigger_any_ignore_hitlag >= 30) {
+            // update text
+            Text_SetText(event_data->hud.text_time, 0, "No Press");
+            frame_box_id = 29;
+        } else {
+            Text_SetText(event_data->hud.text_time, 0, "%df/7f", hmn_data->input.timer_trigger_any_ignore_hitlag + 1);
+            frame_box_id = hmn_data->input.timer_trigger_any_ignore_hitlag;
+        }
+
+        // update arrow
+        JOBJ *arrow_jobj;
+        JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1);
+        event_data->hud.arrow_prevpos = arrow_jobj->trans.X;
+        event_data->hud.arrow_nextpos = event_data->hud.arrow_base_x - (frame_box_id * LCLARROW_OFFSET);
+        JOBJ_ClearFlags(arrow_jobj, JOBJ_HIDDEN);
+        event_data->hud.arrow_timer = LCLARROW_ANIMFRAMES;
+
+        // Print airborne frames
+        if (event_data->is_fastfall)
+            Text_SetText(event_data->hud.text_air, 0, "%df", event_data->fastfall_frame - 1);
+        else
+            Text_SetText(event_data->hud.text_air, 0, "-");
+        event_data->is_fastfall = 0; // reset fastfall bool
+
+        // Print succession
+        float succession = ((float) event_data->hud.lcl_success / (float) event_data->hud.lcl_total) * 100.0;
+        Text_SetText(event_data->hud.text_scs, 0, "%.1f%%", succession);
+
+        // Play HUD anim
+        JOBJ_RemoveAnimAll(hud_jobj);
+        JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[is_fail], 0);
+        JOBJ_ReqAnimAll(hud_jobj, 0);
+    }
+
+    // if autocancel landing
+    // came from aerial attack
+    if (((hmn_data->state == ASID_LANDING) && (hmn_data->TM.state_frame == 0)) && // if first frame of landing
+        ((hmn_data->TM.state_prev[0] >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW))) {
+        // state as autocancelled
+        Text_SetText(event_data->hud.text_time, 0, "Auto-canceled");
+
+        // Play HUD anim
+        JOBJ_RemoveAnimAll(hud_jobj);
+        JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[2], 0);
+        JOBJ_ReqAnimAll(hud_jobj, 0);
+    }
+
+    // update arrow animation
+    if (event_data->hud.arrow_timer > 0) {
+        // decrement timer
+        event_data->hud.arrow_timer--;
+
+        // get this frames position
+        float time = 1 - ((float) event_data->hud.arrow_timer / (float) LCLARROW_ANIMFRAMES);
+        float xpos = Bezier(time, event_data->hud.arrow_prevpos, event_data->hud.arrow_nextpos);
+
+        // update position
+        JOBJ *arrow_jobj;
+        JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1); // get timing bar jobj
+        arrow_jobj->trans.X = xpos;
+        JOBJ_SetMtxDirtySub(arrow_jobj);
+    }
+
+    // update HUD anim
+    JOBJ_AnimAll(hud_jobj);
+
+    return;
+}
+
+// Think Function
+void Event_Think(GOBJ *event) {
+    LCancelData *event_data = event->userdata;
+
+    // get fighter data
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+    //GOBJ *cpu = Fighter_GetGObj(1);
+    //FighterData *cpu_data = cpu->userdata;
+    HSD_Pad *pad = PadGet(hmn_data->player_controller_number, PADGET_ENGINE);
+
+    LCancel_Think(event_data, hmn_data);
+    Barrel_Think(event_data);
+
+    return;
+}
+
+void Event_Exit() {
+    Match *match = MATCH;
+
+    // end game
+    match->state = 3;
+
+    // cleanup
+    Match_EndVS();
+
+    // unfreeze
+    HSD_Update *update = HSD_UPDATE;
+    update->pause_develop = 0;
+    return;
+}
+
+void LCancel_HUDCamThink(GOBJ *gobj) {
+    // if HUD enabled and not paused
+    if ((LcOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
+        CObjThink_Common(gobj);
+    }
+
+    return;
+}
+
+// Tips Functions
+void Tips_Toggle(GOBJ *menu_gobj, int value) {
+    // destroy existing tips when disabling
+    if (value == 1)
+        event_vars->Tip_Destroy();
+
     return;
 }
 
@@ -680,87 +760,8 @@ void Barrel_Null() {
     return;
 }
 
-void Barrel_Break(GOBJ *barrel_gobj) {
-    ItemData *barrel_data = barrel_gobj->userdata;
-    Effect_SpawnSync(1063, barrel_gobj, &barrel_data->pos);
-    SFX_Play(251);
-    ScreenRumble_Execute(2, &barrel_data->pos);
-    JOBJ *barrel_jobj = barrel_gobj->hsd_object;
-    JOBJ_SetFlagsAll(barrel_jobj, JOBJ_HIDDEN);
-    barrel_data->xd0c = 2;
-    barrel_data->self_vel.X = 0;
-    barrel_data->self_vel.Y = 0;
-    barrel_data->itemVar1 = 1;
-    barrel_data->itemVar2 = 40;
-    barrel_data->xdcf3 = 1;
-    ItemStateChange(barrel_gobj, 7, 2);
-
-    return;
-}
-
-int Barrel_OnHurt(GOBJ *barrel_gobj) {
-    // get event data
-    LCancelData *event_data = event_vars->event_gobj->userdata;
-
-    switch (LcOptions_Main[0].option_val) {
-        // off
-        case (0): {
-            break;
-        }
-        // stationary
-        case (1): {
-            break;
-        }
-        // move
-        case (2): {
-            // Break this barrel
-            Barrel_Break(event_data->barrel_gobj);
-
-            // spawn new barrel at a random position
-            barrel_gobj = Barrel_Spawn(1);
-            event_data->barrel_gobj = barrel_gobj;
-            break;
-        }
-    }
-
-    return 0;
-}
-
-int Barrel_OnDestroy(GOBJ *barrel_gobj) {
-    // get event data
-    LCancelData *event_data = event_vars->event_gobj->userdata;
-
-    // if this barrel is still the current barrel
-    if (barrel_gobj == event_data->barrel_gobj)
-        event_data->barrel_gobj = 0;
-
-    return 0;
-}
-
-static void *item_callbacks[] = {
-    0x803f58e0,
-    0x80287458,
-    Barrel_OnDestroy, // onDestroy
-    0x80287e68,
-    0x80287ea8,
-    0x80287ec8,
-    0x80288818,
-    Barrel_OnHurt, // onhurt
-    0x802889f8,
-    0x802888b8,
-    0x00000000,
-    0x00000000,
-    0x80288958,
-    0x80288c68,
-    0x803f5988,
-};
-
 // Misc
 float Bezier(float time, float start, float end) {
     float bez = time * time * (3.0f - 2.0f * time);
     return bez * (end - start) + start;
 }
-
-// Initial Menu
-static EventMenu *Event_Menu = &LClMenu_Main;
-EventMenu **menu_start = &Event_Menu;

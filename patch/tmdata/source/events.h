@@ -910,6 +910,21 @@ enum MsgColors {
     MSGCOLOR_YELLOW
 };
 
+static EventVars **event_vars_ptr = 0x803d7054; // R13 + (-0x4730)
+static float stc_msg_queue_offsets[] = {5.15, 5.15, 5.15, 5.15, 5.15, 5.15, -5.15};
+// Y offsets for each message in the queue
+static Vec3 stc_msg_queue_general_pos = {-21, 18.5, 0};
+static GXColor stc_msg_colors[] = {
+    {255, 255, 255, 255}, {141, 255, 110, 255}, {255, 162, 186, 255}, {255, 240, 0, 255},
+};
+
+static EventDesc *static_eventInfo;
+static MenuData *static_menuData;
+static EventVars stc_event_vars;
+static int *eventDataBackup;
+static EventVars *event_vars;
+static GOBJ *stc_msgmgr;
+
 // Function prototypes
 EventDesc *GetEventDesc(int page, int event);
 
@@ -953,14 +968,6 @@ void Event_IncTimer(GOBJ *gobj);
 
 void Test_Think(GOBJ *gobj);
 
-static EventDesc *static_eventInfo;
-static MenuData *static_menuData;
-static EventVars stc_event_vars;
-static int *eventDataBackup;
-
-static EventVars **event_vars_ptr = 0x803d7054; // R13 + (-0x4730)
-static EventVars *event_vars;
-
 // Message
 void Message_Init();
 
@@ -976,15 +983,8 @@ void Message_CObjThink(GOBJ *gobj);
 
 float BezierBlend(float t);
 
-static GOBJ *stc_msgmgr;
-static float stc_msg_queue_offsets[] = {5.15, 5.15, 5.15, 5.15, 5.15, 5.15, -5.15};
-// Y offsets for each message in the queue
-static Vec3 stc_msg_queue_general_pos = {-21, 18.5, 0};
-static GXColor stc_msg_colors[] = {
-    {255, 255, 255, 255}, {141, 255, 110, 255}, {255, 162, 186, 255}, {255, 240, 0, 255},
-};
-
 int Tip_Display(int lifetime, char *fmt, ...);
 
 void Tip_Destroy(); // 0 = immediately destroy, 1 = force exit
+
 void Tip_Think(GOBJ *gobj);

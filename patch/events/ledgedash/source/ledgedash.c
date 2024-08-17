@@ -90,6 +90,7 @@ static EventOption LdshOptions_Main[] = {
         .onOptionSelect = Event_Exit,
     },
 };
+
 static EventMenu LdshMenu_Main = {
     .name = "Ledgedash Training", // the name of this menu
     .option_num = sizeof(LdshOptions_Main) / sizeof(EventOption), // number of options this menu contains
@@ -100,74 +101,9 @@ static EventMenu LdshMenu_Main = {
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
-// Init Function
-void Event_Init(GOBJ *gobj) {
-    LedgedashData *event_data = gobj->userdata;
-
-    // theres got to be a better way to do this...
-    event_vars = *event_vars_ptr;
-
-    // get assets
-    event_data->assets = File_GetSymbol(event_vars->event_archive, "ldshData");
-
-    // standardize camera
-    Stage *stage = stc_stage;
-    float *unk_cam = 0x803bcca0;
-    stc_stage->fov_r = 0; // no camera rotation
-    stc_stage->x28 = 1; // pan value?
-    stc_stage->x2c = 1; // pan value?
-    stc_stage->x30 = 1; // pan value?
-    stc_stage->x34 = 130; // zoom out
-    unk_cam[0x40 / 4] = 30;
-
-    // Init hitlog
-    event_data->hitlog_gobj = Ledgedash_HitLogInit();
-
-    // Init HUD
-    Ledgedash_HUDInit(event_data);
-
-    // Init Fighter
-    Ledgedash_FtInit(event_data);
-
-    return;
-}
-
-// Think Function
-void Event_Think(GOBJ *event) {
-    LedgedashData *event_data = event->userdata;
-
-    // get fighter data
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-    HSD_Pad *pad = PadGet(hmn_data->player_controller_number, PADGET_ENGINE);
-
-    // no ledgefall
-    FtCliffCatch *ft_state = &hmn_data->state_var;
-    if (hmn_data->state == ASID_CLIFFWAIT)
-        ft_state->fall_timer = 2;
-
-    Ledgedash_HUDThink(event_data, hmn_data);
-    Ledgedash_HitLogThink(event_data, hmn);
-    Ledgedash_ResetThink(event_data, hmn);
-    Ledgedash_ChangeLedgeThink(event_data, hmn);
-
-    return;
-}
-
-void Event_Exit() {
-    Match *match = MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = HSD_UPDATE;
-    update->pause_develop = 0;
-    return;
-}
+// Initial Menu
+static EventMenu *Event_Menu = &LdshMenu_Main;
+EventMenu **menu_start = &Event_Menu;
 
 // Ledgedash functions
 void Ledgedash_HUDInit(LedgedashData *event_data) {
@@ -260,6 +196,342 @@ void Ledgedash_HUDInit(LedgedashData *event_data) {
     }
 
     return 0;
+}
+
+void Fighter_UpdatePosition(GOBJ *fighter) {
+    FighterData *fighter_data = fighter->userdata;
+
+    // Update Position (Copy Physics XYZ into all ECB XYZ)
+    fighter_data->coll_data.topN_Curr.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_Curr.Y = fighter_data->phys.pos.Y;
+    fighter_data->coll_data.topN_Prev.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_Prev.Y = fighter_data->phys.pos.Y;
+    fighter_data->coll_data.topN_CurrCorrect.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_CurrCorrect.Y = fighter_data->phys.pos.Y;
+    fighter_data->coll_data.topN_Proj.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_Proj.Y = fighter_data->phys.pos.Y;
+
+    // Update Collision Frame ID
+    fighter_data->coll_data.coll_test = *stc_colltest;
+
+    // Adjust JObj position (code copied from 8006c324)
+    JOBJ *fighter_jobj = fighter->hsd_object;
+    fighter_jobj->trans.X = fighter_data->phys.pos.X;
+    fighter_jobj->trans.Y = fighter_data->phys.pos.Y;
+    fighter_jobj->trans.Z = fighter_data->phys.pos.Z;
+    JOBJ_SetMtxDirtySub(fighter_jobj);
+
+    // Update Static Player Block Coords
+    Fighter_SetPosition(fighter_data->ply, fighter_data->flags.ms, &fighter_data->phys.pos);
+    return;
+}
+
+void Ledgedash_InitVariables(LedgedashData *event_data) {
+    event_data->hud.timer = 0;
+    event_data->tip.is_input_release = 0;
+    event_data->tip.is_input_jump = 0;
+    event_data->tip.refresh_displayed = 0;
+    event_data->hud.is_release = 0;
+    event_data->hud.is_jump = 0;
+    event_data->hud.is_airdodge = 0;
+    event_data->hud.is_aerial = 0;
+    event_data->hud.is_land = 0;
+    event_data->hud.is_actionable = 0;
+
+    // init action log
+    for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
+        event_data->hud.action_log[i] = 0;
+    }
+}
+
+void Fighter_UpdateCamera(GOBJ *fighter) {
+    FighterData *fighter_data = fighter->userdata;
+
+    // Update camerabox pos
+    Fighter_UpdateCameraBox(fighter);
+
+    // Update tween
+    fighter_data->cameraBox->boundleft_curr = fighter_data->cameraBox->boundleft_proj;
+    fighter_data->cameraBox->boundright_curr = fighter_data->cameraBox->boundright_proj;
+
+    // update camera position
+    Match_CorrectCamera();
+
+    // reset onscreen bool
+    //Fighter_UpdateOnscreenBool(fighter);
+    fighter_data->flags.is_offscreen = 0;
+}
+
+void Fighter_PlaceOnLedge(LedgedashData *event_data, GOBJ *hmn, int line_index, float ledge_dir) {
+    FighterData *hmn_data = hmn->userdata;
+
+    // save ledge info
+    event_data->ledge_line = line_index;
+    event_data->ledge_dir = ledge_dir;
+
+    // get ledge position
+    Vec3 ledge_pos;
+    if (ledge_dir > 0)
+        GrColl_GetLedgeLeft2(line_index, &ledge_pos);
+    else
+        GrColl_GetLedgeRight2(line_index, &ledge_pos);
+
+    // remove velocity
+    hmn_data->phys.self_vel.X = 0;
+    hmn_data->phys.self_vel.Y = 0;
+
+    // restore tether
+    hmn_data->flags.used_tether = 0;
+
+    // check if starting on ledge
+    if (LdshMenu_Main.options[0].option_val == 0) {
+        // init refresh num
+        event_data->tip.refresh_num = -1; // setting this to -1 because the per frame code will add 1 and make it 0
+
+        // Sleep first
+        Fighter_EnterSleep(hmn, 0);
+        Fighter_EnterRebirth(hmn);
+
+        // place player on this ledge
+        FtCliffCatch *ft_state = &hmn_data->state_var;
+        hmn_data->facing_direction = ledge_dir;
+        ft_state->ledge_index = line_index; // store line index
+        Fighter_EnterCliffWait(hmn);
+        ft_state->timer = 0; // spoof as on ledge for a frame already
+        Fighter_LoseGroundJump(hmn_data);
+        Fighter_EnableCollUpdate(hmn_data);
+        Coll_CheckLedge(&hmn_data->coll_data);
+        Fighter_MoveToCliff(hmn);
+        Fighter_UpdatePosition(hmn);
+        hmn_data->phys.self_vel.X = 0;
+        hmn_data->phys.self_vel.Y = 0;
+        ftCommonData *ftcommon = *stc_ftcommon;
+        Fighter_ApplyIntang(hmn, ftcommon->cliff_invuln_time);
+    } else {
+        // init refresh num
+        event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
+
+        // place player in a random position in respawn wait
+        Fighter_EnterSleep(hmn, 0);
+        Fighter_EnterRebirth(hmn);
+        hmn_data->facing_direction = ledge_dir;
+
+        // get random position
+        float xpos_min = 40;
+        float xpos_max = 65;
+        float ypos_min = -30;
+        float ypos_max = 30;
+        hmn_data->phys.pos.X = ((ledge_dir * -1) * (xpos_min + HSD_Randi(xpos_max - xpos_min) + HSD_Randf())) + (
+                                   ledge_pos.X);
+        hmn_data->phys.pos.Y = ((ledge_dir * -1) * (ypos_min + HSD_Randi(ypos_max - ypos_min) + HSD_Randf())) + (
+                                   ledge_pos.Y);
+
+        // enter rebirth
+        Fighter_EnterRebirthWait(hmn);
+        hmn_data->cb.Phys = RebirthWait_Phys;
+        hmn_data->cb.IASA = RebirthWait_IASA;
+
+        Fighter_UpdateRebirthPlatformPos(hmn);
+
+        Ledgedash_InitVariables(event_data);
+    }
+
+    // update camera box
+    CameraBox *cam = event_data->cam;
+    cam->cam_pos.X = ledge_pos.X + (ledge_dir * 20);
+    cam->cam_pos.Y = ledge_pos.Y + 15;
+
+    Fighter_UpdateCamera(hmn);
+
+    // remove all particles
+    for (int i = 0; i < PTCL_LINKMAX; i++) {
+        Particle2 **ptcls = &stc_ptcl[i];
+        Particle2 *ptcl = *ptcls;
+        while (ptcl != 0) {
+            Particle2 *ptcl_next = ptcl->next;
+
+            // begin destroying this particle
+
+            // subtract some value, 8039c9f0
+            if (ptcl->x88 != 0) {
+                int *arr = ptcl->x88;
+                arr[0x50 / 4]--;
+            }
+            // remove from generator? 8039ca14
+            if (ptcl->gen != 0)
+                psRemoveParticleAppSRT(ptcl);
+
+            // delete parent jobj, 8039ca48
+            psDeletePntJObjwithParticle(ptcl);
+
+            // update most recent ptcl pointer
+            *ptcls = ptcl->next;
+
+            // free alloc, 8039ca54
+            HSD_ObjFree(0x804d0f60, ptcl);
+
+            // decrement ptcl total
+            u16 ptclnum = *stc_ptclnum;
+            ptclnum--;
+            *stc_ptclnum = ptclnum;
+
+            // get next
+            ptcl = ptcl_next;
+        }
+    }
+
+    // remove all camera shake gobjs (p_link 18, entity_class 3)
+    GOBJList *gobj_list = *stc_gobj_list;
+    GOBJ *gobj = gobj_list->match_cam;
+    while (gobj != 0) {
+        GOBJ *gobj_next = gobj->next;
+
+        // if entity class 3 (quake)
+        if (gobj->entity_class == 3) {
+            GObj_Destroy(gobj);
+        }
+
+        gobj = gobj_next;
+    }
+
+    return;
+}
+
+// Fighter fuctions
+void Ledgedash_FtInit(LedgedashData *event_data) {
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+
+    // create camera box
+    CameraBox *cam = CameraBox_Alloc();
+    cam->boundleft_proj = -10;
+    cam->boundright_proj = 10;
+    cam->boundtop_proj = 10;
+    cam->boundbottom_proj = -10;
+    cam->boundleft_curr = cam->boundleft_proj;
+    cam->boundright_curr = cam->boundright_proj;
+    cam->boundtop_curr = cam->boundtop_proj;
+    cam->boundbottom_curr = cam->boundbottom_proj;
+    event_data->cam = cam;
+
+    // search for nearest ledge
+    float ledge_dir;
+    int line_index = Ledge_Find(0, 0, &ledge_dir);
+    if (line_index != -1)
+        Fighter_PlaceOnLedge(event_data, hmn, line_index, ledge_dir);
+    else {
+        event_data->cam->flags = 0;
+        event_data->ledge_line = -1;
+        event_vars->Tip_Display(500 * 60, "Error:\nIt appears there are no \nledges on this stage...");
+    }
+
+    return;
+}
+
+// Init Function
+void Event_Init(GOBJ *gobj) {
+    LedgedashData *event_data = gobj->userdata;
+
+    // theres got to be a better way to do this...
+    event_vars = *event_vars_ptr;
+
+    // get assets
+    event_data->assets = File_GetSymbol(event_vars->event_archive, "ldshData");
+
+    // standardize camera
+    Stage *stage = stc_stage;
+    float *unk_cam = 0x803bcca0;
+    stc_stage->fov_r = 0; // no camera rotation
+    stc_stage->x28 = 1; // pan value?
+    stc_stage->x2c = 1; // pan value?
+    stc_stage->x30 = 1; // pan value?
+    stc_stage->x34 = 130; // zoom out
+    unk_cam[0x40 / 4] = 30;
+
+    // Init hitlog
+    event_data->hitlog_gobj = Ledgedash_HitLogInit();
+
+    // Init HUD
+    Ledgedash_HUDInit(event_data);
+
+    // Init Fighter
+    Ledgedash_FtInit(event_data);
+
+    return;
+}
+
+int Fighter_CheckFall(FighterData *hmn_data) {
+    int is_fall = 0;
+
+    // look for Fall input
+    float stick_x = fabs(hmn_data->input.lstick_x);
+    float stick_y = hmn_data->input.lstick_y;
+    if ((stick_x >= 0.2875) && (hmn_data->input.timer_lstick_tilt_x < 2) ||
+        (stick_y <= -0.2875) && (hmn_data->input.timer_lstick_tilt_y < 2)) {
+        is_fall = 1;
+        }
+
+    return is_fall;
+}
+
+void Tips_Think(LedgedashData *event_data, FighterData *hmn_data) {
+    if (LdshOptions_Main[3].option_val == 0) {
+        // check for early fall input in cliffcatch
+        if ((event_data->tip.is_input_release == 0) && (hmn_data->state == ASID_CLIFFCATCH) && (
+                Fighter_CheckFall(hmn_data) == 1)) {
+            event_data->tip.is_input_release = 1;
+            event_vars->Tip_Destroy();
+
+            // determine how many frames early
+            float *anim_ptr = Animation_GetAddress(hmn_data, hmn_data->anim_id);
+            float frame_total = anim_ptr[0x8 / 4];
+            float frames_early = frame_total - hmn_data->stateFrame;
+            event_vars->Tip_Display(3 * 60, "Misinput:\nFell %d frames early.", (int) frames_early + 1);
+        }
+
+        // check for early fall input on cliffwait frame 0
+        if ((event_data->tip.is_input_release == 0) && (hmn_data->state == ASID_CLIFFWAIT) && (
+                hmn_data->TM.state_frame == 1) && (Fighter_CheckFall(hmn_data) == 1)) {
+            event_data->tip.is_input_release = 1;
+            event_vars->Tip_Destroy();
+            event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nFell 1 frame early.");
+        }
+
+        // check for late fall input
+        if ((event_data->tip.is_input_release == 0) && (hmn_data->state == ASID_CLIFFJUMPQUICK1) && (
+                Fighter_CheckFall(hmn_data) == 1)) {
+            event_data->tip.is_input_release = 1;
+            event_vars->Tip_Destroy();
+
+            // jumped and fell on same frame
+            if (hmn_data->TM.state_frame == 0)
+                event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nInputted jump and fall \non the same frame.");
+
+                // fell late
+            else
+                event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nJumped %d frame(s) early.",
+                                        hmn_data->TM.state_frame);
+        }
+
+        // check for ledgedash without refreshing
+        if ((event_data->tip.refresh_displayed == 0) && (event_data->hud.is_actionable == 1) && (
+                event_data->tip.refresh_num == 0)) {
+            event_data->tip.refresh_displayed = 1;
+
+            // increment condition count
+            event_data->tip.refresh_cond_num++;
+
+            // after 3 conditions, display tip
+            if (event_data->tip.refresh_cond_num >= 3) {
+                // if tip is displayed, reset cond num
+                if (event_vars->Tip_Display(
+                    5 * 60,
+                    "Warning:\nIt is higly recommended to\nre-grab ledge after \nbeing reset to simulate \na realistic scenario!"))
+                    event_data->tip.refresh_cond_num = 0;
+            }
+        }
+    }
+    return;
 }
 
 void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data) {
@@ -419,112 +691,6 @@ void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data) {
     return;
 }
 
-void Ledgedash_HUDCamThink(GOBJ *gobj) {
-    // if HUD enabled and not paused
-    if ((LdshOptions_Main[2].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
-        CObjThink_Common(gobj);
-    }
-
-    return;
-}
-
-void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn) {
-    FighterData *hmn_data = hmn->userdata;
-    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
-
-    // check if enabled and ledge exists
-    if ((LdshOptions_Main[1].option_val == 0) && (event_data->ledge_line != -1)) {
-        // check if reset timer is set
-        if (event_data->reset_timer > 0) {
-            // decrement reset timer
-            event_data->reset_timer--;
-
-            // if reset timer is up, go back to ledge
-            if (event_data->reset_timer == 0) {
-                Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
-            }
-        }
-        // check to set reset timner
-        else if (event_data->hud.is_actionable) {
-            event_data->reset_timer = 30;
-        } else {
-            int state = hmn_data->state;
-
-            // reset actions
-            if ((hmn_data->flags.dead == 1) || // if dead
-                ((hmn_data->state == ASID_ESCAPEAIR) && (hmn_data->TM.state_frame >= 9)) || // missed airdodge
-                ((((state >= ASID_CLIFFCLIMBSLOW) && (state <= ASID_CLIFFJUMPQUICK2)) ||
-                  // reset if any other ledge action
-                  ((state >= ASID_ATTACKAIRN) && (state <= ASID_ATTACKAIRLW)) ||
-                  ((hmn_data->phys.air_state == 0) && (
-                       (state != ASID_LANDING) && (state != ASID_LANDINGFALLSPECIAL) && (state != ASID_REBIRTHWAIT))))
-                 && // reset if grounded non landing
-                 (hmn_data->TM.state_frame >= 7))) {
-                // reset and play sfx
-                Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
-                SFX_PlayCommon(3);
-            }
-        }
-    }
-
-    return;
-}
-
-void Ledgedash_InitVariables(LedgedashData *event_data) {
-    event_data->hud.timer = 0;
-    event_data->tip.is_input_release = 0;
-    event_data->tip.is_input_jump = 0;
-    event_data->tip.refresh_displayed = 0;
-    event_data->hud.is_release = 0;
-    event_data->hud.is_jump = 0;
-    event_data->hud.is_airdodge = 0;
-    event_data->hud.is_aerial = 0;
-    event_data->hud.is_land = 0;
-    event_data->hud.is_actionable = 0;
-
-    // init action log
-    for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
-        event_data->hud.action_log[i] = 0;
-    }
-}
-
-// Menu Toggle functions
-void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
-    // get fighter data
-    GOBJ *hmn = Fighter_GetGObj(0);
-    LedgedashData *event_data = event_vars->event_gobj->userdata;
-
-    Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
-
-    return;
-}
-
-void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value) {
-    LedgedashData *event_data = event_vars->event_gobj->userdata;
-
-    // enable camera
-    if (value == 0)
-        event_data->cam->kind = 0;
-        // disable camera
-    else
-        event_data->cam->kind = 1;
-
-    return;
-}
-
-// Hitlog functions
-GOBJ *Ledgedash_HitLogInit() {
-    GOBJ *hit_gobj = GObj_Create(0, 0, 0);
-    LdshHitlogData *hit_data = calloc(sizeof(LdshHitlogData));
-    GObj_AddUserData(hit_gobj, 4, HSD_Free, hit_data);
-    GObj_AddGXLink(hit_gobj, Ledgedash_HitLogGX, 5, 0);
-
-    // init array
-    hit_data->num = 0;
-
-    return hit_gobj;
-}
-
 void Ledgedash_HitLogThink(LedgedashData *event_data, GOBJ *hmn) {
     FighterData *hmn_data = hmn->userdata;
     LdshHitlogData *hitlog_data = event_data->hitlog_gobj->userdata;
@@ -585,61 +751,43 @@ void Ledgedash_HitLogThink(LedgedashData *event_data, GOBJ *hmn) {
     return;
 }
 
-void Ledgedash_HitLogGX(GOBJ *gobj, int pass) {
-    static GXColor hitlog_ambient = {128, 0, 0, 50};
-    static GXColor hit_diffuse = {255, 99, 99, 50};
-    static GXColor grab_diffuse = {255, 0, 255, 50};
-    static GXColor detect_diffuse = {255, 255, 255, 50};
-
-    LdshHitlogData *hitlog_data = gobj->userdata;
-
-    for (int i = 0; i < hitlog_data->num; i++) {
-        LdshHitboxData *this_ldsh_hit = &hitlog_data->hitlog[i];
-
-        // determine color
-        GXColor *diffuse, *ambient;
-        if (this_ldsh_hit->kind == 0)
-            diffuse = &hit_diffuse;
-        else if (this_ldsh_hit->kind == 8)
-            diffuse = &grab_diffuse;
-        else if (this_ldsh_hit->kind == 11)
-            diffuse = &detect_diffuse;
-        else
-            diffuse = &hit_diffuse;
-
-        Develop_DrawSphere(this_ldsh_hit->size, &this_ldsh_hit->pos_curr, &this_ldsh_hit->pos_prev, diffuse,
-                           &hitlog_ambient);
-    }
-
-    return;
-}
-
-// Fighter fuctions
-void Ledgedash_FtInit(LedgedashData *event_data) {
-    GOBJ *hmn = Fighter_GetGObj(0);
+void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn) {
     FighterData *hmn_data = hmn->userdata;
+    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
 
-    // create camera box
-    CameraBox *cam = CameraBox_Alloc();
-    cam->boundleft_proj = -10;
-    cam->boundright_proj = 10;
-    cam->boundtop_proj = 10;
-    cam->boundbottom_proj = -10;
-    cam->boundleft_curr = cam->boundleft_proj;
-    cam->boundright_curr = cam->boundright_proj;
-    cam->boundtop_curr = cam->boundtop_proj;
-    cam->boundbottom_curr = cam->boundbottom_proj;
-    event_data->cam = cam;
+    // check if enabled and ledge exists
+    if ((LdshOptions_Main[1].option_val == 0) && (event_data->ledge_line != -1)) {
+        // check if reset timer is set
+        if (event_data->reset_timer > 0) {
+            // decrement reset timer
+            event_data->reset_timer--;
 
-    // search for nearest ledge
-    float ledge_dir;
-    int line_index = Ledge_Find(0, 0, &ledge_dir);
-    if (line_index != -1)
-        Fighter_PlaceOnLedge(event_data, hmn, line_index, ledge_dir);
-    else {
-        event_data->cam->flags = 0;
-        event_data->ledge_line = -1;
-        event_vars->Tip_Display(500 * 60, "Error:\nIt appears there are no \nledges on this stage...");
+            // if reset timer is up, go back to ledge
+            if (event_data->reset_timer == 0) {
+                Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
+            }
+        }
+        // check to set reset timner
+        else if (event_data->hud.is_actionable) {
+            event_data->reset_timer = 30;
+        } else {
+            int state = hmn_data->state;
+
+            // reset actions
+            if ((hmn_data->flags.dead == 1) || // if dead
+                ((hmn_data->state == ASID_ESCAPEAIR) && (hmn_data->TM.state_frame >= 9)) || // missed airdodge
+                ((((state >= ASID_CLIFFCLIMBSLOW) && (state <= ASID_CLIFFJUMPQUICK2)) ||
+                  // reset if any other ledge action
+                  ((state >= ASID_ATTACKAIRN) && (state <= ASID_ATTACKAIRLW)) ||
+                  ((hmn_data->phys.air_state == 0) && (
+                       (state != ASID_LANDING) && (state != ASID_LANDINGFALLSPECIAL) && (state != ASID_REBIRTHWAIT))))
+                 && // reset if grounded non landing
+                 (hmn_data->TM.state_frame >= 7))) {
+                // reset and play sfx
+                Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
+                SFX_PlayCommon(3);
+                 }
+        }
     }
 
     return;
@@ -672,6 +820,118 @@ void Ledgedash_ChangeLedgeThink(LedgedashData *event_data, GOBJ *hmn) {
             Fighter_PlaceOnLedge(event_data, hmn, line_index, ledge_dir);
         else
             Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
+    }
+
+    return;
+}
+
+// Think Function
+void Event_Think(GOBJ *event) {
+    LedgedashData *event_data = event->userdata;
+
+    // get fighter data
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+    HSD_Pad *pad = PadGet(hmn_data->player_controller_number, PADGET_ENGINE);
+
+    // no ledgefall
+    FtCliffCatch *ft_state = &hmn_data->state_var;
+    if (hmn_data->state == ASID_CLIFFWAIT)
+        ft_state->fall_timer = 2;
+
+    Ledgedash_HUDThink(event_data, hmn_data);
+    Ledgedash_HitLogThink(event_data, hmn);
+    Ledgedash_ResetThink(event_data, hmn);
+    Ledgedash_ChangeLedgeThink(event_data, hmn);
+
+    return;
+}
+
+void Event_Exit() {
+    Match *match = MATCH;
+
+    // end game
+    match->state = 3;
+
+    // cleanup
+    Match_EndVS();
+
+    // unfreeze
+    HSD_Update *update = HSD_UPDATE;
+    update->pause_develop = 0;
+    return;
+}
+
+void Ledgedash_HUDCamThink(GOBJ *gobj) {
+    // if HUD enabled and not paused
+    if ((LdshOptions_Main[2].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
+        CObjThink_Common(gobj);
+    }
+
+    return;
+}
+
+// Menu Toggle functions
+void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
+    // get fighter data
+    GOBJ *hmn = Fighter_GetGObj(0);
+    LedgedashData *event_data = event_vars->event_gobj->userdata;
+
+    Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
+
+    return;
+}
+
+void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value) {
+    LedgedashData *event_data = event_vars->event_gobj->userdata;
+
+    // enable camera
+    if (value == 0)
+        event_data->cam->kind = 0;
+        // disable camera
+    else
+        event_data->cam->kind = 1;
+
+    return;
+}
+
+// Hitlog functions
+GOBJ *Ledgedash_HitLogInit() {
+    GOBJ *hit_gobj = GObj_Create(0, 0, 0);
+    LdshHitlogData *hit_data = calloc(sizeof(LdshHitlogData));
+    GObj_AddUserData(hit_gobj, 4, HSD_Free, hit_data);
+    GObj_AddGXLink(hit_gobj, Ledgedash_HitLogGX, 5, 0);
+
+    // init array
+    hit_data->num = 0;
+
+    return hit_gobj;
+}
+
+void Ledgedash_HitLogGX(GOBJ *gobj, int pass) {
+    static GXColor hitlog_ambient = {128, 0, 0, 50};
+    static GXColor hit_diffuse = {255, 99, 99, 50};
+    static GXColor grab_diffuse = {255, 0, 255, 50};
+    static GXColor detect_diffuse = {255, 255, 255, 50};
+
+    LdshHitlogData *hitlog_data = gobj->userdata;
+
+    for (int i = 0; i < hitlog_data->num; i++) {
+        LdshHitboxData *this_ldsh_hit = &hitlog_data->hitlog[i];
+
+        // determine color
+        GXColor *diffuse, *ambient;
+        if (this_ldsh_hit->kind == 0)
+            diffuse = &hit_diffuse;
+        else if (this_ldsh_hit->kind == 8)
+            diffuse = &grab_diffuse;
+        else if (this_ldsh_hit->kind == 11)
+            diffuse = &detect_diffuse;
+        else
+            diffuse = &hit_diffuse;
+
+        Develop_DrawSphere(this_ldsh_hit->size, &this_ldsh_hit->pos_curr, &this_ldsh_hit->pos_prev, diffuse,
+                           &hitlog_ambient);
     }
 
     return;
@@ -815,187 +1075,6 @@ int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
     return index_closest;
 }
 
-void Fighter_PlaceOnLedge(LedgedashData *event_data, GOBJ *hmn, int line_index, float ledge_dir) {
-    FighterData *hmn_data = hmn->userdata;
-
-    // save ledge info
-    event_data->ledge_line = line_index;
-    event_data->ledge_dir = ledge_dir;
-
-    // get ledge position
-    Vec3 ledge_pos;
-    if (ledge_dir > 0)
-        GrColl_GetLedgeLeft2(line_index, &ledge_pos);
-    else
-        GrColl_GetLedgeRight2(line_index, &ledge_pos);
-
-    // remove velocity
-    hmn_data->phys.self_vel.X = 0;
-    hmn_data->phys.self_vel.Y = 0;
-
-    // restore tether
-    hmn_data->flags.used_tether = 0;
-
-    // check if starting on ledge
-    if (LdshMenu_Main.options[0].option_val == 0) {
-        // init refresh num
-        event_data->tip.refresh_num = -1; // setting this to -1 because the per frame code will add 1 and make it 0
-
-        // Sleep first
-        Fighter_EnterSleep(hmn, 0);
-        Fighter_EnterRebirth(hmn);
-
-        // place player on this ledge
-        FtCliffCatch *ft_state = &hmn_data->state_var;
-        hmn_data->facing_direction = ledge_dir;
-        ft_state->ledge_index = line_index; // store line index
-        Fighter_EnterCliffWait(hmn);
-        ft_state->timer = 0; // spoof as on ledge for a frame already
-        Fighter_LoseGroundJump(hmn_data);
-        Fighter_EnableCollUpdate(hmn_data);
-        Coll_CheckLedge(&hmn_data->coll_data);
-        Fighter_MoveToCliff(hmn);
-        Fighter_UpdatePosition(hmn);
-        hmn_data->phys.self_vel.X = 0;
-        hmn_data->phys.self_vel.Y = 0;
-        ftCommonData *ftcommon = *stc_ftcommon;
-        Fighter_ApplyIntang(hmn, ftcommon->cliff_invuln_time);
-    } else {
-        // init refresh num
-        event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
-
-        // place player in a random position in respawn wait
-        Fighter_EnterSleep(hmn, 0);
-        Fighter_EnterRebirth(hmn);
-        hmn_data->facing_direction = ledge_dir;
-
-        // get random position
-        float xpos_min = 40;
-        float xpos_max = 65;
-        float ypos_min = -30;
-        float ypos_max = 30;
-        hmn_data->phys.pos.X = ((ledge_dir * -1) * (xpos_min + HSD_Randi(xpos_max - xpos_min) + HSD_Randf())) + (
-                                   ledge_pos.X);
-        hmn_data->phys.pos.Y = ((ledge_dir * -1) * (ypos_min + HSD_Randi(ypos_max - ypos_min) + HSD_Randf())) + (
-                                   ledge_pos.Y);
-
-        // enter rebirth
-        Fighter_EnterRebirthWait(hmn);
-        hmn_data->cb.Phys = RebirthWait_Phys;
-        hmn_data->cb.IASA = RebirthWait_IASA;
-
-        Fighter_UpdateRebirthPlatformPos(hmn);
-
-        Ledgedash_InitVariables(event_data);
-    }
-
-    // update camera box
-    CameraBox *cam = event_data->cam;
-    cam->cam_pos.X = ledge_pos.X + (ledge_dir * 20);
-    cam->cam_pos.Y = ledge_pos.Y + 15;
-
-    Fighter_UpdateCamera(hmn);
-
-    // remove all particles
-    for (int i = 0; i < PTCL_LINKMAX; i++) {
-        Particle2 **ptcls = &stc_ptcl[i];
-        Particle2 *ptcl = *ptcls;
-        while (ptcl != 0) {
-            Particle2 *ptcl_next = ptcl->next;
-
-            // begin destroying this particle
-
-            // subtract some value, 8039c9f0
-            if (ptcl->x88 != 0) {
-                int *arr = ptcl->x88;
-                arr[0x50 / 4]--;
-            }
-            // remove from generator? 8039ca14
-            if (ptcl->gen != 0)
-                psRemoveParticleAppSRT(ptcl);
-
-            // delete parent jobj, 8039ca48
-            psDeletePntJObjwithParticle(ptcl);
-
-            // update most recent ptcl pointer
-            *ptcls = ptcl->next;
-
-            // free alloc, 8039ca54
-            HSD_ObjFree(0x804d0f60, ptcl);
-
-            // decrement ptcl total
-            u16 ptclnum = *stc_ptclnum;
-            ptclnum--;
-            *stc_ptclnum = ptclnum;
-
-            // get next
-            ptcl = ptcl_next;
-        }
-    }
-
-    // remove all camera shake gobjs (p_link 18, entity_class 3)
-    GOBJList *gobj_list = *stc_gobj_list;
-    GOBJ *gobj = gobj_list->match_cam;
-    while (gobj != 0) {
-        GOBJ *gobj_next = gobj->next;
-
-        // if entity class 3 (quake)
-        if (gobj->entity_class == 3) {
-            GObj_Destroy(gobj);
-        }
-
-        gobj = gobj_next;
-    }
-
-    return;
-}
-
-void Fighter_UpdatePosition(GOBJ *fighter) {
-    FighterData *fighter_data = fighter->userdata;
-
-    // Update Position (Copy Physics XYZ into all ECB XYZ)
-    fighter_data->coll_data.topN_Curr.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_Curr.Y = fighter_data->phys.pos.Y;
-    fighter_data->coll_data.topN_Prev.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_Prev.Y = fighter_data->phys.pos.Y;
-    fighter_data->coll_data.topN_CurrCorrect.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_CurrCorrect.Y = fighter_data->phys.pos.Y;
-    fighter_data->coll_data.topN_Proj.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_Proj.Y = fighter_data->phys.pos.Y;
-
-    // Update Collision Frame ID
-    fighter_data->coll_data.coll_test = *stc_colltest;
-
-    // Adjust JObj position (code copied from 8006c324)
-    JOBJ *fighter_jobj = fighter->hsd_object;
-    fighter_jobj->trans.X = fighter_data->phys.pos.X;
-    fighter_jobj->trans.Y = fighter_data->phys.pos.Y;
-    fighter_jobj->trans.Z = fighter_data->phys.pos.Z;
-    JOBJ_SetMtxDirtySub(fighter_jobj);
-
-    // Update Static Player Block Coords
-    Fighter_SetPosition(fighter_data->ply, fighter_data->flags.ms, &fighter_data->phys.pos);
-    return;
-}
-
-void Fighter_UpdateCamera(GOBJ *fighter) {
-    FighterData *fighter_data = fighter->userdata;
-
-    // Update camerabox pos
-    Fighter_UpdateCameraBox(fighter);
-
-    // Update tween
-    fighter_data->cameraBox->boundleft_curr = fighter_data->cameraBox->boundleft_proj;
-    fighter_data->cameraBox->boundright_curr = fighter_data->cameraBox->boundright_proj;
-
-    // update camera position
-    Match_CorrectCamera();
-
-    // reset onscreen bool
-    //Fighter_UpdateOnscreenBool(fighter);
-    fighter_data->flags.is_offscreen = 0;
-}
-
 void RebirthWait_Phys(GOBJ *fighter) {
     FighterData *fighter_data = fighter->userdata;
 
@@ -1025,20 +1104,6 @@ int RebirthWait_IASA(GOBJ *fighter) {
     return 0;
 }
 
-int Fighter_CheckFall(FighterData *hmn_data) {
-    int is_fall = 0;
-
-    // look for Fall input
-    float stick_x = fabs(hmn_data->input.lstick_x);
-    float stick_y = hmn_data->input.lstick_y;
-    if ((stick_x >= 0.2875) && (hmn_data->input.timer_lstick_tilt_x < 2) ||
-        (stick_y <= -0.2875) && (hmn_data->input.timer_lstick_tilt_y < 2)) {
-        is_fall = 1;
-    }
-
-    return is_fall;
-}
-
 // Tips Functions
 void Tips_Toggle(GOBJ *menu_gobj, int value) {
     // destroy existing tips when disabling
@@ -1047,67 +1112,3 @@ void Tips_Toggle(GOBJ *menu_gobj, int value) {
 
     return;
 }
-
-void Tips_Think(LedgedashData *event_data, FighterData *hmn_data) {
-    if (LdshOptions_Main[3].option_val == 0) {
-        // check for early fall input in cliffcatch
-        if ((event_data->tip.is_input_release == 0) && (hmn_data->state == ASID_CLIFFCATCH) && (
-                Fighter_CheckFall(hmn_data) == 1)) {
-            event_data->tip.is_input_release = 1;
-            event_vars->Tip_Destroy();
-
-            // determine how many frames early
-            float *anim_ptr = Animation_GetAddress(hmn_data, hmn_data->anim_id);
-            float frame_total = anim_ptr[0x8 / 4];
-            float frames_early = frame_total - hmn_data->stateFrame;
-            event_vars->Tip_Display(3 * 60, "Misinput:\nFell %d frames early.", (int) frames_early + 1);
-        }
-
-        // check for early fall input on cliffwait frame 0
-        if ((event_data->tip.is_input_release == 0) && (hmn_data->state == ASID_CLIFFWAIT) && (
-                hmn_data->TM.state_frame == 1) && (Fighter_CheckFall(hmn_data) == 1)) {
-            event_data->tip.is_input_release = 1;
-            event_vars->Tip_Destroy();
-            event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nFell 1 frame early.");
-        }
-
-        // check for late fall input
-        if ((event_data->tip.is_input_release == 0) && (hmn_data->state == ASID_CLIFFJUMPQUICK1) && (
-                Fighter_CheckFall(hmn_data) == 1)) {
-            event_data->tip.is_input_release = 1;
-            event_vars->Tip_Destroy();
-
-            // jumped and fell on same frame
-            if (hmn_data->TM.state_frame == 0)
-                event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nInputted jump and fall \non the same frame.");
-
-                // fell late
-            else
-                event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nJumped %d frame(s) early.",
-                                        hmn_data->TM.state_frame);
-        }
-
-        // check for ledgedash without refreshing
-        if ((event_data->tip.refresh_displayed == 0) && (event_data->hud.is_actionable == 1) && (
-                event_data->tip.refresh_num == 0)) {
-            event_data->tip.refresh_displayed = 1;
-
-            // increment condition count
-            event_data->tip.refresh_cond_num++;
-
-            // after 3 conditions, display tip
-            if (event_data->tip.refresh_cond_num >= 3) {
-                // if tip is displayed, reset cond num
-                if (event_vars->Tip_Display(
-                    5 * 60,
-                    "Warning:\nIt is higly recommended to\nre-grab ledge after \nbeing reset to simulate \na realistic scenario!"))
-                    event_data->tip.refresh_cond_num = 0;
-            }
-        }
-    }
-    return;
-}
-
-// Initial Menu
-static EventMenu *Event_Menu = &LdshMenu_Main;
-EventMenu **menu_start = &Event_Menu;

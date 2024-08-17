@@ -681,6 +681,59 @@ static int button_bits[] = {
     HSD_TRIGGER_Z, // Z
 };
 
+static char *stage_names[] = {
+    "",
+    "",
+    "Princess Peach's Castle",
+    "Rainbow Cruise",
+    "Kongo Jungle",
+    "Jungle Japes",
+    "Great Bay",
+    "Hyrule Temple",
+    "Brinstar",
+    "Brinstar Depths",
+    "Yoshi's Story",
+    "Yoshi's Island",
+    "Fountain of Dreams",
+    "Green Greens",
+    "Corneria",
+    "Venom",
+    "Pokemon Stadium",
+    "Poke Floats",
+    "Mute City",
+    "Big Blue",
+    "Onett",
+    "Fourside",
+    "Icicle Mountain",
+    "",
+    "Mushroom Kingdom",
+    "Mushroom Kingdom II",
+    "",
+    "Flat Zone",
+    "Dream Land",
+    "Yoshi's Island (64)",
+    "Kongo Jungle (64)",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "Battlefield",
+    "Final Destination",
+};
+
+static EventOption LabOptions_Main[];
+static EventOption LabOptions_General[];
+static EventOption LabOptions_InfoDisplay[];
+static EventMenu LabMenu_General;
+static EventMenu LabMenu_InfoDisplay;
+static EventMenu LabMenu_CPU;
+static EventMenu LabMenu_Record;
+
+// CSS Import
+s8 *onload_fileno = R13 + (-0x4670);
+s8 *onload_slot = R13 + (-0x466F);
+
 void Event_Init(GOBJ *gobj);
 
 void Event_Update();
@@ -790,59 +843,6 @@ void Lab_Exit(int value);
 void InfoDisplay_Think(GOBJ *gobj);
 
 void InfoDisplay_GX(GOBJ *gobj, int pass);
-
-static EventOption LabOptions_Main[];
-static EventOption LabOptions_General[];
-static EventOption LabOptions_InfoDisplay[];
-static EventMenu LabMenu_General;
-static EventMenu LabMenu_InfoDisplay;
-static EventMenu LabMenu_CPU;
-static EventMenu LabMenu_Record;
-
-static char *stage_names[] = {
-    "",
-    "",
-    "Princess Peach's Castle",
-    "Rainbow Cruise",
-    "Kongo Jungle",
-    "Jungle Japes",
-    "Great Bay",
-    "Hyrule Temple",
-    "Brinstar",
-    "Brinstar Depths",
-    "Yoshi's Story",
-    "Yoshi's Island",
-    "Fountain of Dreams",
-    "Green Greens",
-    "Corneria",
-    "Venom",
-    "Pokemon Stadium",
-    "Poke Floats",
-    "Mute City",
-    "Big Blue",
-    "Onett",
-    "Fourside",
-    "Icicle Mountain",
-    "",
-    "Mushroom Kingdom",
-    "Mushroom Kingdom II",
-    "",
-    "Flat Zone",
-    "Dream Land",
-    "Yoshi's Island (64)",
-    "Kongo Jungle (64)",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "Battlefield",
-    "Final Destination",
-};
-
-// CSS Import
-s8 *onload_fileno = R13 + (-0x4670);
-s8 *onload_slot = R13 + (-0x466F);
 
 void Button_Create();
 

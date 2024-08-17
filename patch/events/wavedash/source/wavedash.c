@@ -1,4 +1,5 @@
 #include "wavedash.h"
+
 static char nullString[] = " ";
 
 // Main Menu
@@ -71,58 +72,9 @@ static EventMenu WdMenu_Main = {
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
-// Init Function
-void Event_Init(GOBJ *gobj) {
-    WavedashData *event_data = gobj->userdata;
-    EventDesc *event_desc = event_data->event_desc;
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-    //GOBJ *cpu = Fighter_GetGObj(1);
-    //FighterData *cpu_data = cpu->userdata;
-
-    // theres got to be a better way to do this...
-    event_vars = *event_vars_ptr;
-
-    // get l-cancel assets
-    event_data->assets = File_GetSymbol(event_vars->event_archive, "wdshData");
-
-    // create HUD
-    Wavedash_Init(event_data);
-
-    // init target
-    Target_Init(event_data, hmn_data);
-
-    return;
-}
-
-// Think Function
-void Event_Think(GOBJ *event) {
-    WavedashData *event_data = event->userdata;
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-
-    // infinite shields
-    hmn_data->shield.health = 60;
-
-    Wavedash_Think(event_data, hmn_data);
-
-    return;
-}
-
-void Event_Exit() {
-    Match *match = MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = HSD_UPDATE;
-    update->pause_develop = 0;
-    return;
-}
+// Initial Menu
+static EventMenu *Event_Menu = &WdMenu_Main;
+EventMenu **menu_start = &Event_Menu;
 
 // Event functions
 void Wavedash_Init(WavedashData *event_data) {
@@ -183,6 +135,161 @@ void Wavedash_Init(WavedashData *event_data) {
     event_data->timer = -1;
     event_data->since_wavedash = 255;
     return 0;
+}
+
+// Target functions
+void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
+    ftCommonData *ftcommon = *stc_ftcommon;
+    float mag;
+
+    // determine best wavedash distance (not taking into account friction doubling)
+    mag = ftcommon->escapeair_vel * cos(atan2(-0.2875, 0.9500));
+    float wd_maxdstn = Target_GetWdashDistance(hmn_data, mag);
+    OSReport("%s wd_maxdstn: %.2f\n", Fighter_GetName(Fighter_GetExternalID(hmn_data->ply)), wd_maxdstn);
+    event_data->wd_maxdstn = wd_maxdstn;
+
+    // determine scale based on wd distance
+    float dist = event_data->wd_maxdstn;
+    if (dist < TRGTSCL_DISTMIN)
+        dist = TRGTSCL_DISTMIN;
+    else if (dist > TRGTSCL_DISTMAX)
+        dist = TRGTSCL_DISTMAX;
+    event_data->target.scale = (((dist - TRGTSCL_DISTMIN) / (TRGTSCL_DISTMAX - TRGTSCL_DISTMIN)) * (
+                                    TRGTSCL_SCALEMAX - TRGTSCL_SCALEMIN)) + TRGTSCL_SCALEMIN;
+
+    // get width of the target
+    JOBJ *target = JOBJ_LoadJoint(event_data->assets->target_jobj); // create dummy
+    float scale = event_data->target.scale; // scale
+    target->scale.X *= scale;
+    target->scale.Z *= scale;
+
+    // get children
+    JOBJ *left_jobj, *right_jobj;
+    JOBJ_GetChild(target, &left_jobj, TRGTJOBJ_LBOUND, -1);
+    JOBJ_GetChild(target, &right_jobj, TRGTJOBJ_RBOUND, -1);
+    // get offsets
+    JOBJ_GetWorldPosition(left_jobj, 0, &event_data->target.left_offset);
+    JOBJ_GetWorldPosition(right_jobj, 0, &event_data->target.right_offset);
+
+    // free jobj
+    JOBJ_RemoveAll(target);
+
+    return;
+}
+
+// Init Function
+void Event_Init(GOBJ *gobj) {
+    WavedashData *event_data = gobj->userdata;
+    EventDesc *event_desc = event_data->event_desc;
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+    //GOBJ *cpu = Fighter_GetGObj(1);
+    //FighterData *cpu_data = cpu->userdata;
+
+    // theres got to be a better way to do this...
+    event_vars = *event_vars_ptr;
+
+    // get l-cancel assets
+    event_data->assets = File_GetSymbol(event_vars->event_archive, "wdshData");
+
+    // create HUD
+    Wavedash_Init(event_data);
+
+    // init target
+    Target_Init(event_data, hmn_data);
+
+    return;
+}
+
+void Target_ChangeState(GOBJ *target_gobj, int state) {
+    WavedashData *event_data = event_vars->event_gobj->userdata;
+    TargetData *target_data = target_gobj->userdata;
+    JOBJ *target_jobj = target_gobj->hsd_object;
+
+    // update state
+    target_data->state = state;
+
+    // add anim
+    JOBJ_AddAnimAll(target_jobj, event_data->assets->target_jointanim[state], event_data->assets->target_matanim[state],
+                    0);
+    JOBJ_ReqAnimAll(target_jobj, 0); // req anim
+
+    return;
+}
+
+void Target_Manager(WavedashData *event_data, FighterData *hmn_data) {
+    GOBJ *target_gobj = event_data->target.gobj;
+
+    switch (WdOptions_Main[0].option_val) {
+        // off
+        case (0): {
+            // if spawned, remove
+            if (target_gobj != 0) {
+                Target_ChangeState(target_gobj, TRGSTATE_DESPAWN);
+                event_data->target.gobj = 0;
+            }
+
+            break;
+        }
+        // on
+        case (1): {
+            // if not spawned, spawn
+            if (target_gobj == 0) {
+                if (hmn_data->phys.air_state == 0) {
+                    // spawn target
+                    target_gobj = Target_Spawn(event_data, hmn_data);
+                    event_data->target.gobj = target_gobj;
+                }
+            }
+
+            // update target logic
+            if (target_gobj != 0) {
+                TargetData *target_data = target_gobj->userdata;
+
+                // update fighter backed up position
+
+                // restore position if not a wavedash
+
+                // check current target state
+                if (target_data->state == TRGSTATE_DESPAWN) {
+                    // create new one
+                    target_gobj = Target_Spawn(event_data, hmn_data);
+                    event_data->target.gobj = target_gobj;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return;
+}
+
+// Tips
+Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
+    // only if enabled
+    if (WdOptions_Main[2].option_val == 0) {
+        // shield after wavedash
+        // look successful wavedash
+        if (event_data->since_wavedash <= 10) {
+            // look for frame 1 of guard off
+            if ((hmn_data->state == ASID_GUARDOFF) && (hmn_data->TM.state_frame == 0) && // just let go of shield
+
+                // only guarded for 1 frame
+                ((hmn_data->TM.state_prev[0] == ASID_GUARD) && (hmn_data->TM.state_prev_frames[0] == 1))) {
+                event_data->tip.shield_num++;
+
+                if (event_data->tip.shield_num >= 3) {
+                    event_vars->Tip_Display(
+                        5 * 60,
+                        "Tip:\nDon't hold the trigger! Quickly \npress and release to prevent \nshielding after wavedashing.");
+                    event_data->tip.shield_num = 0;
+                }
+                }
+        }
+    }
+
+    return;
 }
 
 void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
@@ -444,6 +551,35 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
     return;
 }
 
+// Think Function
+void Event_Think(GOBJ *event) {
+    WavedashData *event_data = event->userdata;
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+
+    // infinite shields
+    hmn_data->shield.health = 60;
+
+    Wavedash_Think(event_data, hmn_data);
+
+    return;
+}
+
+void Event_Exit() {
+    Match *match = MATCH;
+
+    // end game
+    match->state = 3;
+
+    // cleanup
+    Match_EndVS();
+
+    // unfreeze
+    HSD_Update *update = HSD_UPDATE;
+    update->pause_develop = 0;
+    return;
+}
+
 void Wavedash_HUDCamThink(GOBJ *gobj) {
     // if HUD enabled and not paused
     if ((WdOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
@@ -456,94 +592,6 @@ void Wavedash_HUDCamThink(GOBJ *gobj) {
 float Bezier(float time, float start, float end) {
     float bez = time * time * (3.0f - 2.0f * time);
     return bez * (end - start) + start;
-}
-
-// Target functions
-void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
-    ftCommonData *ftcommon = *stc_ftcommon;
-    float mag;
-
-    // determine best wavedash distance (not taking into account friction doubling)
-    mag = ftcommon->escapeair_vel * cos(atan2(-0.2875, 0.9500));
-    float wd_maxdstn = Target_GetWdashDistance(hmn_data, mag);
-    OSReport("%s wd_maxdstn: %.2f\n", Fighter_GetName(Fighter_GetExternalID(hmn_data->ply)), wd_maxdstn);
-    event_data->wd_maxdstn = wd_maxdstn;
-
-    // determine scale based on wd distance
-    float dist = event_data->wd_maxdstn;
-    if (dist < TRGTSCL_DISTMIN)
-        dist = TRGTSCL_DISTMIN;
-    else if (dist > TRGTSCL_DISTMAX)
-        dist = TRGTSCL_DISTMAX;
-    event_data->target.scale = (((dist - TRGTSCL_DISTMIN) / (TRGTSCL_DISTMAX - TRGTSCL_DISTMIN)) * (
-                                    TRGTSCL_SCALEMAX - TRGTSCL_SCALEMIN)) + TRGTSCL_SCALEMIN;
-
-    // get width of the target
-    JOBJ *target = JOBJ_LoadJoint(event_data->assets->target_jobj); // create dummy
-    float scale = event_data->target.scale; // scale
-    target->scale.X *= scale;
-    target->scale.Z *= scale;
-
-    // get children
-    JOBJ *left_jobj, *right_jobj;
-    JOBJ_GetChild(target, &left_jobj, TRGTJOBJ_LBOUND, -1);
-    JOBJ_GetChild(target, &right_jobj, TRGTJOBJ_RBOUND, -1);
-    // get offsets
-    JOBJ_GetWorldPosition(left_jobj, 0, &event_data->target.left_offset);
-    JOBJ_GetWorldPosition(right_jobj, 0, &event_data->target.right_offset);
-
-    // free jobj
-    JOBJ_RemoveAll(target);
-
-    return;
-}
-
-void Target_Manager(WavedashData *event_data, FighterData *hmn_data) {
-    GOBJ *target_gobj = event_data->target.gobj;
-
-    switch (WdOptions_Main[0].option_val) {
-        // off
-        case (0): {
-            // if spawned, remove
-            if (target_gobj != 0) {
-                Target_ChangeState(target_gobj, TRGSTATE_DESPAWN);
-                event_data->target.gobj = 0;
-            }
-
-            break;
-        }
-        // on
-        case (1): {
-            // if not spawned, spawn
-            if (target_gobj == 0) {
-                if (hmn_data->phys.air_state == 0) {
-                    // spawn target
-                    target_gobj = Target_Spawn(event_data, hmn_data);
-                    event_data->target.gobj = target_gobj;
-                }
-            }
-
-            // update target logic
-            if (target_gobj != 0) {
-                TargetData *target_data = target_gobj->userdata;
-
-                // update fighter backed up position
-
-                // restore position if not a wavedash
-
-                // check current target state
-                if (target_data->state == TRGSTATE_DESPAWN) {
-                    // create new one
-                    target_gobj = Target_Spawn(event_data, hmn_data);
-                    event_data->target.gobj = target_gobj;
-                }
-            }
-
-            break;
-        }
-    }
-
-    return;
 }
 
 GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data) {
@@ -720,22 +768,6 @@ void Target_Think(GOBJ *target_gobj) {
     return;
 }
 
-void Target_ChangeState(GOBJ *target_gobj, int state) {
-    WavedashData *event_data = event_vars->event_gobj->userdata;
-    TargetData *target_data = target_gobj->userdata;
-    JOBJ *target_jobj = target_gobj->hsd_object;
-
-    // update state
-    target_data->state = state;
-
-    // add anim
-    JOBJ_AddAnimAll(target_jobj, event_data->assets->target_jointanim[state], event_data->assets->target_matanim[state],
-                    0);
-    JOBJ_ReqAnimAll(target_jobj, 0); // req anim
-
-    return;
-}
-
 float Target_GetWdashDistance(FighterData *hmn_data, float mag) {
     float distance = 0;
     ftCommonData *ftcommon = *stc_ftcommon;
@@ -785,34 +817,3 @@ int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offs
 
     return status;
 }
-
-// Tips
-Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
-    // only if enabled
-    if (WdOptions_Main[2].option_val == 0) {
-        // shield after wavedash
-        // look successful wavedash
-        if (event_data->since_wavedash <= 10) {
-            // look for frame 1 of guard off
-            if ((hmn_data->state == ASID_GUARDOFF) && (hmn_data->TM.state_frame == 0) && // just let go of shield
-
-                // only guarded for 1 frame
-                ((hmn_data->TM.state_prev[0] == ASID_GUARD) && (hmn_data->TM.state_prev_frames[0] == 1))) {
-                event_data->tip.shield_num++;
-
-                if (event_data->tip.shield_num >= 3) {
-                    event_vars->Tip_Display(
-                        5 * 60,
-                        "Tip:\nDon't hold the trigger! Quickly \npress and release to prevent \nshielding after wavedashing.");
-                    event_data->tip.shield_num = 0;
-                }
-            }
-        }
-    }
-
-    return;
-}
-
-// Initial Menu
-static EventMenu *Event_Menu = &WdMenu_Main;
-EventMenu **menu_start = &Event_Menu;

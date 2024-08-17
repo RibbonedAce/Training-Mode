@@ -1,911 +1,5 @@
 #include "lab.h"
 
-static char nullString[] = " ";
-
-// CPU Action Definitions
-static CPUAction Lab_CPUActionShield[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARDREFLECT, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionGrab[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_A | PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_Z, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionUpB[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_KNEEBEND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        127, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_B, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLE, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        127, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_B, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionDownB[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLE, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        -127, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_B, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionSpotdodge[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        -127, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionRollAway[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        STCKDIR_AWAY, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARDREFLECT, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        STCKDIR_AWAY, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionRollTowards[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        STCKDIR_TOWARD, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARDREFLECT, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        STCKDIR_TOWARD, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionRollRandom[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        STICKDIR_RDM, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_GUARDREFLECT, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        STICKDIR_RDM, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionNair[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_A, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionFair[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        127, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        3, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionDair[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        -127, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionBair[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        127, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        4, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionUair[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        127, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionJump[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionJumpFull[] = {
-    {
-        ASID_GUARD, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_KNEEBEND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionJumpAway[] = {
-    {
-        ASID_JUMPS, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        0, // is the last input
-        2, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLE, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        STCKDIR_AWAY, // specify stick direction
-    },
-
-    -1,
-};
-static CPUAction Lab_CPUActionJumpTowards[] = {
-    {
-        ASID_JUMPS, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        0, // is the last input
-        1, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLE, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_X, // button to input
-        0, // is the last input
-        STCKDIR_TOWARD, // specify stick direction
-    },
-
-    -1,
-};
-static CPUAction Lab_CPUActionAirdodge[] = {
-    {
-        ASID_DAMAGEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_TRIGGER_R, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionFFTumble[] = {
-    {
-        ASID_DAMAGEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        -127, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionFFWiggle[] = {
-    {
-        ASID_DAMAGEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        127, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        0, // is the last input
-        0, // specify stick direction
-    },
-    {
-        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        -127, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionJab[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_A, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionFTilt[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        80, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_A, // button to input
-        1, // is the last input
-        STCKDIR_TOWARD, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionUTilt[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        80, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_A, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionDTilt[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        -80, // left stick Y value
-        0, // c stick X value
-        0, // c stick Y value
-        PAD_BUTTON_A, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionUSmash[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        127, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionDSmash[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        0, // c stick X value
-        -127, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        0, // specify stick direction
-    },
-    -1,
-};
-static CPUAction Lab_CPUActionFSmash[] = {
-    {
-        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
-        0, // first possible frame to perform this action
-        0, // last possible frame to perfrom this action
-        0, // left stick X value
-        0, // left stick Y value
-        127, // c stick X value
-        0, // c stick Y value
-        0, // button to input
-        1, // is the last input
-        STCKDIR_TOWARD, // specify stick direction
-    },
-    -1,
-};
-
-static CPUAction *Lab_CPUActions[] = {
-    // none 0
-    0,
-    // shield 1
-    &Lab_CPUActionShield,
-    // grab 2
-    &Lab_CPUActionGrab,
-    // up b 3
-    &Lab_CPUActionUpB,
-    // down b 4
-    &Lab_CPUActionDownB,
-    // spotdodge 5
-    &Lab_CPUActionSpotdodge,
-    // roll away 6
-    &Lab_CPUActionRollAway,
-    // roll towards 7
-    &Lab_CPUActionRollTowards,
-    // roll random
-    &Lab_CPUActionRollRandom,
-    // nair 8
-    &Lab_CPUActionNair,
-    // fair 9
-    &Lab_CPUActionFair,
-    // dair 10
-    &Lab_CPUActionDair,
-    // bair 11
-    &Lab_CPUActionBair,
-    // uair 12
-    &Lab_CPUActionUair,
-    // short hop 13
-    &Lab_CPUActionJump,
-    // full hop 14
-    &Lab_CPUActionJumpFull,
-    // jump away 15
-    &Lab_CPUActionJumpAway,
-    // jump towards 16
-    &Lab_CPUActionJumpTowards,
-    // airdodge 17
-    &Lab_CPUActionAirdodge,
-    // fastfall 18
-    &Lab_CPUActionFFTumble,
-    // wiggle fastfall 19
-    &Lab_CPUActionFFWiggle,
-    // wiggle fastfall 19
-    &Lab_CPUActionJab,
-    &Lab_CPUActionFTilt,
-    &Lab_CPUActionUTilt,
-    &Lab_CPUActionDTilt,
-    &Lab_CPUActionUSmash,
-    &Lab_CPUActionDSmash,
-    &Lab_CPUActionFSmash,
-};
-
-static char *CPU_ACTIONS_NAMES[] = {
-    "CPUACT_NONE",
-    "CPUACT_SHIELD",
-    "CPUACT_GRAB",
-    "CPUACT_UPB",
-    "CPUACT_DOWNB",
-    "CPUACT_SPOTDODGE",
-    "CPUACT_ROLLAWAY",
-    "CPUACT_ROLLTOWARDS",
-    "CPUACT_ROLLRDM",
-    "CPUACT_NAIR",
-    "CPUACT_FAIR",
-    "CPUACT_DAIR",
-    "CPUACT_BAIR",
-    "CPUACT_UAIR",
-    "CPUACT_SHORTHOP",
-    "CPUACT_FULLHOP",
-    "CPUACT_JUMPAWAY",
-    "CPUACT_JUMPTOWARDS",
-    "CPUACT_AIRDODGE",
-    "CPUACT_FFTUMBLE",
-    "CPUACT_FFWIGGLE",
-    "CPUACT_JAB",
-    "CPUACT_FTILT",
-    "CPUACT_UTILT",
-    "CPUACT_DTILT",
-    "CPUACT_USMASH",
-    "CPUACT_DSMASH",
-    "CPUACT_FSMASH",
-};
-static u8 GrAcLookup[] = {
-    CPUACT_NONE, CPUACT_SPOTDODGE, CPUACT_SHIELD, CPUACT_GRAB, CPUACT_UPB, CPUACT_DOWNB, CPUACT_USMASH, CPUACT_DSMASH,
-    CPUACT_FSMASH, CPUACT_ROLLAWAY, CPUACT_ROLLTOWARDS, CPUACT_ROLLRDM, CPUACT_NAIR, CPUACT_FAIR, CPUACT_DAIR,
-    CPUACT_BAIR, CPUACT_UAIR, CPUACT_JAB, CPUACT_FTILT, CPUACT_UTILT, CPUACT_DTILT, CPUACT_SHORTHOP, CPUACT_FULLHOP
-};
-static u8 AirAcLookup[] = {
-    CPUACT_NONE, CPUACT_AIRDODGE, CPUACT_JUMPAWAY, CPUACT_JUMPTOWARDS, CPUACT_UPB, CPUACT_DOWNB, CPUACT_NAIR,
-    CPUACT_FAIR, CPUACT_DAIR, CPUACT_BAIR, CPUACT_UAIR, CPUACT_FFTUMBLE, CPUACT_FFWIGGLE
-};
-static u8 ShieldAcLookup[] = {
-    CPUACT_NONE, CPUACT_GRAB, CPUACT_SHORTHOP, CPUACT_FULLHOP, CPUACT_SPOTDODGE, CPUACT_ROLLAWAY, CPUACT_ROLLTOWARDS,
-    CPUACT_ROLLRDM, CPUACT_UPB, CPUACT_DOWNB, CPUACT_NAIR, CPUACT_FAIR, CPUACT_DAIR, CPUACT_BAIR, CPUACT_UAIR
-};
-
-// Main Menu
-static char **LabOptions_OffOn[] = {"Off", "On"};
 static EventOption LabOptions_Main[] = {
     {
         .option_kind = OPTKIND_MENU, // the type of option this is; menu, string list, integer list, etc
@@ -972,18 +66,13 @@ static EventOption LabOptions_Main[] = {
         .onOptionSelect = Lab_Exit,
     },
 };
-static EventMenu LabMenu_Main = {
-    .name = "Main Menu", // the name of this menu
-    .option_num = sizeof(LabOptions_Main) / sizeof(EventOption), // number of options this menu contains
-    .scroll = 0, // runtime variable used for how far down in the menu to start
-    .state = 0, // bool used to know if this menu is focused, used at runtime
-    .cursor = 0, // index of the option currently selected, used at runtime
-    .options = &LabOptions_Main, // pointer to all of this menu's options
-    .prev = 0, // pointer to previous menu, used at runtime
-};
+
 // General
-static char **LabOptions_CamMode[] = {"Normal", "Zoom", "Fixed", "Advanced"};
+static char **LabOptions_OffOn[] = {"Off", "On"};
 static char **LabOptions_FrameAdvButton[] = {"L", "Z", "X", "Y"};
+static char **LabOptions_CamMode[] = {"Normal", "Zoom", "Fixed", "Advanced"};
+
+// Main Menu
 static EventOption LabOptions_General[] = {
     /*frame advance*/ {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integer list, etc
@@ -1107,15 +196,11 @@ static EventOption LabOptions_General[] = {
         .onOptionChange = 0,
     },
 };
-static EventMenu LabMenu_General = {
-    .name = "General", // the name of this menu
-    .option_num = sizeof(LabOptions_General) / sizeof(EventOption), // number of options this menu contains
-    .scroll = 0, // runtime variable used for how far down in the menu to start
-    .state = 0, // bool used to know if this menu is focused, used at runtime
-    .cursor = 0, // index of the option currently selected, used at runtime
-    .options = &LabOptions_General, // pointer to all of this menu's options
-    .prev = 0, // pointer to previous menu, used at runtime
-};
+
+static char **LabValues_InfoPresets[] = {"None", "Custom", "Ledge", "Damage"};
+static char **LabValues_InfoSize[] = {"Small", "Medium", "Large"};
+static char **LabValues_InfoPlayers[] = {"Player 1", "Player 2", "Player 3", "Player 4"};
+
 // Info Display
 static char **LabValues_InfoDisplay[] = {
     "None", "Position", "State Name", "State Frame", "Velocity - Self", "Velocity - KB", "Velocity - Total",
@@ -1124,10 +209,7 @@ static char **LabValues_InfoDisplay[] = {
     "ECB Lock", "ECB Bottom", "Jumps", "Walljumps", "Jab Counter", "Line Info", "Blastzone Left/Right",
     "Blastzone Up/Down"
 };
-static char **LabValues_InfoPresets[] = {"None", "Custom", "Ledge", "Damage"};
-//static char **LabValues_InfoPosition[] = {"Top Left", "Top Mid", "Top Right", "Bottom Left", "Bottom Mid", "Bottom Right"};
-static char **LabValues_InfoSize[] = {"Small", "Medium", "Large"};
-static char **LabValues_InfoPlayers[] = {"Player 1", "Player 2", "Player 3", "Player 4"};
+
 static EventOption LabOptions_InfoDisplay[] = {
     {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integer list, etc
@@ -1242,6 +324,17 @@ static EventOption LabOptions_InfoDisplay[] = {
         .onOptionChange = Lab_ChangeInfoRow,
     },
 };
+
+static EventMenu LabMenu_General = {
+    .name = "General", // the name of this menu
+    .option_num = sizeof(LabOptions_General) / sizeof(EventOption), // number of options this menu contains
+    .scroll = 0, // runtime variable used for how far down in the menu to start
+    .state = 0, // bool used to know if this menu is focused, used at runtime
+    .cursor = 0, // index of the option currently selected, used at runtime
+    .options = &LabOptions_General, // pointer to all of this menu's options
+    .prev = 0, // pointer to previous menu, used at runtime
+};
+
 static EventMenu LabMenu_InfoDisplay = {
     .name = "Info Display", // the name of this menu
     .option_num = 11, // number of options this menu contains
@@ -1251,28 +344,33 @@ static EventMenu LabMenu_InfoDisplay = {
     .options = &LabOptions_InfoDisplay, // pointer to all of this menu's options
     .prev = 0, // pointer to previous menu, used at runtime
 };
+
 // CPU
-static char **LabValues_Shield[] = {"Off", "On Until Hit", "On"};
 static char **LabValues_CPUBehave[] = {"Stand", "Shield", "Crouch", "Jump"};
-static char **LabValues_TDI[] = {"Random", "Inwards", "Outwards", "Floorhug", "Custom", "None"};
+static char **LabValues_Shield[] = {"Off", "On Until Hit", "On"};
 static char **LabValues_SDIFreq[] = {"None", "Low", "Medium", "High"};
 static char **LabValues_SDIDir[] = {"Random", "Away", "Towards"};
+static char **LabValues_TDI[] = {"Random", "Inwards", "Outwards", "Floorhug", "Custom", "None"};
 static char **LabValues_Tech[] = {"Random", "Neutral", "Away", "Towards", "None"};
 static char **LabValues_Getup[] = {"Random", "Stand", "Away", "Towards", "Attack"};
+static char **LabValues_GrabEscape[] = {"None", "Medium", "High", "Perfect"};
+
 static char **LabValues_CounterGround[] = {
     "None", "Spotdodge", "Shield", "Grab", "Up B", "Down B", "Up Smash", "Down Smash", "Forward Smash", "Roll Away",
     "Roll Towards", "Roll Random", "Neutral Air", "Forward Air", "Down Air", "Back Air", "Up Air", "Jab",
     "Forward Tilt", "Up Tilt", "Down Tilt", "Short Hop", "Full Hop"
 };
+
 static char **LabValues_CounterAir[] = {
     "None", "Airdodge", "Jump Away", "Jump Towards", "Up B", "Down B", "Neutral Air", "Forward Air", "Down Air",
     "Back Air", "Up Air", "Tumble Fastfall", "Wiggle Fastfall"
 };
+
 static char **LabValues_CounterShield[] = {
     "None", "Grab", "Short Hop", "Full Hop", "Spotdodge", "Roll Away", "Roll Towards", "Roll Random", "Up B", "Down B",
     "Neutral Air", "Forward Air", "Down Air", "Back Air", "Up Air"
 };
-static char **LabValues_GrabEscape[] = {"None", "Medium", "High", "Perfect"};
+
 static EventOption LabOptions_CPU[] = {
     /*cpu percent*/ {
         .option_kind = OPTKIND_INT, // the type of option this is; menu, string list, integer list, etc
@@ -1455,6 +553,7 @@ static EventOption LabOptions_CPU[] = {
         .onOptionChange = 0,
     },
 };
+
 static EventMenu LabMenu_CPU = {
     .name = "CPU Options", // the name of this menu
     .option_num = sizeof(LabOptions_CPU) / sizeof(EventOption), // number of options this menu contains
@@ -1464,10 +563,12 @@ static EventMenu LabMenu_CPU = {
     .options = &LabOptions_CPU, // pointer to all of this menu's options
     .prev = 0, // pointer to previous menu, used at runtime
 };
+
 // Recording
 static char **LabValues_RecordSlot[] = {"Random", "Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6"};
 static char **LabValues_HMNRecordMode[] = {"Off", "Record", "Playback"};
 static char **LabValues_CPURecordMode[] = {"Off", "Control", "Record", "Playback"};
+
 static EventOption LabOptions_Record[] = {
     {
         .option_kind = OPTKIND_FUNC, // the type of option this is; menu, string list, integer list, etc
@@ -1568,6 +669,7 @@ static EventOption LabOptions_Record[] = {
         .onOptionSelect = Export_Init,
     },
 };
+
 static EventMenu LabMenu_Record = {
     .name = "Recording", // the name of this menu
     .option_num = sizeof(LabOptions_Record) / sizeof(EventOption), // number of options this menu contains
@@ -1575,6 +677,949 @@ static EventMenu LabMenu_Record = {
     .state = 0, // bool used to know if this menu is focused, used at runtime
     .cursor = 0, // index of the option currently selected, used at runtime
     .options = &LabOptions_Record, // pointer to all of this menu's options
+    .prev = 0, // pointer to previous menu, used at runtime
+};
+
+static char nullString[] = " ";
+
+// CPU Action Definitions
+static CPUAction Lab_CPUActionShield[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARDREFLECT, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionGrab[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_A | PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_Z, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionUpB[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_KNEEBEND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        127, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_B, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLE, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        127, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_B, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionDownB[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLE, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        -127, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_B, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionSpotdodge[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        -127, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionRollAway[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        STCKDIR_AWAY, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARDREFLECT, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        STCKDIR_AWAY, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionRollTowards[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        STCKDIR_TOWARD, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARDREFLECT, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        STCKDIR_TOWARD, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionRollRandom[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        STICKDIR_RDM, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_GUARDREFLECT, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        STICKDIR_RDM, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionNair[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_A, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionFair[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        127, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        3, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionDair[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        -127, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionBair[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        127, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        4, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionUair[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        127, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionJump[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionJumpFull[] = {
+    {
+        ASID_GUARD, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R | PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_KNEEBEND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionJumpAway[] = {
+    {
+        ASID_JUMPS, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        0, // is the last input
+        2, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLE, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        STCKDIR_AWAY, // specify stick direction
+    },
+
+    -1,
+};
+
+static CPUAction Lab_CPUActionJumpTowards[] = {
+    {
+        ASID_JUMPS, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        0, // is the last input
+        1, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLE, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_X, // button to input
+        0, // is the last input
+        STCKDIR_TOWARD, // specify stick direction
+    },
+
+    -1,
+};
+
+static CPUAction Lab_CPUActionAirdodge[] = {
+    {
+        ASID_DAMAGEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_TRIGGER_R, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionFFTumble[] = {
+    {
+        ASID_DAMAGEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        -127, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionFFWiggle[] = {
+    {
+        ASID_DAMAGEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        127, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        0, // is the last input
+        0, // specify stick direction
+    },
+    {
+        ASID_ACTIONABLEAIR, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        -127, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionJab[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_A, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionFTilt[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        80, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_A, // button to input
+        1, // is the last input
+        STCKDIR_TOWARD, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionUTilt[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        80, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_A, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionDTilt[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        -80, // left stick Y value
+        0, // c stick X value
+        0, // c stick Y value
+        PAD_BUTTON_A, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionUSmash[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        127, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionDSmash[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        0, // c stick X value
+        -127, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        0, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction Lab_CPUActionFSmash[] = {
+    {
+        ASID_ACTIONABLEGROUND, // state to perform this action. -1 for last
+        0, // first possible frame to perform this action
+        0, // last possible frame to perfrom this action
+        0, // left stick X value
+        0, // left stick Y value
+        127, // c stick X value
+        0, // c stick Y value
+        0, // button to input
+        1, // is the last input
+        STCKDIR_TOWARD, // specify stick direction
+    },
+    -1,
+};
+
+static CPUAction *Lab_CPUActions[] = {
+    // none 0
+    0,
+    // shield 1
+    &Lab_CPUActionShield,
+    // grab 2
+    &Lab_CPUActionGrab,
+    // up b 3
+    &Lab_CPUActionUpB,
+    // down b 4
+    &Lab_CPUActionDownB,
+    // spotdodge 5
+    &Lab_CPUActionSpotdodge,
+    // roll away 6
+    &Lab_CPUActionRollAway,
+    // roll towards 7
+    &Lab_CPUActionRollTowards,
+    // roll random
+    &Lab_CPUActionRollRandom,
+    // nair 8
+    &Lab_CPUActionNair,
+    // fair 9
+    &Lab_CPUActionFair,
+    // dair 10
+    &Lab_CPUActionDair,
+    // bair 11
+    &Lab_CPUActionBair,
+    // uair 12
+    &Lab_CPUActionUair,
+    // short hop 13
+    &Lab_CPUActionJump,
+    // full hop 14
+    &Lab_CPUActionJumpFull,
+    // jump away 15
+    &Lab_CPUActionJumpAway,
+    // jump towards 16
+    &Lab_CPUActionJumpTowards,
+    // airdodge 17
+    &Lab_CPUActionAirdodge,
+    // fastfall 18
+    &Lab_CPUActionFFTumble,
+    // wiggle fastfall 19
+    &Lab_CPUActionFFWiggle,
+    // wiggle fastfall 19
+    &Lab_CPUActionJab,
+    &Lab_CPUActionFTilt,
+    &Lab_CPUActionUTilt,
+    &Lab_CPUActionDTilt,
+    &Lab_CPUActionUSmash,
+    &Lab_CPUActionDSmash,
+    &Lab_CPUActionFSmash,
+};
+
+static char *CPU_ACTIONS_NAMES[] = {
+    "CPUACT_NONE",
+    "CPUACT_SHIELD",
+    "CPUACT_GRAB",
+    "CPUACT_UPB",
+    "CPUACT_DOWNB",
+    "CPUACT_SPOTDODGE",
+    "CPUACT_ROLLAWAY",
+    "CPUACT_ROLLTOWARDS",
+    "CPUACT_ROLLRDM",
+    "CPUACT_NAIR",
+    "CPUACT_FAIR",
+    "CPUACT_DAIR",
+    "CPUACT_BAIR",
+    "CPUACT_UAIR",
+    "CPUACT_SHORTHOP",
+    "CPUACT_FULLHOP",
+    "CPUACT_JUMPAWAY",
+    "CPUACT_JUMPTOWARDS",
+    "CPUACT_AIRDODGE",
+    "CPUACT_FFTUMBLE",
+    "CPUACT_FFWIGGLE",
+    "CPUACT_JAB",
+    "CPUACT_FTILT",
+    "CPUACT_UTILT",
+    "CPUACT_DTILT",
+    "CPUACT_USMASH",
+    "CPUACT_DSMASH",
+    "CPUACT_FSMASH",
+};
+
+static u8 GrAcLookup[] = {
+    CPUACT_NONE, CPUACT_SPOTDODGE, CPUACT_SHIELD, CPUACT_GRAB, CPUACT_UPB, CPUACT_DOWNB, CPUACT_USMASH, CPUACT_DSMASH,
+    CPUACT_FSMASH, CPUACT_ROLLAWAY, CPUACT_ROLLTOWARDS, CPUACT_ROLLRDM, CPUACT_NAIR, CPUACT_FAIR, CPUACT_DAIR,
+    CPUACT_BAIR, CPUACT_UAIR, CPUACT_JAB, CPUACT_FTILT, CPUACT_UTILT, CPUACT_DTILT, CPUACT_SHORTHOP, CPUACT_FULLHOP
+};
+
+static u8 AirAcLookup[] = {
+    CPUACT_NONE, CPUACT_AIRDODGE, CPUACT_JUMPAWAY, CPUACT_JUMPTOWARDS, CPUACT_UPB, CPUACT_DOWNB, CPUACT_NAIR,
+    CPUACT_FAIR, CPUACT_DAIR, CPUACT_BAIR, CPUACT_UAIR, CPUACT_FFTUMBLE, CPUACT_FFWIGGLE
+};
+
+static u8 ShieldAcLookup[] = {
+    CPUACT_NONE, CPUACT_GRAB, CPUACT_SHORTHOP, CPUACT_FULLHOP, CPUACT_SPOTDODGE, CPUACT_ROLLAWAY, CPUACT_ROLLTOWARDS,
+    CPUACT_ROLLRDM, CPUACT_UPB, CPUACT_DOWNB, CPUACT_NAIR, CPUACT_FAIR, CPUACT_DAIR, CPUACT_BAIR, CPUACT_UAIR
+};
+
+static EventMenu LabMenu_Main = {
+    .name = "Main Menu", // the name of this menu
+    .option_num = sizeof(LabOptions_Main) / sizeof(EventOption), // number of options this menu contains
+    .scroll = 0, // runtime variable used for how far down in the menu to start
+    .state = 0, // bool used to know if this menu is focused, used at runtime
+    .cursor = 0, // index of the option currently selected, used at runtime
+    .options = &LabOptions_Main, // pointer to all of this menu's options
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
@@ -1589,6 +1634,7 @@ static _HSD_ImageDesc resized_image = {
     .height = RESIZE_HEIGHT,
     .width = RESIZE_WIDTH,
 };
+
 static u8 snap_status;
 static u8 export_status;
 static Arch_LabData *stc_lab_data;
@@ -1609,6 +1655,16 @@ static MemcardSave memcard_save;
 static int chunk_num;
 static int save_pre_tick;
 static char *slots_names[] = {"A", "B"};
+
+// Export functions
+static char *keyboard_rows[2][4] = {
+    {"1234567890", "qwertyuiop", "asdfghjkl-", "zxcvbnm,./"},
+    {"!@#$%^&*()", "QWERTYUIOP", "ASDFGHJKL: ", "ZXCVBNM<>?"}
+};
+
+// Initial Menu
+static EventMenu *Event_Menu = &LabMenu_Main;
+EventMenu **menu_start = &Event_Menu;
 
 // lz77 functions credited to https://github.com/andyherbert/lz1
 int x_to_the_n(int x, int n) {
@@ -4242,6 +4298,55 @@ void Record_CObjThink(GOBJ *gobj) {
     return;
 }
 
+int Record_GetCurrFrame() {
+    return (event_vars->game_timer - 1) - rec_state->frame;
+}
+
+int Record_GetEndFrame() {
+    // get hmn slot
+    int hmn_slot = LabOptions_Record[OPTREC_HMNSLOT].option_val;
+    if (hmn_slot == 0) // use random slot
+        hmn_slot = rec_data.hmn_rndm_slot;
+    else
+        hmn_slot--;
+
+    // get cpu slot
+    int cpu_slot = LabOptions_Record[OPTREC_CPUSLOT].option_val;
+    if (cpu_slot == 0) // use random slot
+        cpu_slot = rec_data.cpu_rndm_slot;
+    else
+        cpu_slot--;
+
+    int curr_frame = Record_GetCurrFrame();
+    RecInputData *hmn_inputs = rec_data.hmn_inputs[hmn_slot];
+    RecInputData *cpu_inputs = rec_data.cpu_inputs[cpu_slot];
+
+    // get what frame the longest recording ends on (savestate frame + recording start frame + recording time)
+    int hmn_end_frame = 0;
+    int cpu_end_frame = 0;
+    if (hmn_inputs->start_frame != -1) // ensure a recording exists
+        hmn_end_frame = (hmn_inputs->start_frame + hmn_inputs->num);
+    if (cpu_inputs->start_frame != -1) // ensure a recording exists
+        cpu_end_frame = (cpu_inputs->start_frame + cpu_inputs->num);
+
+    // find the larger recording
+    RecInputData *input_data = hmn_inputs;
+    if (cpu_end_frame > hmn_end_frame)
+        input_data = cpu_inputs;
+
+    // get the frame the recording starts on. i actually hate this code and need to change how this works
+    int rec_start;
+    if (input_data->start_frame == -1) // case 1: recording didnt start, use current frame
+        rec_start = curr_frame - 1;
+    else // case 2: recording has started, use the frame saved
+        rec_start = input_data->start_frame - rec_state->frame;
+
+    // get end frame
+    int end_frame = rec_start + input_data->num;
+
+    return end_frame;
+}
+
 void Record_GX(GOBJ *gobj, int pass) {
     // update UI position
     // the reason im doing this here is because i want it to update in the menu
@@ -4541,6 +4646,38 @@ void Record_Update(int ply, RecInputData *input_data, int rec_mode) {
     return;
 }
 
+void Record_OnSuccessfulSave() {
+    // enable other options
+    for (int i = 1; i < sizeof(LabOptions_Record) / sizeof(EventOption); i++) {
+        LabOptions_Record[i].disable = 0;
+    }
+
+    // clear slots
+    for (int i = 0; i < REC_SLOTS; i++) {
+        // clear data
+        memset(rec_data.hmn_inputs[i], 0, sizeof(RecInputData));
+        memset(rec_data.cpu_inputs[i], 0, sizeof(RecInputData));
+
+        // init frame this recording starts on
+        rec_data.hmn_inputs[i]->start_frame = -1;
+        rec_data.cpu_inputs[i]->start_frame = -1;
+    }
+
+    // init settings
+    LabOptions_Record[OPTREC_HMNMODE].option_val = 0; // set hmn to off
+    LabOptions_Record[OPTREC_HMNSLOT].option_val = 1; // set hmn to slot 1
+    LabOptions_Record[OPTREC_CPUMODE].option_val = 0; // set cpu to off
+    LabOptions_Record[OPTREC_CPUSLOT].option_val = 1; // set cpu to slot 1
+
+    // also save to personal savestate
+    event_vars->Savestate_Save(event_vars->savestate);
+
+    // take screenshot
+    snap_status = 1;
+
+    return;
+}
+
 void Record_InitState(GOBJ *menu_gobj) {
     if (event_vars->Savestate_Save(rec_state)) {
         Record_OnSuccessfulSave();
@@ -4668,87 +4805,6 @@ int Record_GetRandomSlot(RecInputData **input_data) {
 
     // get random slot in use
     return arr[(HSD_Randi(slot_num))];
-}
-
-int Record_GetCurrFrame() {
-    return (event_vars->game_timer - 1) - rec_state->frame;
-}
-
-int Record_GetEndFrame() {
-    // get hmn slot
-    int hmn_slot = LabOptions_Record[OPTREC_HMNSLOT].option_val;
-    if (hmn_slot == 0) // use random slot
-        hmn_slot = rec_data.hmn_rndm_slot;
-    else
-        hmn_slot--;
-
-    // get cpu slot
-    int cpu_slot = LabOptions_Record[OPTREC_CPUSLOT].option_val;
-    if (cpu_slot == 0) // use random slot
-        cpu_slot = rec_data.cpu_rndm_slot;
-    else
-        cpu_slot--;
-
-    int curr_frame = Record_GetCurrFrame();
-    RecInputData *hmn_inputs = rec_data.hmn_inputs[hmn_slot];
-    RecInputData *cpu_inputs = rec_data.cpu_inputs[cpu_slot];
-
-    // get what frame the longest recording ends on (savestate frame + recording start frame + recording time)
-    int hmn_end_frame = 0;
-    int cpu_end_frame = 0;
-    if (hmn_inputs->start_frame != -1) // ensure a recording exists
-        hmn_end_frame = (hmn_inputs->start_frame + hmn_inputs->num);
-    if (cpu_inputs->start_frame != -1) // ensure a recording exists
-        cpu_end_frame = (cpu_inputs->start_frame + cpu_inputs->num);
-
-    // find the larger recording
-    RecInputData *input_data = hmn_inputs;
-    if (cpu_end_frame > hmn_end_frame)
-        input_data = cpu_inputs;
-
-    // get the frame the recording starts on. i actually hate this code and need to change how this works
-    int rec_start;
-    if (input_data->start_frame == -1) // case 1: recording didnt start, use current frame
-        rec_start = curr_frame - 1;
-    else // case 2: recording has started, use the frame saved
-        rec_start = input_data->start_frame - rec_state->frame;
-
-    // get end frame
-    int end_frame = rec_start + input_data->num;
-
-    return end_frame;
-}
-
-void Record_OnSuccessfulSave() {
-    // enable other options
-    for (int i = 1; i < sizeof(LabOptions_Record) / sizeof(EventOption); i++) {
-        LabOptions_Record[i].disable = 0;
-    }
-
-    // clear slots
-    for (int i = 0; i < REC_SLOTS; i++) {
-        // clear data
-        memset(rec_data.hmn_inputs[i], 0, sizeof(RecInputData));
-        memset(rec_data.cpu_inputs[i], 0, sizeof(RecInputData));
-
-        // init frame this recording starts on
-        rec_data.hmn_inputs[i]->start_frame = -1;
-        rec_data.cpu_inputs[i]->start_frame = -1;
-    }
-
-    // init settings
-    LabOptions_Record[OPTREC_HMNMODE].option_val = 0; // set hmn to off
-    LabOptions_Record[OPTREC_HMNSLOT].option_val = 1; // set hmn to slot 1
-    LabOptions_Record[OPTREC_CPUMODE].option_val = 0; // set cpu to off
-    LabOptions_Record[OPTREC_CPUSLOT].option_val = 1; // set cpu to slot 1
-
-    // also save to personal savestate
-    event_vars->Savestate_Save(event_vars->savestate);
-
-    // take screenshot
-    snap_status = 1;
-
-    return;
 }
 
 void Memcard_Wait() {
@@ -4979,12 +5035,6 @@ void Savestates_Update() {
     return;
 }
 
-// Export functions
-static char *keyboard_rows[2][4] = {
-    {"1234567890", "qwertyuiop", "asdfghjkl-", "zxcvbnm,./"},
-    {"!@#$%^&*()", "QWERTYUIOP", "ASDFGHJKL: ", "ZXCVBNM<>?"}
-};
-
 int RowPixelToBlockPixel(int pixel_x, int pixel_y, int width, int height) {
     // get block width and height
     int block_width = divide_roundup(width, 4);
@@ -5139,371 +5189,90 @@ void Export_Init(GOBJ *menu_gobj) {
     return;
 }
 
-int Export_Think(GOBJ *export_gobj) {
-    ExportData *export_data = export_gobj->userdata;
-    int can_unpause = 0;
-
-    switch (export_data->menu_index) {
-        case (EXMENU_SELCARD): {
-            can_unpause = Export_SelCardThink(export_gobj);
-            break;
-        }
-        case (EXMENU_NAME): {
-            can_unpause = Export_EnterNameThink(export_gobj);
-            break;
-        }
-        case (EXMENU_CONFIRM): {
-            can_unpause = Export_ConfirmThink(export_gobj);
-            break;
-        }
-    }
-
-    return can_unpause;
-}
-
-void Export_Destroy(GOBJ *export_gobj) {
-    ExportData *export_data = export_gobj->userdata;
-    MenuData *menu_data = event_vars->menu_gobj->userdata;
-
-    switch (export_data->menu_index) {
-        case (EXMENU_SELCARD): {
-            Export_SelCardExit(export_gobj);
-            break;
-        }
-        case (EXMENU_NAME): {
-            Export_EnterNameExit(export_gobj);
-            break;
-        }
-    }
-
-    // free buffer allocs
-    HSD_Free(stc_transfer_buf);
-    HSD_Free(export_data->filename_buffer);
-    HSD_Free(export_data->scaled_image);
-
-    // destroy gobj
-    GObj_Destroy(export_gobj);
-
-    // show menu
-    event_vars->hide_menu = 0;
-    menu_data->custom_gobj = 0;
-    menu_data->custom_gobj_think = 0;
-    menu_data->custom_gobj_destroy = 0;
-
-    return;
-}
-
-void Export_SelCardInit(GOBJ *export_gobj) {
-    ExportData *export_data = export_gobj->userdata;
-    MenuData *menu_data = event_vars->menu_gobj->userdata;
-
-    // show menu jobjs
-    JOBJ_ClearFlags(export_data->memcard_jobj[0], JOBJ_HIDDEN);
-    JOBJ_ClearFlags(export_data->memcard_jobj[1], JOBJ_HIDDEN);
-
-    // create text
-    Text *text_misc = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_misc = text_misc;
-    // enable align and kerning
-    text_misc->align = 1;
-    text_misc->kerning = 1;
-    // scale canvas
-    text_misc->scale.X = MENU_CANVASSCALE;
-    text_misc->scale.Y = MENU_CANVASSCALE;
-    text_misc->trans.Z = MENU_TEXTZ;
-
-    // create title text
-    Text *text_title = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_title = text_title;
-    // enable align and kerning
-    text_title->align = 0;
-    text_title->kerning = 1;
-    // scale canvas
-    text_title->trans.X = -23;
-    text_title->trans.Y = -18;
-    text_title->scale.X = MENU_CANVASSCALE * 2;
-    text_title->scale.Y = MENU_CANVASSCALE * 2;
-    text_title->trans.Z = MENU_TEXTZ;
-
-    // create desc text
-    Text *text_desc = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_desc = text_desc;
-    // enable align and kerning
-    text_desc->align = 0;
-    text_desc->kerning = 1;
-    // scale canvas
-    text_desc->trans.X = -23;
-    text_desc->trans.Y = 12;
-    text_desc->scale.X = MENU_CANVASSCALE;
-    text_desc->scale.Y = MENU_CANVASSCALE;
-    text_desc->trans.Z = MENU_TEXTZ;
-
-    Text_AddSubtext(text_title, 0, 0, "Select a Memory Card"); // add title
-    Text_AddSubtext(text_desc, 0, 0, ""); // add description
-
-    // add dummy text
-    Text_AddSubtext(text_misc, -165, 67, "Slot A");
-    Text_AddSubtext(text_misc, 165, 67, "Slot B");
-
-    // init memcard inserted status
-    for (int i = 0; i < 2; i++) {
-        export_data->is_inserted[i] = 0;
-    }
-
-    // init cursor
-    export_data->menu_index = EXMENU_SELCARD;
-    export_data->slot = 0;
-
-    return;
-}
-
-int Export_SelCardThink(GOBJ *export_gobj) {
-    ExportData *export_data = export_gobj->userdata;
-
-    int req_blocks = (divide_roundup(stc_transfer_buf_size, 8192) + 1);
-
-    // get pausing players inputs
-    HSD_Pad *pad = PadGet(stc_hmn_controller, PADGET_MASTER);
-    int inputs = pad->down;
-
-    // update memcard info
-    for (int i = 1; i >= 0; i--) {
-        // probe slot
-        u8 is_inserted;
-
-        s32 memSize, sectorSize;
-        if (CARDProbeEx(i, &memSize, &sectorSize) == CARD_RESULT_READY) {
-            // if it was just inserted, get info
-            if (export_data->is_inserted[i] == 0) {
-                // mount card
-                stc_memcard_work->is_done = 0;
-                if (CARDMountAsync(i, stc_memcard_work->work_area, 0, Memcard_RemovedCallback) == CARD_RESULT_READY) {
-                    // check card
-                    Memcard_Wait();
-                    stc_memcard_work->is_done = 0;
-                    if (CARDCheckAsync(i, Memcard_RemovedCallback) == CARD_RESULT_READY) {
-                        Memcard_Wait();
-
-                        // if we get this far, a valid memcard is inserted
-                        is_inserted = 1;
-                        SFX_PlayCommon(2);
-                        //export_data->slot = i;  // move cursor to this
-
-                        // get free blocks
-                        s32 byteNotUsed, filesNotUsed;
-                        if (CARDFreeBlocks(i, &byteNotUsed, &filesNotUsed) == CARD_RESULT_READY) {
-                            export_data->free_blocks[i] = (byteNotUsed / 8192);
-                            export_data->free_files[i] = filesNotUsed;
-                        }
-                    } else
-                        is_inserted = 0;
-
-                    CARDUnmount(i);
-                    stc_memcard_work->is_done = 0;
-                } else
-                    is_inserted = 0;
-            } else
-                is_inserted = 1;
-        } else
-            is_inserted = 0;
-
-        export_data->is_inserted[i] = is_inserted;
-    }
-
-    // if left
-    if ((inputs & HSD_BUTTON_LEFT) || (inputs & HSD_BUTTON_DPAD_LEFT)) {
-        if (export_data->slot > 0) {
-            export_data->slot--;
-            SFX_PlayCommon(2);
-        }
-    }
-
-    // if right
-    if ((inputs & HSD_BUTTON_RIGHT) || (inputs & HSD_BUTTON_DPAD_RIGHT)) {
-        if (export_data->slot < 1) {
-            export_data->slot++;
-            SFX_PlayCommon(2);
-        }
-    }
-
-    int cursor = export_data->slot;
-    // if press A,
-    if ((inputs & HSD_BUTTON_A) || (inputs & HSD_BUTTON_START)) {
-        // ensure it can be saved
-        if ((export_data->is_inserted[cursor] == 1) && (export_data->free_files[cursor] >= 1) && (
-                export_data->free_blocks[cursor] >= req_blocks)) {
-            // can save move to next screen
-            Export_SelCardExit(export_gobj);
-
-            // init next menu
-            Export_EnterNameInit(export_gobj);
-
-            SFX_PlayCommon(1);
-
-            return;
-        } else
-            SFX_PlayCommon(3);
-    }
-
-    // if press B,
-    if ((inputs & HSD_BUTTON_B)) {
-        Export_Destroy(export_gobj);
-
-        // play sfx
-        SFX_PlayCommon(0);
-
-        return;
-    }
-
-    // update selection
-    Text *text = export_data->text_misc;
-    for (int i = 0; i < 2; i++) {
-        static GXColor white = {255, 255, 255, 255};
-        static GXColor yellow = {201, 178, 0, 255};
-        GXColor *color;
-
-        // highlight cursor only
-        if (export_data->slot == i)
-            color = &yellow;
-        else
-            color = &white;
-
-        Text_SetColor(text, i, color);
-    }
-
-    // update description
-    Text *text_desc = export_data->text_desc;
-    if (export_data->is_inserted[cursor] == 0) {
-        Text_SetText(text_desc, 0, "No device is inserted in Slot %s.", slots_names[cursor]);
-    } else if (export_data->free_files[cursor] < 1) {
-        Text_SetText(text_desc, 0,
-                     "The memory card in Slot %s does not \nhave enough free files. 1 free file is \nrequired to save.",
-                     slots_names[cursor]);
-    } else if (export_data->free_blocks[cursor] < req_blocks) {
-        Text_SetText(text_desc, 0,
-                     "The memory card in Slot %s does not \nhave enough free blocks. %d blocks is \nrequired to save.",
-                     slots_names[cursor], req_blocks);
-    } else {
-        Text_SetText(text_desc, 0, "Slot %s: %d free blocks. %d blocks will be used.", slots_names[cursor],
-                     export_data->free_blocks[cursor], req_blocks);
-    }
-    return 1;
-}
-
-void Export_SelCardExit(GOBJ *export_gobj) {
+void Export_EnterNameExit(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
 
     // hide menu jobjs
-    JOBJ_SetFlags(export_data->memcard_jobj[0], JOBJ_HIDDEN);
-    JOBJ_SetFlags(export_data->memcard_jobj[1], JOBJ_HIDDEN);
+    JOBJ_SetFlags(export_data->screenshot_jobj, JOBJ_HIDDEN);
+    JOBJ_SetFlags(export_data->textbox_jobj, JOBJ_HIDDEN);
 
     Text_Destroy(export_data->text_title);
     Text_Destroy(export_data->text_desc);
-    Text_Destroy(export_data->text_misc);
+    Text_Destroy(export_data->text_keyboard);
+    Text_Destroy(export_data->text_filename);
+    Text_Destroy(export_data->text_filedetails);
 }
 
-void Export_EnterNameInit(GOBJ *export_gobj) {
+void Export_ConfirmInit(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
     MenuData *menu_data = event_vars->menu_gobj->userdata;
 
-    // show menu jobjs
-    JOBJ_ClearFlags(export_data->screenshot_jobj, JOBJ_HIDDEN);
-    JOBJ_ClearFlags(export_data->textbox_jobj, JOBJ_HIDDEN);
+    // create gobj
+    GOBJ *confirm_gobj = GObj_Create(0, 0, 0);
+    export_data->confirm_gobj = confirm_gobj;
 
-    // create keyboard text
-    Text *text_keyboard = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_keyboard = text_keyboard;
+    // load menu joint
+    JOBJ *confirm_jobj = JOBJ_LoadJoint(stc_lab_data->export_popup);
+    GObj_AddObject(confirm_gobj, 3, confirm_jobj); // add to gobj
+    GObj_AddGXLink(confirm_gobj, GXLink_Common, GXLINK_MENUMODEL, GXPRI_POPUPMODEL); // add gx link
+
+    // create text
+    Text *confirm_text = Text_CreateText(2, menu_data->canvas_popup);
+    export_data->confirm_text = confirm_text;
     // enable align and kerning
-    text_keyboard->align = 1;
-    text_keyboard->kerning = 1;
+    confirm_text->align = 1;
+    confirm_text->kerning = 1;
     // scale canvas
-    text_keyboard->trans.X = EXP_KEYBOARD_X;
-    text_keyboard->trans.Y = EXP_KEYBOARD_Y;
-    text_keyboard->scale.X = MENU_CANVASSCALE * EXP_KEYBOARD_SIZE;
-    text_keyboard->scale.Y = MENU_CANVASSCALE * EXP_KEYBOARD_SIZE;
-    // init keyboard
+    confirm_text->trans.X = 0;
+    confirm_text->trans.Y = 0;
+    confirm_text->scale.X = MENU_CANVASSCALE;
+    confirm_text->scale.Y = MENU_CANVASSCALE;
+    confirm_text->trans.Z = MENU_TEXTZ;
+    Text_AddSubtext(confirm_text, 0, -40, "Save File to Slot %s?", slots_names[export_data->slot]);
+    int yes_subtext = Text_AddSubtext(confirm_text, -60, 20, "Yes");
+    GXColor yellow = {201, 178, 0, 255};
+    Text_SetColor(confirm_text, yes_subtext, &yellow);
+    Text_AddSubtext(confirm_text, 60, 20, "No");
+
+    export_data->menu_index = EXMENU_CONFIRM;
+    export_data->confirm_state = EXPOP_CONFIRM;
+    export_data->confirm_cursor = 0;
+
+    return 0;
+}
+
+void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj) {
+    ExportData *export_data = export_gobj->userdata;
+    Text *text_keyboard = export_data->text_keyboard;
+    u8 *cursor = export_data->key_cursor;
+
+    // get correct set of letters
+    char **keyboard_letters = keyboard_rows[export_data->caps_lock];
+
+    // iterate through rows
     for (int i = 0; i < 4; i++) {
         // iterate through columns
         for (int j = 0; j < 10; j++) {
-            Text_AddSubtext(text_keyboard, (-(9.0 / 2.0) * 60) + (j * 60), -80 + (i * 60), "");
+            int this_subtext = (i * 10) + j;
+
+            // update letter text
+            char letter[2];
+            letter[0] = keyboard_letters[i][j];
+            letter[1] = '\0';
+            Text_SetText(text_keyboard, this_subtext, &letter);
+
+            // update letter color
+            static GXColor white = {255, 255, 255, 255};
+            static GXColor yellow = {201, 178, 0, 255};
+            GXColor *color;
+            // check for cursor
+            if ((cursor[0] == j) && (cursor[1] == i))
+                color = &yellow;
+            else
+                color = &white;
+            Text_SetColor(text_keyboard, this_subtext, color);
         }
     }
-    export_data->key_cursor[0] = 0;
-    export_data->key_cursor[1] = 0;
-    export_data->caps_lock = 0;
-    Export_EnterNameUpdateKeyboard(export_gobj);
-
-    // create file details
-    ExportHeader *header = stc_transfer_buf;
-    char *stage_name = stage_names[header->metadata.stage_internal];
-    char *hmn_name = Fighter_GetName(header->metadata.hmn);
-    char *cpu_name = Fighter_GetName(header->metadata.cpu);
-    Text *text_filedetails = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_filedetails = text_filedetails;
-    // enable align and kerning
-    text_filedetails->align = 0;
-    text_filedetails->kerning = 1;
-    // scale canvas
-    text_filedetails->trans.X = EXP_FILEDETAILS_X;
-    text_filedetails->trans.Y = EXP_FILEDETAILS_Y;
-    text_filedetails->scale.X = MENU_CANVASSCALE * EXP_FILEDETAILS_SIZE;
-    text_filedetails->scale.Y = MENU_CANVASSCALE * EXP_FILEDETAILS_SIZE;
-
-    Text_AddSubtext(text_filedetails, 0, 0, "Stage: %s\nHMN: %s\nCPU: %s\n\nSlot %s", stage_name, hmn_name, cpu_name,
-                    slots_names[export_data->slot]); // add title
-
-    // create title text
-    Text *text_title = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_title = text_title;
-    // enable align and kerning
-    text_title->align = 0;
-    text_title->kerning = 1;
-    // scale canvas
-    text_title->trans.X = -23;
-    text_title->trans.Y = -18;
-    text_title->scale.X = MENU_CANVASSCALE * 2;
-    text_title->scale.Y = MENU_CANVASSCALE * 2;
-    text_title->trans.Z = MENU_TEXTZ;
-    Text_AddSubtext(text_title, 0, 0, "Enter File Name");
-
-    // create desc text
-    Text *text_desc = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_desc = text_desc;
-    // enable align and kerning
-    text_desc->align = 0;
-    text_desc->kerning = 1;
-    // scale canvas
-    text_desc->trans.X = -23;
-    text_desc->trans.Y = 12;
-    text_desc->scale.X = MENU_CANVASSCALE;
-    text_desc->scale.Y = MENU_CANVASSCALE;
-    Text_AddSubtext(text_desc, 0, 0, "A: Select  B: Backspace  Y: Caps  Start: Confirm"); // add description
-    Text_AddSubtext(text_desc, 0, 40, "     X: Space  L: Cursor left  R: Cursor right"); // add description
-
-    // create filename
-    Text *text_filename = Text_CreateText(2, menu_data->canvas_menu);
-    export_data->text_filename = text_filename;
-    // enable align and kerning
-    text_filename->align = 0;
-    text_filename->kerning = 1;
-    text_filename->use_aspect = 1;
-    GXColor filename_color = {225, 225, 225, 255};
-    text_filename->color = filename_color;
-    // scale canvas
-    text_filename->trans.X = EXP_FILENAME_X;
-    text_filename->trans.Y = EXP_FILENAME_Y;
-    text_filename->aspect.X = EXP_FILENAME_ASPECTX;
-    text_filename->aspect.Y = EXP_FILENAME_ASPECTY;
-    text_filename->scale.X = MENU_CANVASSCALE * EXP_FILENAME_SIZE;
-    text_filename->scale.Y = MENU_CANVASSCALE * EXP_FILENAME_SIZE;
-    // init filename buffer
-    export_data->filename_buffer[0] = '_';
-    export_data->filename_buffer[1] = '\0';
-    Text_AddSubtext(text_filename, 0, 0, export_data->filename_buffer); // add title
-
-    // init menu variables
-    export_data->menu_index = EXMENU_NAME;
-    export_data->filename_cursor = 0;
 
     return;
 }
@@ -5680,56 +5449,133 @@ int Export_EnterNameThink(GOBJ *export_gobj) {
     return 0;
 }
 
-void Export_EnterNameExit(GOBJ *export_gobj) {
+void Export_ConfirmExit(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
 
-    // hide menu jobjs
-    JOBJ_SetFlags(export_data->screenshot_jobj, JOBJ_HIDDEN);
-    JOBJ_SetFlags(export_data->textbox_jobj, JOBJ_HIDDEN);
+    GObj_Destroy(export_data->confirm_gobj);
+    Text_Destroy(export_data->confirm_text);
 
-    Text_Destroy(export_data->text_title);
-    Text_Destroy(export_data->text_desc);
-    Text_Destroy(export_data->text_keyboard);
-    Text_Destroy(export_data->text_filename);
-    Text_Destroy(export_data->text_filedetails);
+    export_data->menu_index = EXMENU_NAME;
 }
 
-void Export_ConfirmInit(GOBJ *export_gobj) {
+int Export_Process(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
-    MenuData *menu_data = event_vars->menu_gobj->userdata;
+    Text *text = export_data->confirm_text;
 
-    // create gobj
-    GOBJ *confirm_gobj = GObj_Create(0, 0, 0);
-    export_data->confirm_gobj = confirm_gobj;
+    int finished = 0;
 
-    // load menu joint
-    JOBJ *confirm_jobj = JOBJ_LoadJoint(stc_lab_data->export_popup);
-    GObj_AddObject(confirm_gobj, 3, confirm_jobj); // add to gobj
-    GObj_AddGXLink(confirm_gobj, GXLink_Common, GXLINK_MENUMODEL, GXPRI_POPUPMODEL); // add gx link
+    // if snapshot is processing, dont update
+    switch (export_status) {
+        case (EXSTAT_REQSAVE): {
+            int slot = export_data->slot;
 
-    // create text
-    Text *confirm_text = Text_CreateText(2, menu_data->canvas_popup);
-    export_data->confirm_text = confirm_text;
-    // enable align and kerning
-    confirm_text->align = 1;
-    confirm_text->kerning = 1;
-    // scale canvas
-    confirm_text->trans.X = 0;
-    confirm_text->trans.Y = 0;
-    confirm_text->scale.X = MENU_CANVASSCALE;
-    confirm_text->scale.Y = MENU_CANVASSCALE;
-    confirm_text->trans.Z = MENU_TEXTZ;
-    Text_AddSubtext(confirm_text, 0, -40, "Save File to Slot %s?", slots_names[export_data->slot]);
-    int yes_subtext = Text_AddSubtext(confirm_text, -60, 20, "Yes");
-    GXColor yellow = {201, 178, 0, 255};
-    Text_SetColor(confirm_text, yes_subtext, &yellow);
-    Text_AddSubtext(confirm_text, 60, 20, "No");
+            save_pre_tick = OSGetTick();
 
-    export_data->menu_index = EXMENU_CONFIRM;
-    export_data->confirm_state = EXPOP_CONFIRM;
-    export_data->confirm_cursor = 0;
+            // create filename string
+            ExportHeader *header = stc_transfer_buf;
+            char filename[32];
+            sprintf(filename, tm_filename, header->metadata.month, header->metadata.day, header->metadata.year,
+                    header->metadata.hour, header->metadata.minute,
+                    header->metadata.second); // generate filename based on date, time, fighters, and stage
 
-    return 0;
+            // save file name to metadata
+            memcpy(&header->metadata.filename, export_data->filename_buffer, export_data->filename_cursor);
+
+            // check if file exists and delete it
+            s32 memSize, sectorSize;
+            if (CARDProbeEx(slot, &memSize, &sectorSize) == CARD_RESULT_READY) {
+                // mount card
+                stc_memcard_work->is_done = 0;
+                if (CARDMountAsync(slot, stc_memcard_work->work_area, 0, Memcard_RemovedCallback) ==
+                    CARD_RESULT_READY) {
+                    // check card
+                    Memcard_Wait();
+                    stc_memcard_work->is_done = 0;
+                    if (CARDCheckAsync(slot, Memcard_RemovedCallback) == CARD_RESULT_READY) {
+                        Memcard_Wait();
+                        // get free blocks
+                        s32 byteNotUsed, filesNotUsed;
+                        if (CARDFreeBlocks(slot, &byteNotUsed, &filesNotUsed) == CARD_RESULT_READY) {
+                            // search for file with this name
+                            for (int i = 0; i < CARD_MAX_FILE; i++) {
+                                CARDStat card_stat;
+
+                                if (CARDGetStatus(slot, i, &card_stat) == CARD_RESULT_READY) {
+                                    // check company code
+                                    if (strncmp(os_info->company, card_stat.company, sizeof(os_info->company)) == 0) {
+                                        // check game name
+                                        if (strncmp(os_info->gameName, card_stat.gameName,
+                                                    sizeof(os_info->gameName)) == 0) {
+                                            // check file name
+                                            if (strncmp(&filename, card_stat.fileName, sizeof(filename)) == 0) {
+                                                // delete
+                                                CARDDeleteAsync(slot, &filename, Memcard_RemovedCallback);
+                                                stc_memcard_work->is_done = 0;
+                                                Memcard_Wait();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    CARDUnmount(slot);
+                    stc_memcard_work->is_done = 0;
+                }
+            }
+
+            // setup save
+            memcpy(stc_memcard_info->file_name, &stc_save_name, sizeof(stc_save_name));
+            memset(stc_memcard_info->file_desc, '\0', 32); // fill with spaces
+            memcpy(stc_memcard_info->file_desc, export_data->filename_buffer, export_data->filename_cursor);
+            // copy inputted name
+            memcard_save.data = stc_transfer_buf;
+            memcard_save.x4 = 3;
+            memcard_save.size = stc_transfer_buf_size;
+            memcard_save.xc = -1;
+            Memcard_CreateSnapshot(slot, &filename, &memcard_save, stc_memcard_unk, stc_memcard_info->file_name,
+                                   stc_lab_data->save_banner, stc_lab_data->save_icon, 0);
+
+            // change status
+            export_status = EXSTAT_SAVEWAIT;
+            OSReport("now saving...\n");
+
+            break;
+        }
+        case (EXSTAT_SAVEWAIT): {
+            // wait to finish writing
+            if (Memcard_CheckStatus() != 11) {
+                // change state
+                export_status = EXSTAT_DONE;
+            } else {
+                OSReport("status %d // progress %d/%d\n", *stc_memcard_write_status, *stc_memcard_block_curr, *
+                         stc_memcard_block_last);
+
+                if (*stc_memcard_write_status == 6) {
+                    Text_SetText(text, 0, "Writing Data...");
+                } else {
+                    Text_SetText(text, 0, "Creating File");
+                }
+            }
+
+            break;
+        }
+        case (EXSTAT_DONE): {
+            export_status = EXSTAT_NONE;
+            finished = 1;
+
+            Text_Destroy(text);
+
+            // done saving, output time
+            int save_post_tick = OSGetTick();
+            int save_time = OSTicksToMilliseconds(save_post_tick - save_pre_tick);
+            OSReport("wrote save in %dms\n", save_time);
+
+            break;
+        }
+    }
+
+    return finished;
 }
 
 int Export_ConfirmThink(GOBJ *export_gobj) {
@@ -5856,169 +5702,373 @@ int Export_ConfirmThink(GOBJ *export_gobj) {
     return 0;
 }
 
-void Export_ConfirmExit(GOBJ *export_gobj) {
+int Export_Think(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
+    int can_unpause = 0;
 
-    GObj_Destroy(export_data->confirm_gobj);
-    Text_Destroy(export_data->confirm_text);
-
-    export_data->menu_index = EXMENU_NAME;
-}
-
-void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj) {
-    ExportData *export_data = export_gobj->userdata;
-    Text *text_keyboard = export_data->text_keyboard;
-    u8 *cursor = export_data->key_cursor;
-
-    // get correct set of letters
-    char **keyboard_letters = keyboard_rows[export_data->caps_lock];
-
-    // iterate through rows
-    for (int i = 0; i < 4; i++) {
-        // iterate through columns
-        for (int j = 0; j < 10; j++) {
-            int this_subtext = (i * 10) + j;
-
-            // update letter text
-            char letter[2];
-            letter[0] = keyboard_letters[i][j];
-            letter[1] = '\0';
-            Text_SetText(text_keyboard, this_subtext, &letter);
-
-            // update letter color
-            static GXColor white = {255, 255, 255, 255};
-            static GXColor yellow = {201, 178, 0, 255};
-            GXColor *color;
-            // check for cursor
-            if ((cursor[0] == j) && (cursor[1] == i))
-                color = &yellow;
-            else
-                color = &white;
-            Text_SetColor(text_keyboard, this_subtext, color);
+    switch (export_data->menu_index) {
+        case (EXMENU_SELCARD): {
+            can_unpause = Export_SelCardThink(export_gobj);
+            break;
+        }
+        case (EXMENU_NAME): {
+            can_unpause = Export_EnterNameThink(export_gobj);
+            break;
+        }
+        case (EXMENU_CONFIRM): {
+            can_unpause = Export_ConfirmThink(export_gobj);
+            break;
         }
     }
+
+    return can_unpause;
+}
+
+void Export_SelCardExit(GOBJ *export_gobj) {
+    ExportData *export_data = export_gobj->userdata;
+
+    // hide menu jobjs
+    JOBJ_SetFlags(export_data->memcard_jobj[0], JOBJ_HIDDEN);
+    JOBJ_SetFlags(export_data->memcard_jobj[1], JOBJ_HIDDEN);
+
+    Text_Destroy(export_data->text_title);
+    Text_Destroy(export_data->text_desc);
+    Text_Destroy(export_data->text_misc);
+}
+
+void Export_Destroy(GOBJ *export_gobj) {
+    ExportData *export_data = export_gobj->userdata;
+    MenuData *menu_data = event_vars->menu_gobj->userdata;
+
+    switch (export_data->menu_index) {
+        case (EXMENU_SELCARD): {
+            Export_SelCardExit(export_gobj);
+            break;
+        }
+        case (EXMENU_NAME): {
+            Export_EnterNameExit(export_gobj);
+            break;
+        }
+    }
+
+    // free buffer allocs
+    HSD_Free(stc_transfer_buf);
+    HSD_Free(export_data->filename_buffer);
+    HSD_Free(export_data->scaled_image);
+
+    // destroy gobj
+    GObj_Destroy(export_gobj);
+
+    // show menu
+    event_vars->hide_menu = 0;
+    menu_data->custom_gobj = 0;
+    menu_data->custom_gobj_think = 0;
+    menu_data->custom_gobj_destroy = 0;
 
     return;
 }
 
-int Export_Process(GOBJ *export_gobj) {
+void Export_SelCardInit(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
-    Text *text = export_data->confirm_text;
+    MenuData *menu_data = event_vars->menu_gobj->userdata;
 
-    int finished = 0;
+    // show menu jobjs
+    JOBJ_ClearFlags(export_data->memcard_jobj[0], JOBJ_HIDDEN);
+    JOBJ_ClearFlags(export_data->memcard_jobj[1], JOBJ_HIDDEN);
 
-    // if snapshot is processing, dont update
-    switch (export_status) {
-        case (EXSTAT_REQSAVE): {
-            int slot = export_data->slot;
+    // create text
+    Text *text_misc = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_misc = text_misc;
+    // enable align and kerning
+    text_misc->align = 1;
+    text_misc->kerning = 1;
+    // scale canvas
+    text_misc->scale.X = MENU_CANVASSCALE;
+    text_misc->scale.Y = MENU_CANVASSCALE;
+    text_misc->trans.Z = MENU_TEXTZ;
 
-            save_pre_tick = OSGetTick();
+    // create title text
+    Text *text_title = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_title = text_title;
+    // enable align and kerning
+    text_title->align = 0;
+    text_title->kerning = 1;
+    // scale canvas
+    text_title->trans.X = -23;
+    text_title->trans.Y = -18;
+    text_title->scale.X = MENU_CANVASSCALE * 2;
+    text_title->scale.Y = MENU_CANVASSCALE * 2;
+    text_title->trans.Z = MENU_TEXTZ;
 
-            // create filename string
-            ExportHeader *header = stc_transfer_buf;
-            char filename[32];
-            sprintf(filename, tm_filename, header->metadata.month, header->metadata.day, header->metadata.year,
-                    header->metadata.hour, header->metadata.minute,
-                    header->metadata.second); // generate filename based on date, time, fighters, and stage
+    // create desc text
+    Text *text_desc = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_desc = text_desc;
+    // enable align and kerning
+    text_desc->align = 0;
+    text_desc->kerning = 1;
+    // scale canvas
+    text_desc->trans.X = -23;
+    text_desc->trans.Y = 12;
+    text_desc->scale.X = MENU_CANVASSCALE;
+    text_desc->scale.Y = MENU_CANVASSCALE;
+    text_desc->trans.Z = MENU_TEXTZ;
 
-            // save file name to metadata
-            memcpy(&header->metadata.filename, export_data->filename_buffer, export_data->filename_cursor);
+    Text_AddSubtext(text_title, 0, 0, "Select a Memory Card"); // add title
+    Text_AddSubtext(text_desc, 0, 0, ""); // add description
 
-            // check if file exists and delete it
-            s32 memSize, sectorSize;
-            if (CARDProbeEx(slot, &memSize, &sectorSize) == CARD_RESULT_READY) {
+    // add dummy text
+    Text_AddSubtext(text_misc, -165, 67, "Slot A");
+    Text_AddSubtext(text_misc, 165, 67, "Slot B");
+
+    // init memcard inserted status
+    for (int i = 0; i < 2; i++) {
+        export_data->is_inserted[i] = 0;
+    }
+
+    // init cursor
+    export_data->menu_index = EXMENU_SELCARD;
+    export_data->slot = 0;
+
+    return;
+}
+
+void Export_EnterNameInit(GOBJ *export_gobj) {
+    ExportData *export_data = export_gobj->userdata;
+    MenuData *menu_data = event_vars->menu_gobj->userdata;
+
+    // show menu jobjs
+    JOBJ_ClearFlags(export_data->screenshot_jobj, JOBJ_HIDDEN);
+    JOBJ_ClearFlags(export_data->textbox_jobj, JOBJ_HIDDEN);
+
+    // create keyboard text
+    Text *text_keyboard = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_keyboard = text_keyboard;
+    // enable align and kerning
+    text_keyboard->align = 1;
+    text_keyboard->kerning = 1;
+    // scale canvas
+    text_keyboard->trans.X = EXP_KEYBOARD_X;
+    text_keyboard->trans.Y = EXP_KEYBOARD_Y;
+    text_keyboard->scale.X = MENU_CANVASSCALE * EXP_KEYBOARD_SIZE;
+    text_keyboard->scale.Y = MENU_CANVASSCALE * EXP_KEYBOARD_SIZE;
+    // init keyboard
+    for (int i = 0; i < 4; i++) {
+        // iterate through columns
+        for (int j = 0; j < 10; j++) {
+            Text_AddSubtext(text_keyboard, (-(9.0 / 2.0) * 60) + (j * 60), -80 + (i * 60), "");
+        }
+    }
+    export_data->key_cursor[0] = 0;
+    export_data->key_cursor[1] = 0;
+    export_data->caps_lock = 0;
+    Export_EnterNameUpdateKeyboard(export_gobj);
+
+    // create file details
+    ExportHeader *header = stc_transfer_buf;
+    char *stage_name = stage_names[header->metadata.stage_internal];
+    char *hmn_name = Fighter_GetName(header->metadata.hmn);
+    char *cpu_name = Fighter_GetName(header->metadata.cpu);
+    Text *text_filedetails = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_filedetails = text_filedetails;
+    // enable align and kerning
+    text_filedetails->align = 0;
+    text_filedetails->kerning = 1;
+    // scale canvas
+    text_filedetails->trans.X = EXP_FILEDETAILS_X;
+    text_filedetails->trans.Y = EXP_FILEDETAILS_Y;
+    text_filedetails->scale.X = MENU_CANVASSCALE * EXP_FILEDETAILS_SIZE;
+    text_filedetails->scale.Y = MENU_CANVASSCALE * EXP_FILEDETAILS_SIZE;
+
+    Text_AddSubtext(text_filedetails, 0, 0, "Stage: %s\nHMN: %s\nCPU: %s\n\nSlot %s", stage_name, hmn_name, cpu_name,
+                    slots_names[export_data->slot]); // add title
+
+    // create title text
+    Text *text_title = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_title = text_title;
+    // enable align and kerning
+    text_title->align = 0;
+    text_title->kerning = 1;
+    // scale canvas
+    text_title->trans.X = -23;
+    text_title->trans.Y = -18;
+    text_title->scale.X = MENU_CANVASSCALE * 2;
+    text_title->scale.Y = MENU_CANVASSCALE * 2;
+    text_title->trans.Z = MENU_TEXTZ;
+    Text_AddSubtext(text_title, 0, 0, "Enter File Name");
+
+    // create desc text
+    Text *text_desc = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_desc = text_desc;
+    // enable align and kerning
+    text_desc->align = 0;
+    text_desc->kerning = 1;
+    // scale canvas
+    text_desc->trans.X = -23;
+    text_desc->trans.Y = 12;
+    text_desc->scale.X = MENU_CANVASSCALE;
+    text_desc->scale.Y = MENU_CANVASSCALE;
+    Text_AddSubtext(text_desc, 0, 0, "A: Select  B: Backspace  Y: Caps  Start: Confirm"); // add description
+    Text_AddSubtext(text_desc, 0, 40, "     X: Space  L: Cursor left  R: Cursor right"); // add description
+
+    // create filename
+    Text *text_filename = Text_CreateText(2, menu_data->canvas_menu);
+    export_data->text_filename = text_filename;
+    // enable align and kerning
+    text_filename->align = 0;
+    text_filename->kerning = 1;
+    text_filename->use_aspect = 1;
+    GXColor filename_color = {225, 225, 225, 255};
+    text_filename->color = filename_color;
+    // scale canvas
+    text_filename->trans.X = EXP_FILENAME_X;
+    text_filename->trans.Y = EXP_FILENAME_Y;
+    text_filename->aspect.X = EXP_FILENAME_ASPECTX;
+    text_filename->aspect.Y = EXP_FILENAME_ASPECTY;
+    text_filename->scale.X = MENU_CANVASSCALE * EXP_FILENAME_SIZE;
+    text_filename->scale.Y = MENU_CANVASSCALE * EXP_FILENAME_SIZE;
+    // init filename buffer
+    export_data->filename_buffer[0] = '_';
+    export_data->filename_buffer[1] = '\0';
+    Text_AddSubtext(text_filename, 0, 0, export_data->filename_buffer); // add title
+
+    // init menu variables
+    export_data->menu_index = EXMENU_NAME;
+    export_data->filename_cursor = 0;
+
+    return;
+}
+
+int Export_SelCardThink(GOBJ *export_gobj) {
+    ExportData *export_data = export_gobj->userdata;
+
+    int req_blocks = (divide_roundup(stc_transfer_buf_size, 8192) + 1);
+
+    // get pausing players inputs
+    HSD_Pad *pad = PadGet(stc_hmn_controller, PADGET_MASTER);
+    int inputs = pad->down;
+
+    // update memcard info
+    for (int i = 1; i >= 0; i--) {
+        // probe slot
+        u8 is_inserted;
+
+        s32 memSize, sectorSize;
+        if (CARDProbeEx(i, &memSize, &sectorSize) == CARD_RESULT_READY) {
+            // if it was just inserted, get info
+            if (export_data->is_inserted[i] == 0) {
                 // mount card
                 stc_memcard_work->is_done = 0;
-                if (CARDMountAsync(slot, stc_memcard_work->work_area, 0, Memcard_RemovedCallback) ==
-                    CARD_RESULT_READY) {
+                if (CARDMountAsync(i, stc_memcard_work->work_area, 0, Memcard_RemovedCallback) == CARD_RESULT_READY) {
                     // check card
                     Memcard_Wait();
                     stc_memcard_work->is_done = 0;
-                    if (CARDCheckAsync(slot, Memcard_RemovedCallback) == CARD_RESULT_READY) {
+                    if (CARDCheckAsync(i, Memcard_RemovedCallback) == CARD_RESULT_READY) {
                         Memcard_Wait();
+
+                        // if we get this far, a valid memcard is inserted
+                        is_inserted = 1;
+                        SFX_PlayCommon(2);
+                        //export_data->slot = i;  // move cursor to this
+
                         // get free blocks
                         s32 byteNotUsed, filesNotUsed;
-                        if (CARDFreeBlocks(slot, &byteNotUsed, &filesNotUsed) == CARD_RESULT_READY) {
-                            // search for file with this name
-                            for (int i = 0; i < CARD_MAX_FILE; i++) {
-                                CARDStat card_stat;
-
-                                if (CARDGetStatus(slot, i, &card_stat) == CARD_RESULT_READY) {
-                                    // check company code
-                                    if (strncmp(os_info->company, card_stat.company, sizeof(os_info->company)) == 0) {
-                                        // check game name
-                                        if (strncmp(os_info->gameName, card_stat.gameName,
-                                                    sizeof(os_info->gameName)) == 0) {
-                                            // check file name
-                                            if (strncmp(&filename, card_stat.fileName, sizeof(filename)) == 0) {
-                                                // delete
-                                                CARDDeleteAsync(slot, &filename, Memcard_RemovedCallback);
-                                                stc_memcard_work->is_done = 0;
-                                                Memcard_Wait();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                        if (CARDFreeBlocks(i, &byteNotUsed, &filesNotUsed) == CARD_RESULT_READY) {
+                            export_data->free_blocks[i] = (byteNotUsed / 8192);
+                            export_data->free_files[i] = filesNotUsed;
                         }
-                    }
-                    CARDUnmount(slot);
+                    } else
+                        is_inserted = 0;
+
+                    CARDUnmount(i);
                     stc_memcard_work->is_done = 0;
-                }
-            }
+                } else
+                    is_inserted = 0;
+            } else
+                is_inserted = 1;
+        } else
+            is_inserted = 0;
 
-            // setup save
-            memcpy(stc_memcard_info->file_name, &stc_save_name, sizeof(stc_save_name));
-            memset(stc_memcard_info->file_desc, '\0', 32); // fill with spaces
-            memcpy(stc_memcard_info->file_desc, export_data->filename_buffer, export_data->filename_cursor);
-            // copy inputted name
-            memcard_save.data = stc_transfer_buf;
-            memcard_save.x4 = 3;
-            memcard_save.size = stc_transfer_buf_size;
-            memcard_save.xc = -1;
-            Memcard_CreateSnapshot(slot, &filename, &memcard_save, stc_memcard_unk, stc_memcard_info->file_name,
-                                   stc_lab_data->save_banner, stc_lab_data->save_icon, 0);
+        export_data->is_inserted[i] = is_inserted;
+    }
 
-            // change status
-            export_status = EXSTAT_SAVEWAIT;
-            OSReport("now saving...\n");
-
-            break;
-        }
-        case (EXSTAT_SAVEWAIT): {
-            // wait to finish writing
-            if (Memcard_CheckStatus() != 11) {
-                // change state
-                export_status = EXSTAT_DONE;
-            } else {
-                OSReport("status %d // progress %d/%d\n", *stc_memcard_write_status, *stc_memcard_block_curr, *
-                         stc_memcard_block_last);
-
-                if (*stc_memcard_write_status == 6) {
-                    Text_SetText(text, 0, "Writing Data...");
-                } else {
-                    Text_SetText(text, 0, "Creating File");
-                }
-            }
-
-            break;
-        }
-        case (EXSTAT_DONE): {
-            export_status = EXSTAT_NONE;
-            finished = 1;
-
-            Text_Destroy(text);
-
-            // done saving, output time
-            int save_post_tick = OSGetTick();
-            int save_time = OSTicksToMilliseconds(save_post_tick - save_pre_tick);
-            OSReport("wrote save in %dms\n", save_time);
-
-            break;
+    // if left
+    if ((inputs & HSD_BUTTON_LEFT) || (inputs & HSD_BUTTON_DPAD_LEFT)) {
+        if (export_data->slot > 0) {
+            export_data->slot--;
+            SFX_PlayCommon(2);
         }
     }
 
-    return finished;
+    // if right
+    if ((inputs & HSD_BUTTON_RIGHT) || (inputs & HSD_BUTTON_DPAD_RIGHT)) {
+        if (export_data->slot < 1) {
+            export_data->slot++;
+            SFX_PlayCommon(2);
+        }
+    }
+
+    int cursor = export_data->slot;
+    // if press A,
+    if ((inputs & HSD_BUTTON_A) || (inputs & HSD_BUTTON_START)) {
+        // ensure it can be saved
+        if ((export_data->is_inserted[cursor] == 1) && (export_data->free_files[cursor] >= 1) && (
+                export_data->free_blocks[cursor] >= req_blocks)) {
+            // can save move to next screen
+            Export_SelCardExit(export_gobj);
+
+            // init next menu
+            Export_EnterNameInit(export_gobj);
+
+            SFX_PlayCommon(1);
+
+            return;
+        } else
+            SFX_PlayCommon(3);
+    }
+
+    // if press B,
+    if ((inputs & HSD_BUTTON_B)) {
+        Export_Destroy(export_gobj);
+
+        // play sfx
+        SFX_PlayCommon(0);
+
+        return;
+    }
+
+    // update selection
+    Text *text = export_data->text_misc;
+    for (int i = 0; i < 2; i++) {
+        static GXColor white = {255, 255, 255, 255};
+        static GXColor yellow = {201, 178, 0, 255};
+        GXColor *color;
+
+        // highlight cursor only
+        if (export_data->slot == i)
+            color = &yellow;
+        else
+            color = &white;
+
+        Text_SetColor(text, i, color);
+    }
+
+    // update description
+    Text *text_desc = export_data->text_desc;
+    if (export_data->is_inserted[cursor] == 0) {
+        Text_SetText(text_desc, 0, "No device is inserted in Slot %s.", slots_names[cursor]);
+    } else if (export_data->free_files[cursor] < 1) {
+        Text_SetText(text_desc, 0,
+                     "The memory card in Slot %s does not \nhave enough free files. 1 free file is \nrequired to save.",
+                     slots_names[cursor]);
+    } else if (export_data->free_blocks[cursor] < req_blocks) {
+        Text_SetText(text_desc, 0,
+                     "The memory card in Slot %s does not \nhave enough free blocks. %d blocks is \nrequired to save.",
+                     slots_names[cursor], req_blocks);
+    } else {
+        Text_SetText(text_desc, 0, "Slot %s: %d free blocks. %d blocks will be used.", slots_names[cursor],
+                     export_data->free_blocks[cursor], req_blocks);
+    }
+    return 1;
 }
 
 int Export_Compress(u8 *dest, u8 *source, u32 size) {
@@ -6286,7 +6336,3 @@ void Event_Think(GOBJ *event) {
 
     return;
 }
-
-// Initial Menu
-static EventMenu *Event_Menu = &LabMenu_Main;
-EventMenu **menu_start = &Event_Menu;
