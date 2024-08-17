@@ -41,25 +41,6 @@ v2 = not released
 #define REC_LEFTTEXTJOINT 2
 #define REC_RIGHTTEXTJOINT 3
 
-// export
-enum export_status {
-    EXSTAT_NONE,
-    EXSTAT_REQSAVE,
-    EXSTAT_SAVEWAIT,
-    EXSTAT_DONE,
-};
-
-enum export_menuindex {
-    EXMENU_SELCARD,
-    EXMENU_NAME,
-    EXMENU_CONFIRM,
-};
-
-enum export_popup {
-    EXPOP_CONFIRM,
-    EXPOP_SAVE,
-};
-
 #define EXP_MEMCARDAJOBJ 9
 #define EXP_MEMCARDBJOBJ 11
 #define EXP_TEXTBOXJOBJ 12
@@ -85,6 +66,130 @@ enum export_popup {
 #define RESIZE_MULT (0.15)
 #define RESIZE_WIDTH (EXP_SCREENSHOT_WIDTH * RESIZE_MULT)
 #define RESIZE_HEIGHT (EXP_SCREENSHOT_HEIGHT * RESIZE_MULT)
+
+// GX
+#define INPUT_GXLINK 12
+#define INPUT_GXPRI 80
+// params
+#define INPUT_SHELL_JOBJ 14
+#define INPUT_SHELL_DOBJ 0
+#define INPUT_COLOR_PRESSED { \
+    255, 255, 255, 255        \
+}
+
+// info display
+#define GXPRI_INFDISP GXPRI_MENUMODEL - 2
+#define GXLINK_INFDISP 12
+#define GXPRI_INFDISPTEXT GXPRI_INFDISP + 1
+#define GXLINK_INFDISPTEXT 12
+
+// info display jobj
+#define INFDISP_WIDTH 6
+#define INFDISP_SCALE 4
+#define INFDISP_X -26.5
+#define INFDISP_Y 21.5
+#define INFDISP_Z 0.01
+#define INFDISP_YOFFSET -2.5
+#define INFDISP_BOTY -0.5
+#define INFDISP_BOTYOFFSET -0.30
+// info display text
+#define INFDISPTEXT_SCALE 0.04
+#define INFDISPTEXT_X 1
+#define INFDISPTEXT_Y 1
+#define INFDISPTEXT_YOFFSET 30
+
+// Recording Options
+#define OPTREC_SAVE 0
+#define OPTREC_LOAD 1
+#define OPTREC_HMNMODE 2
+#define OPTREC_HMNSLOT 3
+#define OPTREC_CPUMODE 4
+#define OPTREC_CPUSLOT 5
+#define OPTREC_LOOP 6
+#define OPTREC_AUTOLOAD 7
+
+// Recording Modes
+#define RECMODE_OFF 0
+#define RECMODE_CTRL 1
+#define RECMODE_REC 2
+#define RECMODE_PLAY 3
+
+// Info Display Options
+//#define OPTINF_TOGGLE 0
+#define OPTINF_PLAYER 0
+#define OPTINF_SIZE 1
+#define OPTINF_PRESET 2
+#define OPTINF_ROW1 3
+
+#define INTANG_COLANIM 10
+
+// Grab Escape RNG Def
+#define CPUMASHRNG_MED 35
+#define CPUMASHRNG_HIGH 55
+
+// Behavior Definitions
+#define CPUBEHAVE_STAND 0
+#define CPUBEHAVE_SHIELD 1
+#define CPUBEHAVE_CROUCH 2
+#define CPUBEHAVE_JUMP 3
+
+// SDI Definitions
+#define CPUSDI_RANDOM 0
+#define CPUSDI_NONE 1
+
+// TDI Definitions
+#define CPUTDI_RANDOM 0
+#define CPUTDI_IN 1
+#define CPUTDI_OUT 2
+#define CPUTDI_FLOORHUG 3
+#define CPUTDI_CUSTOM 4
+#define CPUTDI_NONE 5
+#define CPUTDI_NUM 6
+
+// Tech Definitions
+#define CPUTECH_RANDOM 0
+#define CPUTECH_NEUTRAL 1
+#define CPUTECH_AWAY 2
+#define CPUTECH_TOWARDS 3
+#define CPUTECH_NONE 4
+
+// Getup Definitions
+#define CPUGETUP_RANDOM 0
+#define CPUGETUP_STAND 1
+#define CPUGETUP_AWAY 2
+#define CPUGETUP_TOWARD 3
+#define CPUGETUP_ATTACK 4
+
+// Hit kind defintions
+#define HITKIND_DAMAGE 0
+#define HITKIND_SHIELD 1
+
+// DI Draw Constants
+#define DI_MaxColl 50
+
+#define IMPORT_FILESPERPAGE 10
+
+#define MENUCAM_GXLINK 5
+#define SIS_ID 0
+
+// export
+enum export_status {
+    EXSTAT_NONE,
+    EXSTAT_REQSAVE,
+    EXSTAT_SAVEWAIT,
+    EXSTAT_DONE,
+};
+
+enum export_menuindex {
+    EXMENU_SELCARD,
+    EXMENU_NAME,
+    EXMENU_CONFIRM,
+};
+
+enum export_popup {
+    EXPOP_CONFIRM,
+    EXPOP_SAVE,
+};
 
 typedef struct ButtonLookup ButtonLookup;
 typedef struct Arch_ImportData Arch_ImportData;
@@ -170,15 +275,6 @@ static int button_bits[] = {
     HSD_TRIGGER_R, // R
     HSD_TRIGGER_Z, // Z
 };
-// GX
-#define INPUT_GXLINK 12
-#define INPUT_GXPRI 80
-// params
-#define INPUT_SHELL_JOBJ 14
-#define INPUT_SHELL_DOBJ 0
-#define INPUT_COLOR_PRESSED { \
-    255, 255, 255, 255        \
-}
 
 struct Arch_ImportData {
     JOBJDesc *import_button;
@@ -493,27 +589,6 @@ static EventMenu LabMenu_InfoDisplay;
 static EventMenu LabMenu_CPU;
 static EventMenu LabMenu_Record;
 
-// info display
-#define GXPRI_INFDISP GXPRI_MENUMODEL - 2
-#define GXLINK_INFDISP 12
-#define GXPRI_INFDISPTEXT GXPRI_INFDISP + 1
-#define GXLINK_INFDISPTEXT 12
-
-// info display jobj
-#define INFDISP_WIDTH 6
-#define INFDISP_SCALE 4
-#define INFDISP_X -26.5
-#define INFDISP_Y 21.5
-#define INFDISP_Z 0.01
-#define INFDISP_YOFFSET -2.5
-#define INFDISP_BOTY -0.5
-#define INFDISP_BOTYOFFSET -0.30
-// info display text
-#define INFDISPTEXT_SCALE 0.04
-#define INFDISPTEXT_X 1
-#define INFDISPTEXT_Y 1
-#define INFDISPTEXT_YOFFSET 30
-
 // General Options
 enum gen_option {
     OPTGEN_FRAME,
@@ -565,29 +640,6 @@ enum sdi_dir {
     SDIDIR_AWAY,
     SDIDIR_TOWARD,
 };
-
-// Recording Options
-#define OPTREC_SAVE 0
-#define OPTREC_LOAD 1
-#define OPTREC_HMNMODE 2
-#define OPTREC_HMNSLOT 3
-#define OPTREC_CPUMODE 4
-#define OPTREC_CPUSLOT 5
-#define OPTREC_LOOP 6
-#define OPTREC_AUTOLOAD 7
-
-// Recording Modes
-#define RECMODE_OFF 0
-#define RECMODE_CTRL 1
-#define RECMODE_REC 2
-#define RECMODE_PLAY 3
-
-// Info Display Options
-//#define OPTINF_TOGGLE 0
-#define OPTINF_PLAYER 0
-#define OPTINF_SIZE 1
-#define OPTINF_PRESET 2
-#define OPTINF_ROW1 3
 
 // Info Display Rows
 enum infdisp_rows {
@@ -641,45 +693,6 @@ enum cpu_mash {
     CPUMASH_PERFECT,
 };
 
-#define INTANG_COLANIM 10
-
-// Grab Escape RNG Def
-#define CPUMASHRNG_MED 35
-#define CPUMASHRNG_HIGH 55
-
-// Behavior Definitions
-#define CPUBEHAVE_STAND 0
-#define CPUBEHAVE_SHIELD 1
-#define CPUBEHAVE_CROUCH 2
-#define CPUBEHAVE_JUMP 3
-
-// SDI Definitions
-#define CPUSDI_RANDOM 0
-#define CPUSDI_NONE 1
-
-// TDI Definitions
-#define CPUTDI_RANDOM 0
-#define CPUTDI_IN 1
-#define CPUTDI_OUT 2
-#define CPUTDI_FLOORHUG 3
-#define CPUTDI_CUSTOM 4
-#define CPUTDI_NONE 5
-#define CPUTDI_NUM 6
-
-// Tech Definitions
-#define CPUTECH_RANDOM 0
-#define CPUTECH_NEUTRAL 1
-#define CPUTECH_AWAY 2
-#define CPUTECH_TOWARDS 3
-#define CPUTECH_NONE 4
-
-// Getup Definitions
-#define CPUGETUP_RANDOM 0
-#define CPUGETUP_STAND 1
-#define CPUGETUP_AWAY 2
-#define CPUGETUP_TOWARD 3
-#define CPUGETUP_ATTACK 4
-
 // Stick Direction Definitions
 enum STICKDIR {
     STCKDIR_NONE,
@@ -689,13 +702,6 @@ enum STICKDIR {
     STCKDIR_BACK,
     STICKDIR_RDM,
 };
-
-// Hit kind defintions
-#define HITKIND_DAMAGE 0
-#define HITKIND_SHIELD 1
-
-// DI Draw Constants
-#define DI_MaxColl 50
 
 static char *stage_names[] = {
     "",
@@ -741,7 +747,6 @@ static char *stage_names[] = {
 // CSS Import
 s8 *onload_fileno = R13 + (-0x4670);
 s8 *onload_slot = R13 + (-0x466F);
-#define IMPORT_FILESPERPAGE 10
 
 enum ImportMenuStates {
     IMP_SELCARD,
@@ -819,6 +824,3 @@ void Menu_Confirm_Exit(GOBJ *menu_gobj);
 GOBJ *Menu_Create();
 
 void Menu_Think(GOBJ *menu_gobj);
-
-#define MENUCAM_GXLINK 5
-#define SIS_ID 0

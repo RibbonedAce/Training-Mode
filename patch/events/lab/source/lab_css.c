@@ -1,5 +1,17 @@
 #include "lab.h"
 
+#define BUTTON_WIDTH 5
+#define BUTTON_HEIGHT 2.2
+
+#define FILEINFO_X 235
+#define FILEINFO_Y -20
+#define FILEINFO_YOFFSET 35
+#define FILEINFO_STAGEY FILEINFO_Y
+#define FILEINFO_HMNY FILEINFO_STAGEY + FILEINFO_YOFFSET
+#define FILEINFO_CPUY FILEINFO_HMNY + FILEINFO_YOFFSET
+#define FILEINFO_DATEY FILEINFO_CPUY + (FILEINFO_YOFFSET * 2)
+#define FILEINFO_TIMEY FILEINFO_DATEY + FILEINFO_YOFFSET
+
 // Static Variables
 static Arch_ImportData *stc_import_assets;
 static ImportData import_data;
@@ -83,9 +95,6 @@ void Button_Create() {
 }
 
 void Button_Think(GOBJ *button_gobj) {
-#define BUTTON_WIDTH 5
-#define BUTTON_HEIGHT 2.2
-
     // init
     CSSCursor *this_cursor = stc_css_cursors[0]; // get the main player's hand cursor data
     Vec2 cursor_pos = this_cursor->pos;
@@ -398,15 +407,6 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
     for (int i = 0; i < IMPORT_FILESPERPAGE; i++) {
         Text_AddSubtext(filename_text, 0, i * 40, "");
     }
-
-#define FILEINFO_X 235
-#define FILEINFO_Y -20
-#define FILEINFO_YOFFSET 35
-#define FILEINFO_STAGEY FILEINFO_Y
-#define FILEINFO_HMNY FILEINFO_STAGEY + FILEINFO_YOFFSET
-#define FILEINFO_CPUY FILEINFO_HMNY + FILEINFO_YOFFSET
-#define FILEINFO_DATEY FILEINFO_CPUY + (FILEINFO_YOFFSET * 2)
-#define FILEINFO_TIMEY FILEINFO_DATEY + FILEINFO_YOFFSET
 
     // create file info text
     Text *fileinfo_text = Text_CreateText(SIS_ID, import_data.canvas);

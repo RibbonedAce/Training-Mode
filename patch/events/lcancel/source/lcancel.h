@@ -1,6 +1,11 @@
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
+#define LCLTEXT_SCALE 4.2
+#define LCLARROW_ANIMFRAMES 4
+#define LCLARROW_JOBJ 7
+#define LCLARROW_OFFSET 0.365
+
 typedef struct LCancelAssets LCancelAssets;
 typedef struct LCancelData LCancelData;
 
@@ -44,11 +49,6 @@ struct LCancelData {
         u8 late_num; // number of times condition has been met
     } tip;
 };
-
-#define LCLTEXT_SCALE 4.2
-#define LCLARROW_ANIMFRAMES 4
-#define LCLARROW_JOBJ 7
-#define LCLARROW_OFFSET 0.365
 
 static void *item_callbacks[];
 

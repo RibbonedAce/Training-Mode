@@ -1,6 +1,20 @@
 #include "events.h"
 #include <stdarg.h>
 
+#define TIP_TXTSIZE 4.7
+#define TIP_TXTSIZEX TIP_TXTSIZE * 0.85
+#define TIP_TXTSIZEY TIP_TXTSIZE
+#define TIP_TXTASPECT 2430
+#define TIP_LINEMAX 5
+#define TIP_CHARMAX 48
+
+#define DESC_TXTSIZEX 5
+#define DESC_TXTSIZEY 5
+#define DESC_TXTASPECT 885
+#define DESC_LINEMAX 4
+#define DESC_CHARMAX 100
+#define DESC_YOFFSET 30
+
 void Event_Init(GOBJ *gobj) {
     int *EventData = gobj->userdata;
     EventDesc *event_desc = EventData[0];
@@ -2857,13 +2871,6 @@ void Tip_Think(GOBJ *gobj) {
 }
 
 int Tip_Display(int lifetime, char *fmt, ...) {
-#define TIP_TXTSIZE 4.7
-#define TIP_TXTSIZEX TIP_TXTSIZE * 0.85
-#define TIP_TXTSIZEY TIP_TXTSIZE
-#define TIP_TXTASPECT 2430
-#define TIP_LINEMAX 5
-#define TIP_CHARMAX 48
-
     va_list args;
 
     // if tip exists
@@ -3791,13 +3798,6 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     text->gobj->gx_cb = EventMenu_TextGX;
     menuData->text_desc = text;
     EventOption *currOption = &menu->options[menu->cursor + menu->scroll];
-
-#define DESC_TXTSIZEX 5
-#define DESC_TXTSIZEY 5
-#define DESC_TXTASPECT 885
-#define DESC_LINEMAX 4
-#define DESC_CHARMAX 100
-#define DESC_YOFFSET 30
 
     text->kerning = 1;
     text->align = 0;

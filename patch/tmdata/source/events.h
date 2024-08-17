@@ -10,6 +10,170 @@
 
 #define TMLOG(...) DevelopText_AddString(event_vars->db_console_text, __VA_ARGS__)
 
+// EventOption option_kind definitions
+#define OPTKIND_MENU 0
+#define OPTKIND_STRING 1
+#define OPTKIND_INT 2
+#define OPTKIND_FLOAT 3
+#define OPTKIND_FUNC 4
+
+// EventMenu state definitions
+#define EMSTATE_FOCUS 0
+#define EMSTATE_OPENSUB 1
+#define EMSTATE_OPENPOP 2
+#define EMSTATE_WAIT 3 // pauses menu logic, used for when a custom window is being shown
+
+// GX Link args
+#define GXLINK_MENUMODEL 12
+#define GXPRI_MENUMODEL 80
+#define GXLINK_MENUTEXT 12
+#define GXPRI_MENUTEXT GXPRI_MENUMODEL + 1
+
+// popup menu
+#define GXPRI_POPUPMODEL GXPRI_MENUTEXT + 1
+#define GXLINK_POPUPMODEL 12
+#define GXPRI_POPUPTEXT GXPRI_POPUPMODEL + 1
+#define GXLINK_POPUPTEXT 12
+
+// cobj
+#define MENUCAM_COBJGXLINK (1 << GXLINK_MENUMODEL) | (1 << GXLINK_MENUTEXT) | (1 << GXLINK_POPUPMODEL) | (1 << GXLINK_POPUPTEXT)
+#define MENUCAM_GXPRI 9
+
+// menu model
+#define OPT_SCALE 1
+#define OPT_X 0 //0.5
+#define OPT_Y -1
+#define OPT_Z 0
+#define OPT_WIDTH 55 / OPT_SCALE
+#define OPT_HEIGHT 40 / OPT_SCALE
+
+// menu text object
+#define MENU_CANVASSCALE 0.05
+#define MENU_TEXTSCALE 1
+#define MENU_TEXTZ 0
+
+// menu title
+#define MENU_TITLEXPOS -430
+#define MENU_TITLEYPOS -366
+#define MENU_TITLESCALE 2.3
+#define MENU_TITLEASPECT 870
+
+// menu description
+#define MENU_DESCXPOS -21.5
+#define MENU_DESCYPOS 12
+#define MENU_DESCSCALE 1
+
+// menu option name
+#define MENU_OPTIONNAMEXPOS -430
+#define MENU_OPTIONNAMEYPOS -230
+#define MENU_NAMEASPECT 440
+
+// menu option value
+#define MENU_OPTIONVALXPOS 250
+#define MENU_OPTIONVALYPOS -230
+#define MENU_TEXTYOFFSET 50
+#define MENU_VALASPECT 280
+
+// menu highlight
+#define MENUHIGHLIGHT_SCALE 1 // OPT_SCALE
+#define MENUHIGHLIGHT_HEIGHT ROWBOX_HEIGHT
+#define MENUHIGHLIGHT_WIDTH (OPT_WIDTH * 0.785)
+#define MENUHIGHLIGHT_X OPT_X
+#define MENUHIGHLIGHT_Y 10.8 //10.3
+#define MENUHIGHLIGHT_Z 0.01
+#define MENUHIGHLIGHT_YOFFSET ROWBOX_YOFFSET
+#define MENUHIGHLIGHT_COLOR { \
+    255, 211, 0, 255          \
+}
+
+// menu scroll
+#define MENUSCROLL_SCALE 2                         // OPT_SCALE
+#define MENUSCROLL_SCALEY 1.105 * MENUSCROLL_SCALE // OPT_SCALE
+#define MENUSCROLL_X 22.5
+#define MENUSCROLL_Y 12
+#define MENUSCROLL_Z 0.01
+#define MENUSCROLL_PEROPTION 1
+#define MENUSCROLL_MINLENGTH -1
+#define MENUSCROLL_MAXLENGTH -10
+#define MENUSCROLL_COLOR { \
+    255, 211, 0, 255       \
+}
+
+// row jobj
+#define ROWBOX_HEIGHT 2.3
+#define ROWBOX_WIDTH 18
+#define ROWBOX_X 12.5 //13
+#define ROWBOX_Y 10.8 //10.3
+#define ROWBOX_Z 0
+#define ROWBOX_YOFFSET -2.5
+#define ROWBOX_COLOR { \
+    104, 105, 129, 100 \
+}
+
+// arrow jobj
+#define TICKBOX_SCALE 1.8
+#define TICKBOX_X 11.7
+#define TICKBOX_Y 11.7
+
+// popup model
+#define POPUP_WIDTH ROWBOX_WIDTH
+#define POPUP_HEIGHT 19
+#define POPUP_SCALE 1
+#define POPUP_X 12.5
+#define POPUP_Y 8.3
+#define POPUP_Z 0.01
+#define POPUP_YOFFSET -2.5
+
+// popup text object
+#define POPUP_CANVASSCALE 0.05
+#define POPUP_TEXTSCALE 1
+#define POPUP_TEXTZ 0.01
+
+// popup text
+#define POPUP_OPTIONVALXPOS 250
+#define POPUP_OPTIONVALYPOS -280
+#define POPUP_TEXTYOFFSET 50
+
+// popup highlight
+#define POPUPHIGHLIGHT_HEIGHT ROWBOX_HEIGHT
+#define POPUPHIGHLIGHT_WIDTH (POPUP_WIDTH * 0.785)
+#define POPUPHIGHLIGHT_X 0
+#define POPUPHIGHLIGHT_Y 5
+#define POPUPHIGHLIGHT_Z 1
+#define POPUPHIGHLIGHT_YOFFSET ROWBOX_YOFFSET
+#define POPUPHIGHLIGHT_COLOR { \
+    255, 211, 0, 255           \
+}
+
+#define MSGQUEUE_NUM 7
+#define MSGQUEUE_SIZE 5
+#define MSGQUEUE_GENERAL 6
+
+#define MSGTIMER_SHIFT 6
+#define MSGTIMER_DELETE 6
+#define MSG_LIFETIME (2 * 60)
+#define MSG_LINEMAX 3  // lines per message
+#define MSG_CHARMAX 32 // characters per line
+#define MSG_HUDYOFFSET 8
+#define MSGJOINT_SCALE 3
+#define MSGJOINT_X 0
+#define MSGJOINT_Y 0
+#define MSGJOINT_Z 0
+#define MSGTEXT_BASESCALE 1.4
+#define MSGTEXT_BASEWIDTH (330 / MSGTEXT_BASESCALE)
+#define MSGTEXT_BASEX 0
+#define MSGTEXT_BASEY -1
+#define MSGTEXT_YOFFSET 30
+
+// GX stuff
+#define MSG_GXLINK 13
+#define MSG_GXPRI 80
+#define MSGTEXT_GXPRI MSG_GXPRI + 1
+#define MSG_COBJLGXLINKS (1 << MSG_GXLINK)
+#define MSG_COBJLGXPRI 8
+
+#define TIP_TXTJOINT 2
+
 // disable all logs in release mode
 #if TM_DEBUG == 0
 #define OSReport (void)sizeof
@@ -749,141 +913,6 @@ static int *eventDataBackup;
 static EventVars **event_vars_ptr = 0x803d7054; // R13 + (-0x4730)
 static EventVars *event_vars;
 
-// EventOption option_kind definitions
-#define OPTKIND_MENU 0
-#define OPTKIND_STRING 1
-#define OPTKIND_INT 2
-#define OPTKIND_FLOAT 3
-#define OPTKIND_FUNC 4
-
-// EventMenu state definitions
-#define EMSTATE_FOCUS 0
-#define EMSTATE_OPENSUB 1
-#define EMSTATE_OPENPOP 2
-#define EMSTATE_WAIT 3 // pauses menu logic, used for when a custom window is being shown
-
-// GX Link args
-#define GXLINK_MENUMODEL 12
-#define GXPRI_MENUMODEL 80
-#define GXLINK_MENUTEXT 12
-#define GXPRI_MENUTEXT GXPRI_MENUMODEL + 1
-
-// popup menu
-#define GXPRI_POPUPMODEL GXPRI_MENUTEXT + 1
-#define GXLINK_POPUPMODEL 12
-#define GXPRI_POPUPTEXT GXPRI_POPUPMODEL + 1
-#define GXLINK_POPUPTEXT 12
-
-// cobj
-#define MENUCAM_COBJGXLINK (1 << GXLINK_MENUMODEL) | (1 << GXLINK_MENUTEXT) | (1 << GXLINK_POPUPMODEL) | (1 << GXLINK_POPUPTEXT)
-#define MENUCAM_GXPRI 9
-
-// menu model
-#define OPT_SCALE 1
-#define OPT_X 0 //0.5
-#define OPT_Y -1
-#define OPT_Z 0
-#define OPT_WIDTH 55 / OPT_SCALE
-#define OPT_HEIGHT 40 / OPT_SCALE
-
-// menu text object
-#define MENU_CANVASSCALE 0.05
-#define MENU_TEXTSCALE 1
-#define MENU_TEXTZ 0
-
-// menu title
-#define MENU_TITLEXPOS -430
-#define MENU_TITLEYPOS -366
-#define MENU_TITLESCALE 2.3
-#define MENU_TITLEASPECT 870
-
-// menu description
-#define MENU_DESCXPOS -21.5
-#define MENU_DESCYPOS 12
-#define MENU_DESCSCALE 1
-
-// menu option name
-#define MENU_OPTIONNAMEXPOS -430
-#define MENU_OPTIONNAMEYPOS -230
-#define MENU_NAMEASPECT 440
-
-// menu option value
-#define MENU_OPTIONVALXPOS 250
-#define MENU_OPTIONVALYPOS -230
-#define MENU_TEXTYOFFSET 50
-#define MENU_VALASPECT 280
-
-// menu highlight
-#define MENUHIGHLIGHT_SCALE 1 // OPT_SCALE
-#define MENUHIGHLIGHT_HEIGHT ROWBOX_HEIGHT
-#define MENUHIGHLIGHT_WIDTH (OPT_WIDTH * 0.785)
-#define MENUHIGHLIGHT_X OPT_X
-#define MENUHIGHLIGHT_Y 10.8 //10.3
-#define MENUHIGHLIGHT_Z 0.01
-#define MENUHIGHLIGHT_YOFFSET ROWBOX_YOFFSET
-#define MENUHIGHLIGHT_COLOR { \
-    255, 211, 0, 255          \
-}
-
-// menu scroll
-#define MENUSCROLL_SCALE 2                         // OPT_SCALE
-#define MENUSCROLL_SCALEY 1.105 * MENUSCROLL_SCALE // OPT_SCALE
-#define MENUSCROLL_X 22.5
-#define MENUSCROLL_Y 12
-#define MENUSCROLL_Z 0.01
-#define MENUSCROLL_PEROPTION 1
-#define MENUSCROLL_MINLENGTH -1
-#define MENUSCROLL_MAXLENGTH -10
-#define MENUSCROLL_COLOR { \
-    255, 211, 0, 255       \
-}
-
-// row jobj
-#define ROWBOX_HEIGHT 2.3
-#define ROWBOX_WIDTH 18
-#define ROWBOX_X 12.5 //13
-#define ROWBOX_Y 10.8 //10.3
-#define ROWBOX_Z 0
-#define ROWBOX_YOFFSET -2.5
-#define ROWBOX_COLOR { \
-    104, 105, 129, 100 \
-}
-
-// arrow jobj
-#define TICKBOX_SCALE 1.8
-#define TICKBOX_X 11.7
-#define TICKBOX_Y 11.7
-
-// popup model
-#define POPUP_WIDTH ROWBOX_WIDTH
-#define POPUP_HEIGHT 19
-#define POPUP_SCALE 1
-#define POPUP_X 12.5
-#define POPUP_Y 8.3
-#define POPUP_Z 0.01
-#define POPUP_YOFFSET -2.5
-
-// popup text object
-#define POPUP_CANVASSCALE 0.05
-#define POPUP_TEXTSCALE 1
-#define POPUP_TEXTZ 0.01
-
-// popup text
-#define POPUP_OPTIONVALXPOS 250
-#define POPUP_OPTIONVALYPOS -280
-#define POPUP_TEXTYOFFSET 50
-
-// popup highlight
-#define POPUPHIGHLIGHT_HEIGHT ROWBOX_HEIGHT
-#define POPUPHIGHLIGHT_WIDTH (POPUP_WIDTH * 0.785)
-#define POPUPHIGHLIGHT_X 0
-#define POPUPHIGHLIGHT_Y 5
-#define POPUPHIGHLIGHT_Z 1
-#define POPUPHIGHLIGHT_YOFFSET ROWBOX_YOFFSET
-#define POPUPHIGHLIGHT_COLOR { \
-    255, 211, 0, 255           \
-}
-
 // Message
 void Message_Init();
 
@@ -898,10 +927,6 @@ void Message_Add(GOBJ *msg_gobj, int queue_num);
 void Message_CObjThink(GOBJ *gobj);
 
 float BezierBlend(float t);
-
-#define MSGQUEUE_NUM 7
-#define MSGQUEUE_SIZE 5
-#define MSGQUEUE_GENERAL 6
 
 enum MsgState {
     MSGSTATE_WAIT,
@@ -953,29 +978,6 @@ static GXColor stc_msg_colors[] = {
     {255, 255, 255, 255}, {141, 255, 110, 255}, {255, 162, 186, 255}, {255, 240, 0, 255},
 };
 
-#define MSGTIMER_SHIFT 6
-#define MSGTIMER_DELETE 6
-#define MSG_LIFETIME (2 * 60)
-#define MSG_LINEMAX 3  // lines per message
-#define MSG_CHARMAX 32 // characters per line
-#define MSG_HUDYOFFSET 8
-#define MSGJOINT_SCALE 3
-#define MSGJOINT_X 0
-#define MSGJOINT_Y 0
-#define MSGJOINT_Z 0
-#define MSGTEXT_BASESCALE 1.4
-#define MSGTEXT_BASEWIDTH (330 / MSGTEXT_BASESCALE)
-#define MSGTEXT_BASEX 0
-#define MSGTEXT_BASEY -1
-#define MSGTEXT_YOFFSET 30
-
-// GX stuff
-#define MSG_GXLINK 13
-#define MSG_GXPRI 80
-#define MSGTEXT_GXPRI MSG_GXPRI + 1
-#define MSG_COBJLGXLINKS (1 << MSG_GXLINK)
-#define MSG_COBJLGXPRI 8
-
 struct TipMgr {
     GOBJ *gobj; // tip gobj
     Text *text; // tip text object
@@ -987,5 +989,3 @@ int Tip_Display(int lifetime, char *fmt, ...);
 
 void Tip_Destroy(); // 0 = immediately destroy, 1 = force exit
 void Tip_Think(GOBJ *gobj);
-
-#define TIP_TXTJOINT 2
