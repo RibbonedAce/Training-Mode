@@ -1,8 +1,13 @@
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
-typedef struct LCancelData LCancelData;
 typedef struct LCancelAssets LCancelAssets;
+typedef struct LCancelData LCancelData;
+
+struct LCancelAssets {
+    JOBJ *hud;
+    void **hudmatanim; // pointer to array
+};
 
 struct LCancelData {
     EventDesc *event_desc;
@@ -38,11 +43,6 @@ struct LCancelData {
         u8 late_isdisp; // whether tip has been shown to the player
         u8 late_num; // number of times condition has been met
     } tip;
-};
-
-typedef struct LCancelAssets {
-    JOBJ *hud;
-    void **hudmatanim; // pointer to array
 };
 
 #define LCLTEXT_SCALE 4.2

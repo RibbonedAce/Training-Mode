@@ -86,13 +86,33 @@ enum export_popup {
 #define RESIZE_WIDTH (EXP_SCREENSHOT_WIDTH * RESIZE_MULT)
 #define RESIZE_HEIGHT (EXP_SCREENSHOT_HEIGHT * RESIZE_MULT)
 
+typedef struct ButtonLookup ButtonLookup;
+typedef struct Arch_ImportData Arch_ImportData;
+typedef struct Arch_LabData Arch_LabData;
+typedef struct LCancelData LCancelData;
+typedef struct InfoDisplayData InfoDisplayData;
+typedef struct DIDraw DIDraw;
+typedef struct DIDrawCalculate DIDrawCalculate;
+typedef struct TDIData TDIData;
+typedef struct CPUAction CPUAction;
+typedef struct RecInputs RecInputs;
+typedef struct RecInputData RecInputData;
+typedef struct RecData RecData;
+typedef struct RecordingSave RecordingSave;
+typedef struct InputData InputData;
+typedef struct ExportData ExportData;
+typedef struct ExportMenuSettings ExportMenuSettings;
+typedef struct ExportHeader ExportHeader;
+typedef struct FileInfo FileInfo;
+typedef struct ImportData ImportData;
+
 // input display
-typedef struct ButtonLookup {
+struct ButtonLookup {
     u8 jobj;
     u8 dobj;
-} ButtonLookup;
+};
 
-typedef enum buttons_enum {
+enum buttons_enum {
     BTN_A,
     BTN_B,
     BTN_X,
@@ -106,7 +126,7 @@ typedef enum buttons_enum {
     BTN_R,
     BTN_Z,
     BTN_NUM,
-} buttons_enum;
+};
 
 static ButtonLookup button_lookup[] = {
     {1, 0}, // A
@@ -160,14 +180,14 @@ static int button_bits[] = {
     255, 255, 255, 255        \
 }
 
-typedef struct Arch_ImportData {
+struct Arch_ImportData {
     JOBJDesc *import_button;
     JOBJDesc *import_menu;
     COBJDesc *import_cam;
     JOBJDesc *import_popup;
-} Arch_ImportData;
+};
 
-typedef struct Arch_LabData {
+struct Arch_LabData {
     JOBJDesc *stick;
     JOBJDesc *cstick;
     void *save_icon;
@@ -175,9 +195,9 @@ typedef struct Arch_LabData {
     JOBJDesc *controller;
     JOBJDesc *export_menu;
     JOBJDesc *export_popup;
-} Arch_LabData;
+};
 
-typedef struct LCancelData {
+struct LCancelData {
     EventDesc *eventInfo;
     u8 cpu_state;
     u8 cpu_hitshield;
@@ -196,36 +216,36 @@ typedef struct LCancelData {
     GOBJ *rec_gobj;
     u8 hmn_controller;
     u8 cpu_controller;
-} LCancelData;
+};
 
-typedef struct InfoDisplayData {
+struct InfoDisplayData {
     JOBJ *menuModel;
     JOBJ *botLeftEdge;
     JOBJ *botRightEdge;
     Text *text;
-} InfoDisplayData;
+};
 
-typedef struct DIDraw {
+struct DIDraw {
     int num[2]; // number of vertices
     Vec2 *vertices[2]; // pointer to vertex to draw
     GXColor color; // color of this vertex
-} DIDraw;
+};
 
-typedef struct DIDrawCalculate {
+struct DIDrawCalculate {
     Vec2 pos; // position of vertices
     int envFlags; // environment flags
     float ECBTopY; // used for determining middle of body
     float ECBLeftY; // used for determining middle of body
     float kb_Y; // used to determine ceiling KOs
-} DIDrawCalculate;
+};
 
-typedef struct TDIData {
+struct TDIData {
     JOBJ *stick_curr[2];
     JOBJ *stick_prev[6][2];
     Text *text_curr;
-} TDIData;
+};
 
-typedef struct CPUAction {
+struct CPUAction {
     u16 state; // state to perform this action. -1 for last
     u8 frameLow; // first possible frame to perform this action
     u8 frameHi; // last possible frame to perfrom this action
@@ -236,9 +256,9 @@ typedef struct CPUAction {
     int input; // button to input
     unsigned char isLast: 1; // flag to indicate this was the final input
     unsigned char stickDir: 3; // 0 = none, 1 = towards opponent, 2 = away from opponent, 3 = forward, 4 = backward
-} CPUAction;
+};
 
-typedef struct RecInputs {
+struct RecInputs {
     unsigned char btn_dpadup: 1;
     unsigned char btn_a: 1;
     unsigned char btn_b: 1;
@@ -252,15 +272,15 @@ typedef struct RecInputs {
     s8 substickX;
     s8 substickY;
     u8 trigger;
-} RecInputs;
+};
 
-typedef struct RecInputData {
+struct RecInputData {
     int start_frame; // the frame these inputs start on
     int num;
-    RecInputs inputs[REC_LENGTH]
-} RecInputData;
+    RecInputs inputs[REC_LENGTH];
+};
 
-typedef struct RecData {
+struct RecData {
     int timer; // this is updated at runtime to know which frames inputs to use.
     int hmn_rndm_slot;
     RecInputData *hmn_inputs[REC_SLOTS];
@@ -270,22 +290,22 @@ typedef struct RecData {
     Text *text;
     float seek_left;
     float seek_right;
-} RecData;
+};
 
-typedef struct RecordingSave {
+struct RecordingSave {
     MatchInit match_data; // this will point to a struct containing match info
     Savestate savestate;
     RecInputData hmn_inputs[REC_SLOTS];
     RecInputData cpu_inputs[REC_SLOTS];
-} RecordingSave;
+};
 
-typedef struct InputData {
+struct InputData {
     JOBJ *controller_joint[4];
     Vec2 ltrig_origin;
     Vec2 rtrig_origin;
-} InputData;
+};
 
-typedef struct ExportData {
+struct ExportData {
     u16 menu_index;
     u16 menu_state;
     JOBJ *memcard_jobj[2];
@@ -313,18 +333,18 @@ typedef struct ExportData {
     int hmn_id;
     int cpu_id;
     int stage_id;
-} ExportData;
+};
 
-typedef struct ExportMenuSettings {
+struct ExportMenuSettings {
     u8 hmn_mode;
     u8 hmn_slot;
     u8 cpu_mode;
     u8 cpu_slot;
     u8 loop_inputs;
     u8 auto_restore;
-} ExportMenuSettings;
+};
 
-typedef struct ExportHeader {
+struct ExportHeader {
     // metadata
     struct rec_metadata {
         u16 version;
@@ -353,7 +373,7 @@ typedef struct ExportHeader {
         int ofst_menusettings;
         // to-do, add menu data offset
     } lookup;
-} ExportHeader;
+};
 
 void Event_Init(GOBJ *gobj);
 
@@ -723,13 +743,13 @@ s8 *onload_fileno = R13 + (-0x4670);
 s8 *onload_slot = R13 + (-0x466F);
 #define IMPORT_FILESPERPAGE 10
 
-typedef enum ImportMenuStates {
+enum ImportMenuStates {
     IMP_SELCARD,
     IMP_SELFILE,
     IMP_CONFIRM,
 };
 
-typedef enum ImportConfirmKind {
+enum ImportConfirmKind {
     CFRM_LOAD,
     CFRM_OLD,
     CFRM_NEW,
@@ -737,13 +757,13 @@ typedef enum ImportConfirmKind {
     CFRM_ERR,
 };
 
-typedef struct FileInfo {
+struct FileInfo {
     char **file_name; // pointer to file name array
     int file_size; // number of files on card
     int file_no; // index of this file on the card
-} FileInfo;
+};
 
-typedef struct ImportData {
+struct ImportData {
     GOBJ *menu_gobj;
     u16 canvas;
     u8 menu_state;
@@ -784,7 +804,7 @@ typedef struct ImportData {
         void *file_data[IMPORT_FILESPERPAGE]; // pointer to each files data
         u8 is_loaded[IMPORT_FILESPERPAGE]; // bools for which snap has been loaded
     } snap;
-} ImportData;
+};
 
 void Button_Create();
 

@@ -1,15 +1,21 @@
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
-typedef struct LedgedashData LedgedashData;
-typedef struct LedgedashAssets LedgedashAssets;
-typedef struct LdshHitlogData LdshHitlogData;
-typedef struct LdshHitboxData LdshHitboxData;
 
 #define LSDH_TIPDURATION 1.7 * 60
 #define LDSH_HITBOXNUM 30 * 4
 #define LCLTEXT_SCALE 4.5
 #define LCLJOBJ_BAR 4
+
+typedef struct LedgedashAssets LedgedashAssets;
+typedef struct LedgedashData LedgedashData;
+typedef struct LdshHitboxData LdshHitboxData;
+typedef struct LdshHitlogData LdshHitlogData;
+
+struct LedgedashAssets {
+    JOBJ *hud;
+    void **hudmatanim; // pointer to array
+};
 
 struct LedgedashData {
     EventDesc *event_desc;
@@ -51,11 +57,6 @@ struct LedgedashData {
     } tip;
 };
 
-struct LedgedashAssets {
-    JOBJ *hud;
-    void **hudmatanim; // pointer to array
-};
-
 struct LdshHitboxData {
     int kind;
     float size;
@@ -68,7 +69,7 @@ struct LdshHitlogData {
     LdshHitboxData hitlog[LDSH_HITBOXNUM];
 };
 
-typedef enum LDSH_ACTION {
+enum LDSH_ACTION {
     LDACT_NONE,
     LDACT_CLIFFWAIT,
     LDACT_FALL,

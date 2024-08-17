@@ -27,8 +27,24 @@
 #define OSReport TMLOG
 #endif
 
+typedef struct evMenu evMenu;
+typedef struct EventMatchData EventMatchData;
+typedef struct EventDesc EventDesc;
+typedef struct EventPage EventPage;
+typedef struct EventOption EventOption;
+typedef struct EventMenu EventMenu;
+typedef struct MenuData MenuData;
+typedef struct FtStateData FtStateData;
+typedef struct FtState FtState;
+typedef struct Savestate Savestate;
+typedef struct evFunction evFunction;
+typedef struct EventVars EventVars;
+typedef struct MsgData MsgData;
+typedef struct MsgMngrData MsgMngrData;
+typedef struct TipMgr TipMgr;
+
 // Custom File Structs
-typedef struct evMenu {
+struct evMenu {
     JOBJDesc *menu;
     JOBJDesc *popup;
     JOBJDesc *scroll;
@@ -39,12 +55,10 @@ typedef struct evMenu {
     COBJDesc *hud_cobjdesc;
     JOBJ *tip_jobj;
     void **tip_jointanim; // pointer to array
-} evMenu;
+};
 
 // Structure Definitions
-typedef struct EventMenu EventMenu;
-
-typedef struct EventMatchData {
+struct EventMatchData {
     unsigned int timer: 2;
     unsigned int matchType: 3;
     unsigned int isDisableMusic: 1;
@@ -70,9 +84,9 @@ typedef struct EventMatchData {
     unsigned int timerSubSeconds: 8; // 0xFF
     void *onCheckPause;
     void *onMatchEnd;
-} EventMatchData;
+};
 
-typedef struct EventDesc {
+struct EventDesc {
     char *eventName;
     char *eventDescription;
     char *eventTutorial;
@@ -86,15 +100,15 @@ typedef struct EventDesc {
     u8 callbackPriority;
     EventMatchData *matchData;
     int defaultOSD;
-} EventDesc;
+};
 
-typedef struct EventPage {
+struct EventPage {
     char *name;
     int eventNum;
     EventDesc **events;
-} EventPage;
+};
 
-typedef struct EventOption {
+struct EventOption {
     u8 option_kind; // the type of option this is; string, integers, etc
     u8 disable; // boolean for disabling the option
     u16 value_num; // number of values
@@ -105,7 +119,7 @@ typedef struct EventOption {
     void **option_values; // pointer to an array of strings
     void (*onOptionChange)(GOBJ *menu_gobj, int value); // function that runs when option is changed
     GOBJ *(*onOptionSelect)(GOBJ *menu_gobj); // function that runs when option is selected
-} EventOption;
+};
 
 struct EventMenu {
     char *name; // name of this menu
@@ -120,7 +134,7 @@ struct EventMenu {
     // function that runs every frame of this menu. returns a bool which indicates if basic menu code should be execution
 };
 
-typedef struct MenuData {
+struct MenuData {
     EventDesc *event_desc;
     EventMenu *currMenu;
     u16 canvas_menu;
@@ -146,9 +160,9 @@ typedef struct MenuData {
 
     // per frame function. Returns bool indicating if the program should check to unpause
     void *(*custom_gobj_destroy)(GOBJ *custom_gobj); // on destroy function
-} MenuData;
+};
 
-typedef struct FtStateData {
+struct FtStateData {
     int is_exist;
     int state;
     float facing_direction;
@@ -638,23 +652,22 @@ typedef struct FtStateData {
         void (*OnHurtboxDetect)(GOBJ *fighter); // 0x21f4
         void (*OnSpin)(GOBJ *fighter); // 0x21f8
     } cb;
-}
-FtStateData;
+};
 
-typedef struct FtState {
+struct FtState {
     FtStateData data[2];
     Playerblock player_block;
     int stale_queue[11];
-} FtState;
+};
 
-typedef struct Savestate {
+struct Savestate {
     int is_exist;
     int frame;
     u8 event_data[EVENT_DATASIZE];
     FtState ft_state[6];
-} Savestate;
+};
 
-typedef struct evFunction {
+struct evFunction {
     void (*Event_Init)(GOBJ *event);
 
     void (*Event_Update)();
@@ -662,9 +675,9 @@ typedef struct evFunction {
     void (*Event_Think)(GOBJ *event);
 
     EventMenu **menu_start;
-} evFunction;
+};
 
-typedef struct EventVars {
+struct EventVars {
     EventDesc *event_desc; // event information
     evMenu *menu_assets; // menu assets
     GOBJ *event_gobj; // event gobj
@@ -683,7 +696,7 @@ typedef struct EventVars {
     evFunction evFunction; // event specific functions
     ArchiveInfo *event_archive; // event archive header
     DevText *db_console_text;
-} EventVars;
+};
 
 // Function prototypes
 EventDesc *GetEventDesc(int page, int event);
@@ -906,7 +919,7 @@ enum MsgArea {
     MSGKIND_GENERAL,
 };
 
-typedef struct MsgData {
+struct MsgData {
     Text *text; // text pointer
     int kind; // the type of message this is
     int state; // unused atm
@@ -915,14 +928,14 @@ typedef struct MsgData {
     int anim_timer; // used to track animation frame
     int lifetime; // amount of frames after spawning to kill this message
     int alive_timer; // amount of frames this message has been alive for
-} MsgData;
+};
 
-typedef struct MsgMngrData {
+struct MsgMngrData {
     COBJ *cobj;
     int state;
     int canvas;
     GOBJ *msg_queue[MSGQUEUE_NUM][MSGQUEUE_SIZE]; // array 7 is for miscellaneous messages, not related to a player
-} MsgMngrData;
+};
 
 static GOBJ *stc_msgmgr;
 static float stc_msg_queue_offsets[] = {5.15, 5.15, 5.15, 5.15, 5.15, 5.15, -5.15};
@@ -963,12 +976,12 @@ static GXColor stc_msg_colors[] = {
 #define MSG_COBJLGXLINKS (1 << MSG_GXLINK)
 #define MSG_COBJLGXPRI 8
 
-typedef struct TipMgr {
+struct TipMgr {
     GOBJ *gobj; // tip gobj
     Text *text; // tip text object
     int state; // state this tip is in. 0 = in, 1 = wait, 2 = out
     int lifetime; // tips time spent onscreen
-} TipMgr;
+};
 
 int Tip_Display(int lifetime, char *fmt, ...);
 

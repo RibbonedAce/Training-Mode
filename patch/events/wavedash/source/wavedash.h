@@ -20,9 +20,17 @@
 #define TRGTSCL_SCALEMIN 1.0
 #define TRGTSCL_SCALEMAX 1.7
 
-typedef struct WavedashData WavedashData;
 typedef struct WavedashAssets WavedashAssets;
+typedef struct WavedashData WavedashData;
 typedef struct TargetData TargetData;
+
+struct WavedashAssets {
+    JOBJ *hud;
+    void **hudmatanim; // pointer to array
+    JOBJ *target_jobj;
+    void **target_jointanim;
+    void **target_matanim;
+};
 
 struct WavedashData {
     EventDesc *event_desc;
@@ -68,14 +76,6 @@ struct WavedashData {
     } restore;
 
     GXColor orig_colors[WDFRAMES];
-};
-
-struct WavedashAssets {
-    JOBJ *hud;
-    void **hudmatanim; // pointer to array
-    JOBJ *target_jobj;
-    void **target_jointanim;
-    void **target_matanim;
 };
 
 enum TargetState {
