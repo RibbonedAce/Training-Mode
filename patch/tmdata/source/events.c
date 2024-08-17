@@ -1,8 +1,7 @@
 #include "events.h"
 #include <stdarg.h>
 
-void Event_Init(GOBJ *gobj)
-{
+void Event_Init(GOBJ *gobj) {
     int *EventData = gobj->userdata;
     EventDesc *event_desc = EventData[0];
 
@@ -33,26 +32,27 @@ static EventMatchData Lab_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = true,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = false,      // 0x10
-    .isCheckForZRetry = false,  // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = false, // 0x10
+    .isCheckForZRetry = false, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Lab = {
     // Event Name
@@ -82,26 +82,27 @@ static EventMatchData LCancel_MatchData = {
     .isCreateHUD = false,
     .isDisablePause = true,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = false,      // 0x10
-    .isCheckForZRetry = false,  // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = false, // 0x10
+    .isCheckForZRetry = false, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc LCancel = {
     // Event Name
@@ -130,26 +131,27 @@ static EventMatchData Ledgedash_MatchData = {
     .isCreateHUD = false,
     .isDisablePause = true,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = false,      // 0x10
-    .isCheckForZRetry = false,  // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = false, // 0x10
+    .isCheckForZRetry = false, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Ledgedash = {
     .eventName = "Ledgedash Training\n",
@@ -177,26 +179,27 @@ static EventMatchData Wavedash_MatchData = {
     .isCreateHUD = false,
     .isDisablePause = true,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = false,      // 0x10
-    .isCheckForZRetry = false,  // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = false, // 0x10
+    .isCheckForZRetry = false, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Wavedash = {
     .eventName = "Wavedash Training\n",
@@ -224,29 +227,29 @@ static EventMatchData Combo_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Combo = {
-
     .eventName = "Combo Training\n",
     .eventDescription = "L+DPad adjusts percent | DPadDown moves CPU\nDPad right/left saves and loads positions.",
     .eventTutorial = "TvLC",
@@ -272,26 +275,27 @@ static EventMatchData AttackOnShield_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc AttackOnShield = {
     .eventName = "Attack on Shield\n",
@@ -319,26 +323,27 @@ static EventMatchData Reversal_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Reversal = {
     .eventName = "Reversal Training\n",
@@ -366,26 +371,27 @@ static EventMatchData SDI_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 2,         // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 2, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc SDI = {
     .eventName = "SDI Training\n",
@@ -414,26 +420,27 @@ static EventMatchData Powershield_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 20,        // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 20, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Powershield = {
     .eventName = "Powershield Training\n",
@@ -461,26 +468,27 @@ static EventMatchData Ledgetech_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 20,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 20, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Ledgetech = {
     .eventName = "Ledge-Tech Training\n",
@@ -508,26 +516,27 @@ static EventMatchData AmsahTech_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 9,         // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 9, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc AmsahTech = {
     .eventName = "Amsah-Tech Training\n",
@@ -555,26 +564,27 @@ static EventMatchData ShieldDrop_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc ShieldDrop = {
     .eventName = "Shield Drop Training\n",
@@ -602,26 +612,27 @@ static EventMatchData WaveshineSDI_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 2,         // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 2, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc WaveshineSDI = {
     .eventName = "Waveshine SDI\n",
@@ -649,26 +660,27 @@ static EventMatchData SlideOff_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 9,         // 0xFF=
-    .stage = 3,           // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 9, // 0xFF=
+    .stage = 3, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc SlideOff = {
     .eventName = "Slide-Off Training\n",
@@ -696,26 +708,27 @@ static EventMatchData GrabMash_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 9,         // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 9, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc GrabMash = {
     .eventName = "Grab Mash Training\n",
@@ -743,22 +756,22 @@ static EventMatchData TechCounter_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 9,         // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 9, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
@@ -790,26 +803,27 @@ static EventMatchData ArmadaShine_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 2,         // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 2, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc ArmadaShine = {
     .eventName = "Armada-Shine Training\n",
@@ -837,26 +851,27 @@ static EventMatchData SideBSweet_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 9,         // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 9, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc SideBSweet = {
     .eventName = "Side-B Sweetspot\n",
@@ -884,26 +899,27 @@ static EventMatchData EscapeSheik_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 19,        // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 19, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc EscapeSheik = {
     .eventName = "Escape Sheik Techchase\n",
@@ -931,26 +947,27 @@ static EventMatchData Eggs_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = -1,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = -1, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Eggs = {
     .eventName = "Eggs-ercise\n",
@@ -978,26 +995,27 @@ static EventMatchData Multishine_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Multishine = {
     .eventName = "Shined Blind\n",
@@ -1025,26 +1043,27 @@ static EventMatchData Reaction_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = 2,         // 0xFF=
-    .stage = 32,          // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = 2, // 0xFF=
+    .stage = 32, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Reaction = {
     .eventName = "Reaction Test\n",
@@ -1072,26 +1091,27 @@ static EventMatchData Ledgestall_MatchData = {
     .isCreateHUD = true,
     .isDisablePause = false,
     // byte 0x3
-    .timerRunOnPause = false,   // 0x01
-    .isHidePauseHUD = true,     // 0x02
-    .isShowLRAStart = true,     // 0x04
+    .timerRunOnPause = false, // 0x01
+    .isHidePauseHUD = true, // 0x02
+    .isShowLRAStart = true, // 0x04
     .isCheckForLRAStart = true, // 0x08
-    .isShowZRetry = true,       // 0x10
-    .isCheckForZRetry = true,   // 0x20
-    .isShowAnalogStick = true,  // 0x40
-    .isShowScore = false,       // 0x80
+    .isShowZRetry = true, // 0x10
+    .isCheckForZRetry = true, // 0x20
+    .isShowAnalogStick = true, // 0x40
+    .isShowScore = false, // 0x80
 
     .isRunStockLogic = false, // 0x20
-    .isDisableHit = false,    // 0x20
+    .isDisableHit = false, // 0x20
     .useKOCounter = false,
     .playerKind = -1,
-    .cpuKind = -1,        // 0xFF=
-    .stage = 6,           // 0xFFFF
-    .timerSeconds = 0,    // 0xFFFFFFFF
+    .cpuKind = -1, // 0xFF=
+    .stage = 6, // 0xFFFF
+    .timerSeconds = 0, // 0xFFFFFFFF
     .timerSubSeconds = 0, // 0xFF
     .onCheckPause = 0,
     .onMatchEnd = 0,
 };
+
 // Event Struct
 static EventDesc Ledgestall = {
     .eventName = "Under Fire\n",
@@ -1119,6 +1139,7 @@ static EventDesc *Minigames_Events[] = {
     &Reaction,
     &Ledgestall,
 };
+
 static EventPage Minigames_Page = {
     .name = "Minigames",
     .eventNum = (sizeof(Minigames_Events) / 4) - 1,
@@ -1143,6 +1164,7 @@ static EventDesc *General_Events[] = {
     &SlideOff,
     &GrabMash,
 };
+
 static EventPage General_Page = {
     .name = "General Tech",
     (sizeof(General_Events) / 4) - 1,
@@ -1156,6 +1178,7 @@ static EventDesc *Spacie_Events[] = {
     &SideBSweet,
     &EscapeSheik,
 };
+
 static EventPage Spacie_Page = {
     .name = "Spacie Tech",
     (sizeof(Spacie_Events) / 4) - 1,
@@ -1190,6 +1213,7 @@ static EventVars stc_event_vars = {
     .Tip_Destroy = Tip_Destroy,
     .savestate = 0,
 };
+
 static Savestate *stc_savestate;
 static EventDesc *static_eventInfo;
 static MenuData *static_menuData;
@@ -1201,10 +1225,8 @@ static TipMgr stc_tipmgr;
 /// Event Functions ///
 ///////////////////////
 
-void EventInit(int page, int eventID, MatchInit *matchData)
-{
-
-    /* 
+void EventInit(int page, int eventID, MatchInit *matchData) {
+    /*
     This function runs when leaving the main menu/css and handles
     setting up the match information, such as rules, players, stage.
     All of this data comes from the EventDesc in events.c
@@ -1250,8 +1272,7 @@ void EventInit(int page, int eventID, MatchInit *matchData)
     // Initialize all player data
     Memcard *memcard = R13_PTR(MEMCARD);
     CSSBackup eventBackup = memcard->EventBackup;
-    for (int i = 0; i < 6; i++)
-    {
+    for (int i = 0; i < 6; i++) {
         // initialize data
         CSS_InitPlayerData(&matchData->playerData[i]);
 
@@ -1259,8 +1280,7 @@ void EventInit(int page, int eventID, MatchInit *matchData)
         matchData->playerData[i].isEntry = false;
 
         // copy nametag id for the player
-        if (i == 0)
-        {
+        if (i == 0) {
             // Update the player's nametag ID
             matchData->playerData[i].nametag = eventBackup.nametag;
 
@@ -1279,14 +1299,12 @@ void EventInit(int page, int eventID, MatchInit *matchData)
     s32 playerCostume;
     Preload *preload = Preload_GetTable();
     // If fighter is -1, copy the player from event data
-    if (eventMatchData->playerKind != -1)
-    {
+    if (eventMatchData->playerKind != -1) {
         playerKind = eventMatchData->playerKind;
         playerCostume = 0;
     }
     // use the fighter chosen on the CSS
-    else
-    {
+    else {
         playerKind = preload->fighters[0].kind;
         playerCostume = preload->fighters[0].costume;
     }
@@ -1295,29 +1313,25 @@ void EventInit(int page, int eventID, MatchInit *matchData)
     s32 cpuKind;
     s32 cpuCostume;
     // If isChooseCPU is true, use the selected CPU
-    if (event->isChooseCPU == true)
-    {
+    if (event->isChooseCPU == true) {
         cpuKind = preload->fighters[1].kind;
         cpuCostume = preload->fighters[1].costume;
 
         // change zelda to sheik
-        if (cpuKind == 18)
-        {
+        if (cpuKind == 18) {
             cpuKind = 19;
             preload->fighters[1].kind = cpuKind;
         }
     }
     // If isChooseCPU is false, copy the CPU from event data
-    else
-    {
+    else {
         cpuKind = eventMatchData->cpuKind;
         cpuCostume = 0;
         cpuCostume = 0;
     }
 
     // Check if CPU is using the same character and color as P1
-    if ((playerKind == cpuKind) && (playerCostume == cpuCostume))
-    {
+    if ((playerKind == cpuKind) && (playerCostume == cpuCostume)) {
         // this doesnt account for if theyre both using the last costume
         cpuCostume += 1;
     }
@@ -1329,8 +1343,7 @@ void EventInit(int page, int eventID, MatchInit *matchData)
     matchData->playerData[0].portNumberOverride = hmn_port;
 
     // Copy CPU if they exist for this event
-    if (cpuKind != -1)
-    {
+    if (cpuKind != -1) {
         matchData->playerData[1].kind = cpuKind;
         matchData->playerData[1].costume = cpuCostume;
         matchData->playerData[1].status = 1;
@@ -1339,8 +1352,7 @@ void EventInit(int page, int eventID, MatchInit *matchData)
 
     // Determine the correct HUD position for this amount of players
     int hudPos = 0;
-    for (int i = 0; i < 6; i++)
-    {
+    for (int i = 0; i < 6; i++) {
         if (matchData->playerData[i].status != 3)
             hudPos++;
     }
@@ -1349,13 +1361,11 @@ void EventInit(int page, int eventID, MatchInit *matchData)
     // Determine the Stage
     int stage;
     // If isSelectStage is true, use the selected stage
-    if (event->isSelectStage == true)
-    {
+    if (event->isSelectStage == true) {
         stage = preload->stage;
     }
     // If isSelectStage is false, copy the stage from event data
-    else
-    {
+    else {
         stage = eventMatchData->stage;
     }
     // Update match struct with this stage
@@ -1366,8 +1376,7 @@ void EventInit(int page, int eventID, MatchInit *matchData)
     return;
 };
 
-void EventLoad()
-{
+void EventLoad() {
     // get this event
     Memcard *memcard = R13_PTR(MEMCARD);
     int page = memcard->TM_EventPage;
@@ -1422,8 +1431,7 @@ void EventLoad()
         Hazards_Disable();
 
     // Run this event's init function
-    if (evFunction->Event_Init != 0)
-    {
+    if (evFunction->Event_Init != 0) {
         evFunction->Event_Init(gobj);
     }
 
@@ -1434,33 +1442,27 @@ void EventLoad()
     return;
 };
 
-void EventUpdate()
-{
-
+void EventUpdate() {
     // get event info
     EventDesc *event_desc = stc_event_vars.event_desc;
     evFunction *evFunction = &stc_event_vars.evFunction;
     GOBJ *menu_gobj = stc_event_vars.menu_gobj;
 
     // run savestate logic if enabled
-    if (event_desc->use_savestates == true)
-    {
+    if (event_desc->use_savestates == true) {
         Update_Savestates();
     }
 
     // run menu logic if exists
-    if (menu_gobj != 0)
-    {
+    if (menu_gobj != 0) {
         // update menu
         EventMenu_Update(menu_gobj);
     }
 
     // run custom event update function
-    if (evFunction->Event_Update != 0)
-    {
+    if (evFunction->Event_Update != 0) {
         evFunction->Event_Update();
-    }
-    else
+    } else
         Develop_UpdateMatchHotkeys();
 
     return;
@@ -1470,18 +1472,15 @@ void EventUpdate()
 /// Hook Functions ///
 //////////////////////
 
-void TM_ConsoleThink(GOBJ *gobj)
-{
+void TM_ConsoleThink(GOBJ *gobj) {
     // init variables
     int *data = gobj->userdata;
     DevText *text = data[0];
 
     // check to toggle console
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         HSD_Pad *pad = PadGet(i, PADGET_MASTER);
-        if (pad->held & (HSD_TRIGGER_L | HSD_TRIGGER_R) && (pad->down & HSD_TRIGGER_Z))
-        {
+        if (pad->held & (HSD_TRIGGER_L | HSD_TRIGGER_R) && (pad->down & HSD_TRIGGER_Z)) {
             // toggle visibility
             text->show_text ^= 1;
             text->show_background ^= 1;
@@ -1495,8 +1494,8 @@ void TM_ConsoleThink(GOBJ *gobj)
     //DevelopText_EraseAllText(text);
     //DevelopMode_ResetCursorXY(text, 0, 0);
 }
-void TM_CreateConsole()
-{
+
+void TM_CreateConsole() {
     // init dev text
     GOBJ *gobj = GObj_Create(0, 0, 0);
     int *data = calloc(32);
@@ -1512,8 +1511,7 @@ void TM_CreateConsole()
     DevelopText_StoreTextScale(text, 10, 12);
     stc_event_vars.db_console_text = text;
 
-    if (show_console != 1)
-    {
+    if (show_console != 1) {
         // toggle visibility
         DevelopText_HideBG(text);
         DevelopText_HideText(text);
@@ -1522,10 +1520,12 @@ void TM_CreateConsole()
     return;
 }
 
-void OnFileLoad(ArchiveInfo *archive) // this function is run right after TmDt is loaded into memory on boot
-{
+// this function is run right after TmDt is loaded into memory on boot
+void OnFileLoad(ArchiveInfo *archive) {
     // init event menu assets
-    stc_event_vars.menu_assets = File_GetSymbol(archive, "evMenu");
+    stc_event_vars
+            .
+            menu_assets = File_GetSymbol(archive, "evMenu");
 
     // store pointer to static variables
     *event_vars_ptr = &stc_event_vars;
@@ -1534,8 +1534,7 @@ void OnFileLoad(ArchiveInfo *archive) // this function is run right after TmDt i
     return;
 }
 
-void OnSceneChange()
-{
+void OnSceneChange() {
     // Hook exists at 801a4c94
 
     TM_CreateWatermark();
@@ -1547,15 +1546,12 @@ void OnSceneChange()
     return;
 };
 
-void OnBoot()
-{
+void OnBoot() {
     // OSReport("hi this is boot\n");
     return;
 };
 
-void OnStartMelee()
-{
-
+void OnStartMelee() {
     Message_Init();
     Tip_Init();
 
@@ -1566,10 +1562,8 @@ void OnStartMelee()
 /// Miscellaneous Functions ///
 ///////////////////////////////
 
-int Savestate_Save(Savestate *savestate)
-{
-    typedef struct BackupQueue
-    {
+int Savestate_Save(Savestate *savestate) {
+    typedef struct BackupQueue {
         GOBJ *fighter;
         FighterData *fighter_data;
     } BackupQueue;
@@ -1582,9 +1576,7 @@ int Savestate_Save(Savestate *savestate)
     int canSave = 1;
     GOBJ **gobj_list = R13_PTR(GOBJLIST);
     GOBJ *fighter = gobj_list[8];
-    while (fighter != 0)
-    {
-
+    while (fighter != 0) {
         FighterData *fighter_data = fighter->userdata;
 
         if ((fighter_data->cb.OnDeath != 0) ||
@@ -1593,8 +1585,8 @@ int Savestate_Save(Savestate *savestate)
             (fighter_data->heldItem != 0) ||
             (fighter_data->x1978 != 0) ||
             (fighter_data->accessory != 0) ||
-            ((fighter_data->kind == 8) && ((fighter_data->state >= 342) && (fighter_data->state <= 344)))) // hardcode ness' usmash because it doesnt destroy the yoyo via onhit callback...
-        {
+            // hardcode ness' usmash because it doesnt destroy the yoyo via onhit callback...
+            ((fighter_data->kind == 8) && ((fighter_data->state >= 342) && (fighter_data->state <= 344)))) {
             // cannot save
             canSave = 0;
             break;
@@ -1605,9 +1597,7 @@ int Savestate_Save(Savestate *savestate)
 
     // loop through all players
     int isSaved = 0;
-    if (canSave == 1)
-    {
-
+    if (canSave == 1) {
         savestate->is_exist = 1;
 
         // save frame
@@ -1617,12 +1607,10 @@ int Savestate_Save(Savestate *savestate)
         memcpy(&savestate->event_data, stc_event_vars.event_gobj->userdata, sizeof(savestate->event_data));
 
         // backup all players
-        for (int i = 0; i < 6; i++)
-        {
+        for (int i = 0; i < 6; i++) {
             // get fighter gobjs
             BackupQueue queue[2];
-            for (int j = 0; j < 2; j++)
-            {
+            for (int j = 0; j < 2; j++) {
                 GOBJ *fighter = 0;
                 FighterData *fighter_data = 0;
 
@@ -1637,9 +1625,7 @@ int Savestate_Save(Savestate *savestate)
             }
 
             // if the main fighter exists
-            if (queue[0].fighter != 0)
-            {
-
+            if (queue[0].fighter != 0) {
                 FtState *ft_state = &savestate->ft_state[i];
 
                 isSaved = 1;
@@ -1653,12 +1639,9 @@ int Savestate_Save(Savestate *savestate)
                 memcpy(&ft_state->stale_queue, stale_queue, sizeof(ft_state->stale_queue));
 
                 // backup each subfighters data
-                for (int j = 0; j < 2; j++)
-                {
+                for (int j = 0; j < 2; j++) {
                     // if exists
-                    if (queue[j].fighter != 0)
-                    {
-
+                    if (queue[j].fighter != 0) {
                         FtStateData *ft_data = &ft_state->data[j];
                         FighterData *fighter_data = queue[j].fighter_data;
 
@@ -1669,27 +1652,40 @@ int Savestate_Save(Savestate *savestate)
                         ft_data->stateFrame = fighter_data->stateFrame;
                         ft_data->stateSpeed = fighter_data->stateSpeed;
                         ft_data->stateBlend = fighter_data->stateBlend;
-                        memcpy(&ft_data->phys, &fighter_data->phys, sizeof(fighter_data->phys));                               // copy physics
-                        memcpy(&ft_data->color, &fighter_data->color, sizeof(fighter_data->color));                            // copy color overlay
-                        memcpy(&ft_data->input, &fighter_data->input, sizeof(fighter_data->input));                            // copy inputs
-                        memcpy(&ft_data->coll_data, &fighter_data->coll_data, sizeof(fighter_data->coll_data));                // copy collision
-                        memcpy(&ft_data->cameraBox, fighter_data->cameraBox, sizeof(CameraBox));                               // copy camerabox
-                        memcpy(&ft_data->hitbox, &fighter_data->hitbox, sizeof(fighter_data->hitbox));                         // copy hitbox
-                        memcpy(&ft_data->throw_hitbox, &fighter_data->throw_hitbox, sizeof(fighter_data->throw_hitbox));       // copy hitbox
-                        memcpy(&ft_data->unk_hitbox, &fighter_data->unk_hitbox, sizeof(fighter_data->unk_hitbox));             // copy hitbox
-                        memcpy(&ft_data->flags, &fighter_data->flags, sizeof(fighter_data->flags));                            // copy flags
-                        memcpy(&ft_data->fighter_var, &fighter_data->fighter_var, sizeof(fighter_data->fighter_var));          // copy var
-                        memcpy(&ft_data->state_var, &fighter_data->state_var, sizeof(fighter_data->state_var));                // copy var
-                        memcpy(&ft_data->ftcmd_var, &fighter_data->ftcmd_var, sizeof(fighter_data->ftcmd_var));                // copy var
-                        memcpy(&ft_data->jump, &fighter_data->jump, sizeof(fighter_data->jump));                               // copy var
-                        memcpy(&ft_data->smash, &fighter_data->smash, sizeof(fighter_data->smash));                            // copy var
-                        memcpy(&ft_data->hurtstatus, &fighter_data->hurtstatus, sizeof(fighter_data->hurtstatus));             // copy var
-                        memcpy(&ft_data->shield, &fighter_data->shield, sizeof(fighter_data->shield));                         // copy hitbox
-                        memcpy(&ft_data->shield_bubble, &fighter_data->shield_bubble, sizeof(fighter_data->shield_bubble));    // copy hitbox
-                        memcpy(&ft_data->reflect_bubble, &fighter_data->reflect_bubble, sizeof(fighter_data->reflect_bubble)); // copy hitbox
-                        memcpy(&ft_data->absorb_bubble, &fighter_data->absorb_bubble, sizeof(fighter_data->absorb_bubble));    // copy hitbox
-                        memcpy(&ft_data->reflect_hit, &fighter_data->reflect_hit, sizeof(fighter_data->reflect_hit));          // copy hitbox
-                        memcpy(&ft_data->absorb_hit, &fighter_data->absorb_hit, sizeof(fighter_data->absorb_hit));             // copy hitbox
+                        memcpy(&ft_data->phys, &fighter_data->phys, sizeof(fighter_data->phys)); // copy physics
+                        memcpy(&ft_data->color, &fighter_data->color, sizeof(fighter_data->color));
+                        // copy color overlay
+                        memcpy(&ft_data->input, &fighter_data->input, sizeof(fighter_data->input)); // copy inputs
+                        memcpy(&ft_data->coll_data, &fighter_data->coll_data, sizeof(fighter_data->coll_data));
+                        // copy collision
+                        memcpy(&ft_data->cameraBox, fighter_data->cameraBox, sizeof(CameraBox)); // copy camerabox
+                        memcpy(&ft_data->hitbox, &fighter_data->hitbox, sizeof(fighter_data->hitbox)); // copy hitbox
+                        memcpy(&ft_data->throw_hitbox, &fighter_data->throw_hitbox,
+                               sizeof(fighter_data->throw_hitbox)); // copy hitbox
+                        memcpy(&ft_data->unk_hitbox, &fighter_data->unk_hitbox,
+                               sizeof(fighter_data->unk_hitbox)); // copy hitbox
+                        memcpy(&ft_data->flags, &fighter_data->flags, sizeof(fighter_data->flags)); // copy flags
+                        memcpy(&ft_data->fighter_var, &fighter_data->fighter_var,
+                               sizeof(fighter_data->fighter_var)); // copy var
+                        memcpy(&ft_data->state_var, &fighter_data->state_var,
+                               sizeof(fighter_data->state_var)); // copy var
+                        memcpy(&ft_data->ftcmd_var, &fighter_data->ftcmd_var,
+                               sizeof(fighter_data->ftcmd_var)); // copy var
+                        memcpy(&ft_data->jump, &fighter_data->jump, sizeof(fighter_data->jump)); // copy var
+                        memcpy(&ft_data->smash, &fighter_data->smash, sizeof(fighter_data->smash)); // copy var
+                        memcpy(&ft_data->hurtstatus, &fighter_data->hurtstatus,
+                               sizeof(fighter_data->hurtstatus)); // copy var
+                        memcpy(&ft_data->shield, &fighter_data->shield, sizeof(fighter_data->shield)); // copy hitbox
+                        memcpy(&ft_data->shield_bubble, &fighter_data->shield_bubble,
+                               sizeof(fighter_data->shield_bubble)); // copy hitbox
+                        memcpy(&ft_data->reflect_bubble, &fighter_data->reflect_bubble,
+                               sizeof(fighter_data->reflect_bubble)); // copy hitbox
+                        memcpy(&ft_data->absorb_bubble, &fighter_data->absorb_bubble,
+                               sizeof(fighter_data->absorb_bubble)); // copy hitbox
+                        memcpy(&ft_data->reflect_hit, &fighter_data->reflect_hit,
+                               sizeof(fighter_data->reflect_hit)); // copy hitbox
+                        memcpy(&ft_data->absorb_hit, &fighter_data->absorb_hit,
+                               sizeof(fighter_data->absorb_hit)); // copy hitbox
 
                         // copy dmg
                         memcpy(&ft_data->dmg, &fighter_data->dmg, sizeof(fighter_data->dmg));
@@ -1704,35 +1700,34 @@ int Savestate_Save(Savestate *savestate)
                         memcpy(&ft_data->cb, &fighter_data->cb, sizeof(fighter_data->cb)); // copy hitbox
 
                         // convert hitbox pointers
-                        for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++)
-                        {
-
+                        for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++) {
                             ft_data->hitbox[k].bone = BoneToID(fighter_data, ft_data->hitbox[k].bone);
-                            for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) // pointers to hitbox victims
-                            {
-                                ft_data->hitbox[k].victims[l].victim_data = FtDataToID(ft_data->hitbox[k].victims[l].victim_data);
+                            // pointers to hitbox victims
+                            for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) {
+                                ft_data->hitbox[k].victims[l].victim_data = FtDataToID(
+                                    ft_data->hitbox[k].victims[l].victim_data);
                             }
                         }
-                        for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++)
-                        {
+                        for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
                             ft_data->throw_hitbox[k].bone = BoneToID(fighter_data, ft_data->throw_hitbox[k].bone);
-                            for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) // pointers to hitbox victims
-                            {
-                                ft_data->throw_hitbox[k].victims[l].victim_data = FtDataToID(ft_data->throw_hitbox[k].victims[l].victim_data);
+                            // pointers to hitbox victims
+                            for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l
+                                 ++) {
+                                ft_data->throw_hitbox[k].victims[l].victim_data = FtDataToID(
+                                    ft_data->throw_hitbox[k].victims[l].victim_data);
                             }
                         }
 
                         ft_data->unk_hitbox.bone = BoneToID(fighter_data, ft_data->unk_hitbox.bone);
-                        for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) // pointers to hitbox victims
-                        {
-
-                            ft_data->unk_hitbox.victims[k].victim_data = FtDataToID(ft_data->unk_hitbox.victims[k].victim_data);
+                        // pointers to hitbox victims
+                        for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) {
+                            ft_data->unk_hitbox.victims[k].victim_data = FtDataToID(
+                                ft_data->unk_hitbox.victims[k].victim_data);
                         }
 
                         // copy XRotN rotation
                         s8 XRotN_id = Fighter_BoneLookup(fighter_data, XRotN);
-                        if (XRotN_id != -1)
-                        {
+                        if (XRotN_id != -1) {
                             ft_data->XRotN_rot = fighter_data->bones[XRotN_id].joint->rot;
                         }
                     }
@@ -1742,20 +1737,16 @@ int Savestate_Save(Savestate *savestate)
     }
 
     // Play SFX
-    if (isSaved == 0)
-    {
+    if (isSaved == 0) {
         SFX_PlayCommon(3);
     }
-    if (isSaved == 1)
-    {
+    if (isSaved == 1) {
         // play sfx
         SFX_PlayCommon(1);
 
         // if not in frame advance, flash screen. I wrote it like this because the second condition kept getting optimized out
-        if ((Pause_CheckStatus(0) != 1))
-        {
-            if ((Pause_CheckStatus(1) != 2))
-            {
+        if ((Pause_CheckStatus(0) != 1)) {
+            if ((Pause_CheckStatus(1) != 2)) {
                 ScreenFlash_Create(2, 0);
             }
         }
@@ -1769,10 +1760,9 @@ int Savestate_Save(Savestate *savestate)
 
     return isSaved;
 }
-int Savestate_Load(Savestate *savestate)
-{
-    typedef struct BackupQueue
-    {
+
+int Savestate_Load(Savestate *savestate) {
+    typedef struct BackupQueue {
         GOBJ *fighter;
         FighterData *fighter_data;
     } BackupQueue;
@@ -1783,12 +1773,10 @@ int Savestate_Load(Savestate *savestate)
 
     // loop through all players
     int isLoaded = 0;
-    for (int i = 0; i < 6; i++)
-    {
+    for (int i = 0; i < 6; i++) {
         // get fighter gobjs
         BackupQueue queue[2];
-        for (int j = 0; j < 2; j++)
-        {
+        for (int j = 0; j < 2; j++) {
             GOBJ *fighter = 0;
             FighterData *fighter_data = 0;
 
@@ -1803,9 +1791,7 @@ int Savestate_Load(Savestate *savestate)
         }
 
         // if the main fighter and backup exists
-        if ((queue[0].fighter != 0) && (savestate->ft_state[i].data[0].is_exist == 1))
-        {
-
+        if ((queue[0].fighter != 0) && (savestate->ft_state[i].data[0].is_exist == 1)) {
             FtState *ft_state = &savestate->ft_state[i];
 
             isLoaded = 1;
@@ -1824,14 +1810,10 @@ int Savestate_Load(Savestate *savestate)
             memcpy(stale_queue, &ft_state->stale_queue, sizeof(ft_state->stale_queue));
 
             // restore fighter data
-            for (int j = 0; j < 2; j++)
-            {
-
+            for (int j = 0; j < 2; j++) {
                 GOBJ *fighter = queue[j].fighter;
 
-                if (fighter != 0)
-                {
-
+                if (fighter != 0) {
                     // get state
                     FtStateData *ft_data = &ft_state->data[j];
                     FighterData *fighter_data = queue[j].fighter_data;
@@ -1854,15 +1836,16 @@ int Savestate_Load(Savestate *savestate)
                     // restore coll data
                     CollData *thiscoll = &fighter_data->coll_data;
                     CollData *savedcoll = &ft_data->coll_data;
-                    GOBJ *gobj = thiscoll->gobj;                                                            // 0x0
-                    JOBJ *joint_1 = thiscoll->joint_1;                                                      // 0x108
-                    JOBJ *joint_2 = thiscoll->joint_2;                                                      // 0x10c
-                    JOBJ *joint_3 = thiscoll->joint_3;                                                      // 0x110
-                    JOBJ *joint_4 = thiscoll->joint_4;                                                      // 0x114
-                    JOBJ *joint_5 = thiscoll->joint_5;                                                      // 0x118
-                    JOBJ *joint_6 = thiscoll->joint_6;                                                      // 0x11c
-                    JOBJ *joint_7 = thiscoll->joint_7;                                                      // 0x120
-                    memcpy(&fighter_data->coll_data, &ft_data->coll_data, sizeof(fighter_data->coll_data)); // copy collision
+                    GOBJ *gobj = thiscoll->gobj; // 0x0
+                    JOBJ *joint_1 = thiscoll->joint_1; // 0x108
+                    JOBJ *joint_2 = thiscoll->joint_2; // 0x10c
+                    JOBJ *joint_3 = thiscoll->joint_3; // 0x110
+                    JOBJ *joint_4 = thiscoll->joint_4; // 0x114
+                    JOBJ *joint_5 = thiscoll->joint_5; // 0x118
+                    JOBJ *joint_6 = thiscoll->joint_6; // 0x11c
+                    JOBJ *joint_7 = thiscoll->joint_7; // 0x120
+                    memcpy(&fighter_data->coll_data, &ft_data->coll_data, sizeof(fighter_data->coll_data));
+                    // copy collision
                     thiscoll->gobj = gobj;
                     thiscoll->joint_1 = joint_1;
                     thiscoll->joint_2 = joint_2;
@@ -1873,9 +1856,11 @@ int Savestate_Load(Savestate *savestate)
                     thiscoll->joint_7 = joint_7;
 
                     // restore hitboxes
-                    memcpy(&fighter_data->hitbox, &ft_data->hitbox, sizeof(fighter_data->hitbox));                   // copy hitbox
-                    memcpy(&fighter_data->throw_hitbox, &ft_data->throw_hitbox, sizeof(fighter_data->throw_hitbox)); // copy hitbox
-                    memcpy(&fighter_data->unk_hitbox, &ft_data->unk_hitbox, sizeof(fighter_data->unk_hitbox));       // copy hitbox
+                    memcpy(&fighter_data->hitbox, &ft_data->hitbox, sizeof(fighter_data->hitbox)); // copy hitbox
+                    memcpy(&fighter_data->throw_hitbox, &ft_data->throw_hitbox,
+                           sizeof(fighter_data->throw_hitbox)); // copy hitbox
+                    memcpy(&fighter_data->unk_hitbox, &ft_data->unk_hitbox, sizeof(fighter_data->unk_hitbox));
+                    // copy hitbox
 
                     // copy grab
                     memcpy(&fighter_data->grab, &ft_data->grab, sizeof(fighter_data->grab));
@@ -1883,31 +1868,32 @@ int Savestate_Load(Savestate *savestate)
                     fighter_data->grab.grab_victim = IDToGOBJ(fighter_data->grab.grab_victim);
 
                     // convert pointers
-                    for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++)
-                    {
+                    for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++) {
                         fighter_data->hitbox[k].bone = IDToBone(fighter_data, ft_data->hitbox[k].bone);
-                        for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) // pointers to hitbox victims
-                        {
-                            fighter_data->hitbox[k].victims[l].victim_data = IDToFtData(ft_data->hitbox[k].victims[l].victim_data);
+                        // pointers to hitbox victims
+                        for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) {
+                            fighter_data->hitbox[k].victims[l].victim_data = IDToFtData(
+                                ft_data->hitbox[k].victims[l].victim_data);
                         }
                     }
-                    for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++)
-                    {
+                    for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
                         fighter_data->throw_hitbox[k].bone = IDToBone(fighter_data, ft_data->throw_hitbox[k].bone);
-                        for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) // pointers to hitbox victims
-                        {
-                            fighter_data->throw_hitbox[k].victims[l].victim_data = IDToFtData(ft_data->throw_hitbox[k].victims[l].victim_data);
+                        // pointers to hitbox victims
+                        for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) {
+                            fighter_data->throw_hitbox[k].victims[l].victim_data = IDToFtData(
+                                ft_data->throw_hitbox[k].victims[l].victim_data);
                         }
                     }
                     fighter_data->unk_hitbox.bone = IDToBone(fighter_data, ft_data->unk_hitbox.bone);
-                    for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) // pointers to hitbox victims
-                    {
-
-                        fighter_data->unk_hitbox.victims[k].victim_data = IDToFtData(ft_data->unk_hitbox.victims[k].victim_data);
+                    // pointers to hitbox victims
+                    for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) {
+                        fighter_data->unk_hitbox.victims[k].victim_data = IDToFtData(
+                            ft_data->unk_hitbox.victims[k].victim_data);
                     }
 
                     // restore fighter variables
-                    memcpy(&fighter_data->fighter_var, &ft_data->fighter_var, sizeof(fighter_data->fighter_var)); // copy hitbox
+                    memcpy(&fighter_data->fighter_var, &ft_data->fighter_var,
+                           sizeof(fighter_data->fighter_var)); // copy hitbox
 
                     // zero pointer to cached animations to force anim load (fixes fall crash)
                     fighter_data->anim_curr_ARAM = 0;
@@ -1918,21 +1904,23 @@ int Savestate_Load(Savestate *savestate)
                     if (fighter_data->flags.is_thrown == 1)
                         anim_source = fighter_data->grab.grab_attacker;
                     Fighter_SetAllHurtboxesNotUpdated(fighter);
-                    ActionStateChange(ft_data->stateFrame, ft_data->stateSpeed, -1, fighter, ft_data->state, 0, anim_source);
+                    ActionStateChange(ft_data->stateFrame, ft_data->stateSpeed, -1, fighter, ft_data->state, 0,
+                                      anim_source);
                     fighter_data->stateBlend = 0;
 
                     // restore XRotN rotation
                     s8 XRotN_id = Fighter_BoneLookup(fighter_data, XRotN);
-                    if (XRotN_id != -1)
-                    {
+                    if (XRotN_id != -1) {
                         fighter_data->bones[XRotN_id].joint->rot = ft_data->XRotN_rot;
                     }
 
                     // restore state variables
-                    memcpy(&fighter_data->state_var, &ft_data->state_var, sizeof(fighter_data->state_var)); // copy hitbox
+                    memcpy(&fighter_data->state_var, &ft_data->state_var, sizeof(fighter_data->state_var));
+                    // copy hitbox
 
                     // restore ftcmd variables
-                    memcpy(&fighter_data->ftcmd_var, &ft_data->ftcmd_var, sizeof(fighter_data->ftcmd_var)); // copy hitbox
+                    memcpy(&fighter_data->ftcmd_var, &ft_data->ftcmd_var, sizeof(fighter_data->ftcmd_var));
+                    // copy hitbox
 
                     // restore damage variables
                     memcpy(&fighter_data->dmg, &ft_data->dmg, sizeof(fighter_data->dmg)); // copy hitbox
@@ -1945,7 +1933,8 @@ int Savestate_Load(Savestate *savestate)
                     memcpy(&fighter_data->flags, &ft_data->flags, sizeof(fighter_data->flags)); // copy hitbox
 
                     // restore hurtstatus variables
-                    memcpy(&fighter_data->hurtstatus, &ft_data->hurtstatus, sizeof(fighter_data->hurtstatus)); // copy hitbox
+                    memcpy(&fighter_data->hurtstatus, &ft_data->hurtstatus, sizeof(fighter_data->hurtstatus));
+                    // copy hitbox
 
                     // update jobj position
                     JOBJ *fighter_jobj = fighter->hsd_object;
@@ -1960,9 +1949,7 @@ int Savestate_Load(Savestate *savestate)
                     Fighter_ColorRemove(fighter_data, 9);
 
                     // restore color
-                    for (int k = 0; k < (sizeof(fighter_data->color) / sizeof(ColorOverlay)); k++)
-                    {
-
+                    for (int k = 0; k < (sizeof(fighter_data->color) / sizeof(ColorOverlay)); k++) {
                         ColorOverlay *thiscolor = &fighter_data->color[k];
                         ColorOverlay *savedcolor = &ft_data->color[k];
 
@@ -1984,12 +1971,17 @@ int Savestate_Load(Savestate *savestate)
                     memcpy(&fighter_data->smash, &ft_data->smash, sizeof(fighter_data->smash)); // copy hitbox
 
                     // restore shield/reflect/absorb variables
-                    memcpy(&fighter_data->shield, &ft_data->shield, sizeof(fighter_data->shield));                         // copy hitbox
-                    memcpy(&fighter_data->shield_bubble, &ft_data->shield_bubble, sizeof(fighter_data->shield_bubble));    // copy hitbox
-                    memcpy(&fighter_data->reflect_bubble, &ft_data->reflect_bubble, sizeof(fighter_data->reflect_bubble)); // copy hitbox
-                    memcpy(&fighter_data->absorb_bubble, &ft_data->absorb_bubble, sizeof(fighter_data->absorb_bubble));    // copy hitbox
-                    memcpy(&fighter_data->reflect_hit, &ft_data->reflect_hit, sizeof(fighter_data->reflect_hit));          // copy hitbox
-                    memcpy(&fighter_data->absorb_hit, &ft_data->absorb_hit, sizeof(fighter_data->absorb_hit));             // copy hitbox
+                    memcpy(&fighter_data->shield, &ft_data->shield, sizeof(fighter_data->shield)); // copy hitbox
+                    memcpy(&fighter_data->shield_bubble, &ft_data->shield_bubble,
+                           sizeof(fighter_data->shield_bubble)); // copy hitbox
+                    memcpy(&fighter_data->reflect_bubble, &ft_data->reflect_bubble,
+                           sizeof(fighter_data->reflect_bubble)); // copy hitbox
+                    memcpy(&fighter_data->absorb_bubble, &ft_data->absorb_bubble,
+                           sizeof(fighter_data->absorb_bubble)); // copy hitbox
+                    memcpy(&fighter_data->reflect_hit, &ft_data->reflect_hit,
+                           sizeof(fighter_data->reflect_hit)); // copy hitbox
+                    memcpy(&fighter_data->absorb_hit, &ft_data->absorb_hit, sizeof(fighter_data->absorb_hit));
+                    // copy hitbox
 
                     // restore callback functions
                     memcpy(&fighter_data->cb, &ft_data->cb, sizeof(fighter_data->cb)); // copy hitbox
@@ -2013,8 +2005,7 @@ int Savestate_Load(Savestate *savestate)
                     Fighter_UpdateIK(fighter);
 
                     // if shield is up, update shield
-                    if ((fighter_data->state >= ASID_GUARDON) && (fighter_data->state <= ASID_GUARDREFLECT))
-                    {
+                    if ((fighter_data->state >= ASID_GUARDON) && (fighter_data->state <= ASID_GUARDREFLECT)) {
                         // get gfx ID
                         int shieldGFX;
                         static u16 ShieldGFXLookup[] = {1047, 1048, -1, 1049, -1}; // covers GUARDON -> GUARDREFLECT
@@ -2039,8 +2030,7 @@ int Savestate_Load(Savestate *savestate)
                     int dyn_proc_num = 45;
 
                     // simulate dynamics a bunch to fall in place
-                    for (int d = 0; d < dyn_proc_num; d++)
-                    {
+                    for (int d = 0; d < dyn_proc_num; d++) {
                         Fighter_ProcDynamics(fighter);
                     }
 
@@ -2053,16 +2043,13 @@ int Savestate_Load(Savestate *savestate)
                     // remove all items belonging to this fighter
                     GOBJList *gobj_list = *stc_gobj_list;
                     GOBJ *item = gobj_list->item;
-                    while (item != 0)
-                    {
-
+                    while (item != 0) {
                         // get next
                         GOBJ *next_item = item->next;
 
                         // check to delete
                         ItemData *item_data = item->userdata;
-                        if (fighter == item_data->fighter)
-                        {
+                        if (fighter == item_data->fighter) {
                             // destroy it
                             Item_Destroy(item);
                         }
@@ -2078,18 +2065,15 @@ int Savestate_Load(Savestate *savestate)
             MatchHUD *hud = &stc_matchhud[i];
 
             // check if fighter is perm dead
-            if (Match_CheckIfStock() == 1)
-            {
+            if (Match_CheckIfStock() == 1) {
                 // remove HUD if no stocks left
-                if (Fighter_GetStocks(i) <= 0)
-                {
+                if (Fighter_GetStocks(i) <= 0) {
                     hud->is_removed = 0;
                 }
             }
 
             // check to create it
-            if (hud->is_removed == 1)
-            {
+            if (hud->is_removed == 1) {
                 Match_CreateHUD(i);
             }
 
@@ -2102,20 +2086,18 @@ int Savestate_Load(Savestate *savestate)
     }
 
     // Restore event data and Play SFX
-    if (isLoaded == 0)
-    {
+    if (isLoaded == 0) {
         SFX_PlayCommon(3);
     }
-    if (isLoaded == 1)
-    {
-
+    if (isLoaded == 1) {
         // restore frame
         Match *match = stc_match;
         match->time_frames = savestate->frame;
         stc_event_vars.game_timer = savestate->frame;
 
         // update timer
-        int frames = match->time_frames - 1; // this is because the scenethink function runs once before the gobj procs do
+        int frames = match->time_frames - 1;
+        // this is because the scenethink function runs once before the gobj procs do
         match->time_seconds = frames / 60;
         match->time_ms = frames % 60;
 
@@ -2123,20 +2105,16 @@ int Savestate_Load(Savestate *savestate)
         memcpy(stc_event_vars.event_gobj->userdata, &savestate->event_data, sizeof(savestate->event_data));
 
         // remove all particles
-        for (int i = 0; i < PTCL_LINKMAX; i++)
-        {
+        for (int i = 0; i < PTCL_LINKMAX; i++) {
             Particle2 **ptcls = &stc_ptcl[i];
             Particle2 *ptcl = *ptcls;
-            while (ptcl != 0)
-            {
-
+            while (ptcl != 0) {
                 Particle2 *ptcl_next = ptcl->next;
 
                 // begin destroying this particle
 
                 // subtract some value, 8039c9f0
-                if (ptcl->x88 != 0)
-                {
+                if (ptcl->x88 != 0) {
                     int *arr = ptcl->x88;
                     arr[0x50 / 4]--;
                 }
@@ -2163,42 +2141,14 @@ int Savestate_Load(Savestate *savestate)
             }
         }
 
-        /*
-    // remove all generators with linkNo 2 (blastzone)
-    ptclGen *gen = *stc_ptclgen;
-    while (gen != 0)
-    {
-        // get next
-        ptclGen *gen_next = gen->next;
-
-        // if linkNo 2, destroy it
-        if (gen->link_no == 2)
-        {
-            // set a flag for some reason
-            gen->type |= 0x80;
-
-            // kill gen
-            gen = psKillGenerator(gen, *stc_ptclgencurr);
-        }
-
-        // save last
-        *stc_ptclgencurr = gen;
-        // get next
-        gen = gen_next;
-    }
-*/
-
         // remove all camera shake gobjs (p_link 18, entity_class 3)
         GOBJList *gobj_list = *stc_gobj_list;
         GOBJ *gobj = gobj_list->match_cam;
-        while (gobj != 0)
-        {
-
+        while (gobj != 0) {
             GOBJ *gobj_next = gobj->next;
 
             // if entity class 3 (quake)
-            if (gobj->entity_class == 3)
-            {
+            if (gobj->entity_class == 3) {
                 GObj_Destroy(gobj);
             }
 
@@ -2218,32 +2168,27 @@ int Savestate_Load(Savestate *savestate)
 
     return isLoaded;
 }
-void Update_Savestates()
-{
 
+void Update_Savestates() {
     // not when pause menu is showing
-    if (Pause_CheckStatus(1) != 2)
-    {
+    if (Pause_CheckStatus(1) != 2) {
         // loop through all humans
-        for (int i = 0; i < 6; i++)
-        {
+        for (int i = 0; i < 6; i++) {
             // check if fighter exists
             GOBJ *fighter = Fighter_GetGObj(i);
-            if (fighter != 0)
-            {
+            if (fighter != 0) {
                 // get fighter data
                 FighterData *fighter_data = fighter->userdata;
                 HSD_Pad *pad = PadGet(fighter_data->ply, PADGET_MASTER);
 
                 // check for savestate
-                int blacklist = (HSD_BUTTON_DPAD_DOWN | HSD_BUTTON_DPAD_UP | HSD_TRIGGER_Z | HSD_TRIGGER_R | HSD_BUTTON_A | HSD_BUTTON_B | HSD_BUTTON_X | HSD_BUTTON_Y | HSD_BUTTON_START);
-                if (((pad->down & HSD_BUTTON_DPAD_RIGHT) != 0) && ((pad->held & (blacklist)) == 0))
-                {
+                int blacklist = (
+                    HSD_BUTTON_DPAD_DOWN | HSD_BUTTON_DPAD_UP | HSD_TRIGGER_Z | HSD_TRIGGER_R | HSD_BUTTON_A |
+                    HSD_BUTTON_B | HSD_BUTTON_X | HSD_BUTTON_Y | HSD_BUTTON_START);
+                if (((pad->down & HSD_BUTTON_DPAD_RIGHT) != 0) && ((pad->held & (blacklist)) == 0)) {
                     // save state
                     Savestate_Save(stc_savestate);
-                }
-                else if (((pad->down & HSD_BUTTON_DPAD_LEFT) != 0) && ((pad->held & (blacklist)) == 0))
-                {
+                } else if (((pad->down & HSD_BUTTON_DPAD_LEFT) != 0) && ((pad->held & (blacklist)) == 0)) {
                     // load state
                     Savestate_Load(stc_savestate);
                 }
@@ -2253,8 +2198,8 @@ void Update_Savestates()
 
     return;
 }
-int GOBJToID(GOBJ *gobj)
-{
+
+int GOBJToID(GOBJ *gobj) {
     // ensure valid pointer
     if (gobj == 0)
         return -1;
@@ -2270,8 +2215,8 @@ int GOBJToID(GOBJ *gobj)
 
     return ((ply << 4) | ms);
 }
-int FtDataToID(FighterData *fighter_data)
-{
+
+int FtDataToID(FighterData *fighter_data) {
     // ensure valid pointer
     if (fighter_data == 0)
         return -1;
@@ -2286,9 +2231,8 @@ int FtDataToID(FighterData *fighter_data)
 
     return ((ply << 4) | ms);
 }
-int BoneToID(FighterData *fighter_data, JOBJ *bone)
-{
 
+int BoneToID(FighterData *fighter_data, JOBJ *bone) {
     // ensure bone exists
     if (bone == 0)
         return -1;
@@ -2296,10 +2240,8 @@ int BoneToID(FighterData *fighter_data, JOBJ *bone)
     int bone_id = -1;
 
     // painstakingly look for a match
-    for (int i = 0; i < fighter_data->bone_num; i++)
-    {
-        if (bone == fighter_data->bones[i].joint)
-        {
+    for (int i = 0; i < fighter_data->bone_num; i++) {
+        if (bone == fighter_data->bones[i].joint) {
             bone_id = i;
             break;
         }
@@ -2307,16 +2249,15 @@ int BoneToID(FighterData *fighter_data, JOBJ *bone)
 
 #if TM_DEBUG > 0
     // no bone found
-    if (bone_id == -1)
-    {
+    if (bone_id == -1) {
         assert("no bone found");
     }
 #endif
 
     return bone_id;
 }
-GOBJ *IDToGOBJ(int id)
-{
+
+GOBJ *IDToGOBJ(int id) {
     // ensure valid pointer
     if (id == -1)
         return 0;
@@ -2330,8 +2271,8 @@ GOBJ *IDToGOBJ(int id)
 
     return gobj;
 }
-FighterData *IDToFtData(int id)
-{
+
+FighterData *IDToFtData(int id) {
     // ensure valid pointer
     if (id == -1)
         return 0;
@@ -2346,8 +2287,8 @@ FighterData *IDToFtData(int id)
 
     return fighter_data;
 }
-JOBJ *IDToBone(FighterData *fighter_data, int id)
-{
+
+JOBJ *IDToBone(FighterData *fighter_data, int id) {
     // ensure valid pointer
     if (id == -1)
         return 0;
@@ -2358,13 +2299,12 @@ JOBJ *IDToBone(FighterData *fighter_data, int id)
     return bone;
 }
 
-void Event_IncTimer(GOBJ *gobj)
-{
+void Event_IncTimer(GOBJ *gobj) {
     stc_event_vars.game_timer++;
     return;
 }
-void TM_CreateWatermark()
-{
+
+void TM_CreateWatermark() {
     // create text canvas
     int canvas = Text_CreateCanvas(10, 0, 9, 13, 0, 14, 0, 19);
 
@@ -2397,83 +2337,76 @@ void TM_CreateWatermark()
 
     return;
 }
-void Hazards_Disable()
-{
+
+void Hazards_Disable() {
     // get stage id
     int stage_internal = Stage_ExternalToInternal(Stage_GetExternalID());
     int is_fixwind = 0;
 
-    switch (stage_internal)
-    {
-    case (GR_STORY):
-    {
-        // remove shyguy map gobj proc
-        GOBJ *shyguy_gobj = Stage_GetMapGObj(3);
-        GObj_RemoveProc(shyguy_gobj);
+    switch (stage_internal) {
+        case (GR_STORY): {
+            // remove shyguy map gobj proc
+            GOBJ *shyguy_gobj = Stage_GetMapGObj(3);
+            GObj_RemoveProc(shyguy_gobj);
 
-        // remove randall
-        GOBJ *randall_gobj = Stage_GetMapGObj(2);
-        Stage_DestroyMapGObj(randall_gobj);
+            // remove randall
+            GOBJ *randall_gobj = Stage_GetMapGObj(2);
+            Stage_DestroyMapGObj(randall_gobj);
 
-        is_fixwind = 1;
+            is_fixwind = 1;
 
-        break;
-    }
-    case (GR_PSTAD):
-    {
-        // remove map gobj proc
-        GOBJ *map_gobj = Stage_GetMapGObj(2);
-        GObj_RemoveProc(map_gobj);
+            break;
+        }
+        case (GR_PSTAD): {
+            // remove map gobj proc
+            GOBJ *map_gobj = Stage_GetMapGObj(2);
+            GObj_RemoveProc(map_gobj);
 
-        is_fixwind = 1;
+            is_fixwind = 1;
 
-        break;
-    }
-    case (GR_OLDPU):
-    {
-        // remove map gobj proc
-        GOBJ *map_gobj = Stage_GetMapGObj(7);
-        GObj_RemoveProc(map_gobj);
+            break;
+        }
+        case (GR_OLDPU): {
+            // remove map gobj proc
+            GOBJ *map_gobj = Stage_GetMapGObj(7);
+            GObj_RemoveProc(map_gobj);
 
-        // remove map gobj proc
-        map_gobj = Stage_GetMapGObj(6);
-        GObj_RemoveProc(map_gobj);
+            // remove map gobj proc
+            map_gobj = Stage_GetMapGObj(6);
+            GObj_RemoveProc(map_gobj);
 
-        // set wind hazard num to 0
-        *ftchkdevice_windnum = 0;
+            // set wind hazard num to 0
+            *ftchkdevice_windnum = 0;
 
-        break;
-    }
-    case (GR_FD):
-    {
-        // set bg skip flag
-        GOBJ *map_gobj = Stage_GetMapGObj(3);
-        map_gobjData *map_data = map_gobj->userdata;
-        map_data->xc4 |= 0x40;
+            break;
+        }
+        case (GR_FD): {
+            // set bg skip flag
+            GOBJ *map_gobj = Stage_GetMapGObj(3);
+            map_gobjData *map_data = map_gobj->userdata;
+            map_data->xc4 |= 0x40;
 
-        // remove on-go function that changes this flag
-        StageOnGO *on_go = stc_stage->on_go;
-        stc_stage->on_go = on_go->next;
-        HSD_Free(on_go);
+            // remove on-go function that changes this flag
+            StageOnGO *on_go = stc_stage->on_go;
+            stc_stage->on_go = on_go->next;
+            HSD_Free(on_go);
 
-        break;
-    }
+            break;
+        }
     }
 
     // Certain stages have an essential ragdoll function
     // in their map_gobj think function. If the think function is removed,
     // the ragdoll function must be re-scheduled to function properly.
-    if (is_fixwind == 1)
-    {
+    if (is_fixwind == 1) {
         GOBJ *wind_gobj = GObj_Create(3, 5, 0);
         GObj_AddProc(wind_gobj, Dynamics_DecayWind, 4);
     }
 }
 
 // Message Functions
-void Message_Init()
-{
 
+void Message_Init() {
     // create cobj
     GOBJ *cam_gobj = GObj_Create(19, 20, 0);
     COBJDesc *cam_desc = stc_event_vars.menu_assets->hud_cobjdesc;
@@ -2502,9 +2435,8 @@ void Message_Init()
 
     return;
 }
-GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, ...)
-{
 
+GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, ...) {
     va_list args;
 
     MsgMngrData *mgr_data = stc_msgmgr->userdata;
@@ -2559,17 +2491,17 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     char *msg_cursor_prev, *msg_cursor_curr; // declare char pointers
     msg_cursor_prev = msg;
     msg_cursor_curr = strchr(msg_cursor_prev, '\n'); // check for occurrence
-    while (msg_cursor_curr != 0)                     // if occurrence found, increment values
-    {
+    // if occurrence found, increment values
+    while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= MSG_LINEMAX)
             assert("MSG_LINEMAX exceeded!");
 
         // Save information about this line
         line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev; // determine length of the line
-        line_num++;                                                        // increment number of newlines found
-        msg_cursor_prev = msg_cursor_curr + 1;                             // update prev cursor
-        msg_cursor_curr = strchr(msg_cursor_prev, '\n');                   // check for another occurrence
+        line_num++; // increment number of newlines found
+        msg_cursor_prev = msg_cursor_curr + 1; // update prev cursor
+        msg_cursor_curr = strchr(msg_cursor_prev, '\n'); // check for another occurrence
     }
 
     // get last lines length
@@ -2578,9 +2510,7 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
 
     // copy each line to an individual char array
     char *msg_cursor = &msg;
-    for (int i = 0; i < line_num; i++)
-    {
-
+    for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > MSG_CHARMAX)
@@ -2607,32 +2537,29 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
 
     return msg_gobj;
 }
-void Message_Manager(GOBJ *mngr_gobj)
-{
+
+void Message_Manager(GOBJ *mngr_gobj) {
     MsgMngrData *mgr_data = mngr_gobj->userdata;
 
     // Iterate through each queue
-    for (int i = 0; i < MSGQUEUE_NUM; i++)
-    {
+    for (int i = 0; i < MSGQUEUE_NUM; i++) {
         GOBJ **msg_queue = &mgr_data->msg_queue[i];
 
         // anim update (time based logic)
-        for (int j = (MSGQUEUE_SIZE - 2); j >= 0; j--) // iterate through backwards (because deletions)
-        {
+        // iterate through backwards (because deletions)
+        for (int j = (MSGQUEUE_SIZE - 2); j >= 0; j--) {
             GOBJ *this_msg_gobj = msg_queue[j];
 
             // if message exists
-            if (this_msg_gobj != 0)
-            {
+            if (this_msg_gobj != 0) {
                 MsgData *this_msg_data = this_msg_gobj->userdata;
                 Text *this_msg_text = this_msg_data->text;
                 JOBJ *this_msg_jobj = this_msg_gobj->hsd_object;
 
                 // check if the message moved this frame
-                if (this_msg_data->orig_index != j)
-                {
-                    this_msg_data->orig_index = j;              // moved so update this
-                    this_msg_data->state = MSGSTATE_SHIFT;      // enter shift
+                if (this_msg_data->orig_index != j) {
+                    this_msg_data->orig_index = j; // moved so update this
+                    this_msg_data->state = MSGSTATE_SHIFT; // enter shift
                     this_msg_data->anim_timer = MSGTIMER_SHIFT; // shift timer
                 }
 
@@ -2640,56 +2567,44 @@ void Message_Manager(GOBJ *mngr_gobj)
                 if (this_msg_data->anim_timer > 0)
                     this_msg_data->anim_timer--;
 
-                switch (this_msg_data->state)
-                {
-                case (MSGSTATE_WAIT):
-                case (MSGSTATE_SHIFT):
-                {
+                switch (this_msg_data->state) {
+                    case (MSGSTATE_WAIT):
+                    case (MSGSTATE_SHIFT): {
+                        // increment alive time
+                        this_msg_data->alive_timer++;
 
-                    // increment alive time
-                    this_msg_data->alive_timer++;
+                        // if lifetime is ended, enter delete state
+                        if (this_msg_data->alive_timer >= this_msg_data->lifetime) {
+                            // if using frame advance, instantly remove this message
+                            if (Pause_CheckStatus(0) == 1) {
+                                Message_Destroy(msg_queue, j);
+                            } else {
+                                this_msg_data->state = MSGSTATE_DELETE;
+                                this_msg_data->anim_timer = MSGTIMER_DELETE;
+                            }
+                        }
 
-                    // if lifetime is ended, enter delete state
-                    if (this_msg_data->alive_timer >= this_msg_data->lifetime)
-                    {
-                        // if using frame advance, instantly remove this message
-                        if (Pause_CheckStatus(0) == 1)
-                        {
+                        break;
+                    }
+
+                    case (MSGSTATE_DELETE): {
+                        // if timer is ended, remove the message
+                        if ((this_msg_data->anim_timer <= 0)) {
                             Message_Destroy(msg_queue, j);
                         }
-                        else
-                        {
-                            this_msg_data->state = MSGSTATE_DELETE;
-                            this_msg_data->anim_timer = MSGTIMER_DELETE;
-                        }
+
+                        break;
                     }
-
-                    break;
-                }
-
-                case (MSGSTATE_DELETE):
-                {
-
-                    // if timer is ended, remove the message
-                    if ((this_msg_data->anim_timer <= 0))
-                    {
-                        Message_Destroy(msg_queue, j);
-                    }
-
-                    break;
-                }
                 }
             }
         }
 
         // position update (update messages' onscreen positions)
-        for (int j = 0; j < MSGQUEUE_SIZE; j++)
-        {
+        for (int j = 0; j < MSGQUEUE_SIZE; j++) {
             GOBJ *this_msg_gobj = msg_queue[j];
 
             // if message exists
-            if (this_msg_gobj != 0)
-            {
+            if (this_msg_gobj != 0) {
                 MsgData *this_msg_data = this_msg_gobj->userdata;
                 Text *this_msg_text = this_msg_data->text;
                 JOBJ *this_msg_jobj = this_msg_gobj->hsd_object;
@@ -2698,74 +2613,66 @@ void Message_Manager(GOBJ *mngr_gobj)
                 Vec3 base_pos;
                 Vec3 this_msg_pos;
                 float pos_delta = stc_msg_queue_offsets[i];
-                if (i < 6)
-                {
+                if (i < 6) {
                     Vec3 *hud_pos = Match_GetPlayerHUDPos(i);
 
                     base_pos.X = hud_pos->X;
                     base_pos.Y = hud_pos->Y + MSG_HUDYOFFSET;
                     base_pos.Z = hud_pos->Z;
-                }
-                else if (i == MSGQUEUE_GENERAL)
-                {
+                } else if (i == MSGQUEUE_GENERAL) {
                     base_pos = stc_msg_queue_general_pos;
                 }
                 this_msg_pos.X = base_pos.X; // Get this messages position
 
-                switch (this_msg_data->state)
-                {
-                case (MSGSTATE_WAIT):
-                case (MSGSTATE_SHIFT):
-                {
+                switch (this_msg_data->state) {
+                    case (MSGSTATE_WAIT):
+                    case (MSGSTATE_SHIFT): {
+                        // get time
+                        float t = (((float) MSGTIMER_SHIFT - this_msg_data->anim_timer) / MSGTIMER_SHIFT);
 
-                    // get time
-                    float t = (((float)MSGTIMER_SHIFT - this_msg_data->anim_timer) / MSGTIMER_SHIFT);
+                        // get initial and final position for animation
+                        float final_pos = base_pos.Y + ((float) j * pos_delta);
+                        float initial_pos = base_pos.Y + ((float) this_msg_data->prev_index * pos_delta);
+                        // if using frame advance, do not animate
+                        if (Pause_CheckStatus(0) == 1) {
+                            this_msg_pos.Y = final_pos;
+                        } else {
+                            this_msg_pos.Y = (BezierBlend(t) * (final_pos - initial_pos)) + initial_pos;
+                        }
 
-                    // get initial and final position for animation
-                    float final_pos = base_pos.Y + ((float)j * pos_delta);
-                    float initial_pos = base_pos.Y + ((float)this_msg_data->prev_index * pos_delta);
-                    if (Pause_CheckStatus(0) == 1) // if using frame advance, do not animate
-                    {
-                        this_msg_pos.Y = final_pos;
+                        Vec3 scale = this_msg_jobj->scale;
+
+                        // BG position
+                        this_msg_jobj->trans.X = this_msg_pos.X;
+                        this_msg_jobj->trans.Y = this_msg_pos.Y;
+                        // text position
+                        this_msg_text->trans.X = this_msg_pos.X + (MSGTEXT_BASEX * (scale.X / 4.0));
+                        this_msg_text->trans.Y = (this_msg_pos.Y * -1) + (MSGTEXT_BASEY * (scale.Y / 4.0));
+
+                        // adjust bar
+                        JOBJ *bar;
+                        JOBJ_GetChild(this_msg_jobj, &bar, 4, -1);
+                        bar->trans.X = (float) (this_msg_data->lifetime - this_msg_data->alive_timer) / (float)
+                                       this_msg_data->lifetime;
+
+                        break;
                     }
-                    else
-                    {
-                        this_msg_pos.Y = (BezierBlend(t) * (final_pos - initial_pos)) + initial_pos;
+                    case (MSGSTATE_DELETE): {
+                        // get time
+                        float t = ((this_msg_data->anim_timer) / (float) MSGTIMER_DELETE);
+
+                        Vec3 *scale = &this_msg_jobj->scale;
+                        Vec3 *pos = &this_msg_jobj->trans;
+
+                        // BG scale
+                        scale->Y = BezierBlend(t);
+                        // text scale
+                        this_msg_text->scale.Y = (scale->Y * 0.01) * MSGTEXT_BASESCALE;
+                        // text position
+                        this_msg_text->trans.Y = (pos->Y * -1) + (MSGTEXT_BASEY * (scale->Y / 4.0));
+
+                        break;
                     }
-
-                    Vec3 scale = this_msg_jobj->scale;
-
-                    // BG position
-                    this_msg_jobj->trans.X = this_msg_pos.X;
-                    this_msg_jobj->trans.Y = this_msg_pos.Y;
-                    // text position
-                    this_msg_text->trans.X = this_msg_pos.X + (MSGTEXT_BASEX * (scale.X / 4.0));
-                    this_msg_text->trans.Y = (this_msg_pos.Y * -1) + (MSGTEXT_BASEY * (scale.Y / 4.0));
-
-                    // adjust bar
-                    JOBJ *bar;
-                    JOBJ_GetChild(this_msg_jobj, &bar, 4, -1);
-                    bar->trans.X = (float)(this_msg_data->lifetime - this_msg_data->alive_timer) / (float)this_msg_data->lifetime;
-
-                    break;
-                }
-                case (MSGSTATE_DELETE):
-                {
-                    // get time
-                    float t = ((this_msg_data->anim_timer) / (float)MSGTIMER_DELETE);
-
-                    Vec3 *scale = &this_msg_jobj->scale;
-                    Vec3 *pos = &this_msg_jobj->trans;
-
-                    // BG scale
-                    scale->Y = BezierBlend(t);
-                    // text scale
-                    this_msg_text->scale.Y = (scale->Y * 0.01) * MSGTEXT_BASESCALE;
-                    // text position
-                    this_msg_text->trans.Y = (pos->Y * -1) + (MSGTEXT_BASEY * (scale->Y / 4.0));
-
-                    break;
-                }
                 }
 
                 JOBJ_SetMtxDirtySub(this_msg_jobj);
@@ -2773,9 +2680,8 @@ void Message_Manager(GOBJ *mngr_gobj)
         }
     }
 }
-void Message_Destroy(GOBJ **msg_queue, int msg_num)
-{
 
+void Message_Destroy(GOBJ **msg_queue, int msg_num) {
     GOBJ *msg_gobj = msg_queue[msg_num];
     MsgData *msg_data = msg_gobj->userdata;
 
@@ -2791,14 +2697,12 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num)
     msg_queue[msg_num] = 0;
 
     // shift others
-    for (int i = (msg_num); i < (MSGQUEUE_SIZE - 1); i++)
-    {
+    for (int i = (msg_num); i < (MSGQUEUE_SIZE - 1); i++) {
         msg_queue[i] = msg_queue[i + 1];
 
         // update its prev pos
         GOBJ *this_msg_gobj = msg_queue[i];
-        if (this_msg_gobj != 0)
-        {
+        if (this_msg_gobj != 0) {
             MsgData *this_msg_data = this_msg_gobj->userdata;
             this_msg_data->prev_index = i + 1; // prev position
         }
@@ -2806,9 +2710,8 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num)
 
     return;
 }
-void Message_Add(GOBJ *msg_gobj, int queue_num)
-{
 
+void Message_Add(GOBJ *msg_gobj, int queue_num) {
     MsgData *msg_data = msg_gobj->userdata;
     MsgMngrData *mgr_data = stc_msgmgr->userdata;
     GOBJ **msg_queue = &mgr_data->msg_queue[queue_num];
@@ -2818,25 +2721,20 @@ void Message_Add(GOBJ *msg_gobj, int queue_num)
         assert("queue_num over!");
 
     // remove any existing messages of this kind
-    for (int i = 0; i < MSGQUEUE_SIZE; i++)
-    {
+    for (int i = 0; i < MSGQUEUE_SIZE; i++) {
         GOBJ *this_msg_gobj = msg_queue[i];
 
         // if it exists
-        if (this_msg_gobj != 0)
-        {
+        if (this_msg_gobj != 0) {
             MsgData *this_msg_data = this_msg_gobj->userdata;
 
             // Remove this message if its of the same kind
-            if ((this_msg_data->kind == msg_data->kind))
-            {
-
+            if ((this_msg_data->kind == msg_data->kind)) {
                 Message_Destroy(msg_queue, i); // remove the message and shift others
 
                 // if the message we're replacing is the most recent message, instantly
                 // remove the old one and do not animate the new one
-                if (i == 0)
-                {
+                if (i == 0) {
                     msg_data->state = MSGSTATE_WAIT;
                     msg_data->anim_timer = 0;
                 }
@@ -2845,21 +2743,18 @@ void Message_Add(GOBJ *msg_gobj, int queue_num)
     }
 
     // first remove last message in the queue
-    if (msg_queue[MSGQUEUE_SIZE - 1] != 0)
-    {
+    if (msg_queue[MSGQUEUE_SIZE - 1] != 0) {
         Message_Destroy(msg_queue, MSGQUEUE_SIZE - 1);
     }
 
     // shift other messages
-    for (int i = (MSGQUEUE_SIZE - 2); i >= 0; i--)
-    {
+    for (int i = (MSGQUEUE_SIZE - 2); i >= 0; i--) {
         // shift message
         msg_queue[i + 1] = msg_queue[i];
 
         // update its prev pos
         GOBJ *this_msg_gobj = msg_queue[i + 1];
-        if (this_msg_gobj != 0)
-        {
+        if (this_msg_gobj != 0) {
             MsgData *this_msg_data = this_msg_gobj->userdata;
             this_msg_data->prev_index = i; // prev position
         }
@@ -2874,23 +2769,21 @@ void Message_Add(GOBJ *msg_gobj, int queue_num)
 
     return;
 }
-void Message_CObjThink(GOBJ *gobj)
-{
 
+void Message_CObjThink(GOBJ *gobj) {
     if (Pause_CheckStatus(1) != 2)
         CObjThink_Common(gobj);
 
     return;
 }
 
-float BezierBlend(float t)
-{
+float BezierBlend(float t) {
     return t * t * (3.0f - 2.0f * t);
 }
 
 // Tips Functions
-void Tip_Init()
-{
+
+void Tip_Init() {
     // init static struct
     memset(&stc_tipmgr, 0, sizeof(TipMgr));
 
@@ -2900,17 +2793,14 @@ void Tip_Init()
 
     return;
 }
-void Tip_Think(GOBJ *gobj)
-{
 
+void Tip_Think(GOBJ *gobj) {
     GOBJ *tip_gobj = stc_tipmgr.gobj;
 
     stc_event_vars.menu_assets->tip_jobj;
 
     // update tip
-    if (tip_gobj != 0)
-    {
-
+    if (tip_gobj != 0) {
         // update anim
         JOBJ_AnimAll(tip_gobj->hsd_object);
 
@@ -2924,53 +2814,49 @@ void Tip_Think(GOBJ *gobj)
         tip_text->trans.Y = (tip_pos.Y * -1) + (0 * (tip_jobj->scale.Y / 4.0));
 
         // state logic
-        switch (stc_tipmgr.state)
-        {
-        case (0): // in
-        {
-            // if anim is done, enter wait
-            if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0)
-                stc_tipmgr.state = 1; // enter wait
+        switch (stc_tipmgr.state) {
+            // in
+            case (0): {
+                // if anim is done, enter wait
+                if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0)
+                    stc_tipmgr.state = 1; // enter wait
 
-            break;
-        }
-        case (1): // wait
-        {
-            // sub timer
-            stc_tipmgr.lifetime--;
-            if (stc_tipmgr.lifetime <= 0)
-            {
-                // apply exit anim
-                JOBJ *tip_root = tip_gobj->hsd_object;
-                JOBJ_RemoveAnimAll(tip_root);
-                JOBJ_AddAnimAll(tip_root, stc_event_vars.menu_assets->tip_jointanim[1], 0, 0);
-                JOBJ_ReqAnimAll(tip_root, 0);
-
-                stc_tipmgr.state = 2; // enter wait
+                break;
             }
+            // wait
+            case (1): {
+                // sub timer
+                stc_tipmgr.lifetime--;
+                if (stc_tipmgr.lifetime <= 0) {
+                    // apply exit anim
+                    JOBJ *tip_root = tip_gobj->hsd_object;
+                    JOBJ_RemoveAnimAll(tip_root);
+                    JOBJ_AddAnimAll(tip_root, stc_event_vars.menu_assets->tip_jointanim[1], 0, 0);
+                    JOBJ_ReqAnimAll(tip_root, 0);
 
-            break;
-        }
-        case (2): // out
-        {
-            // if anim is done, destroy
-            if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0)
-            {
-                // remove text
-                Text_Destroy(stc_tipmgr.text);
-                GObj_Destroy(stc_tipmgr.gobj);
-                stc_tipmgr.gobj = 0;
+                    stc_tipmgr.state = 2; // enter wait
+                }
+
+                break;
             }
-            break;
-        }
+            // out
+            case (2): {
+                // if anim is done, destroy
+                if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0) {
+                    // remove text
+                    Text_Destroy(stc_tipmgr.text);
+                    GObj_Destroy(stc_tipmgr.gobj);
+                    stc_tipmgr.gobj = 0;
+                }
+                break;
+            }
         }
     }
 
     return;
 }
-int Tip_Display(int lifetime, char *fmt, ...)
-{
 
+int Tip_Display(int lifetime, char *fmt, ...) {
 #define TIP_TXTSIZE 4.7
 #define TIP_TXTSIZEX TIP_TXTSIZE * 0.85
 #define TIP_TXTSIZEY TIP_TXTSIZE
@@ -2981,11 +2867,9 @@ int Tip_Display(int lifetime, char *fmt, ...)
     va_list args;
 
     // if tip exists
-    if (stc_tipmgr.gobj != 0)
-    {
+    if (stc_tipmgr.gobj != 0) {
         // if tip is in the process of exiting
-        if (stc_tipmgr.state == 2)
-        {
+        if (stc_tipmgr.state == 2) {
             // remove text
             Text_Destroy(stc_tipmgr.text);
             GObj_Destroy(stc_tipmgr.gobj);
@@ -2996,7 +2880,8 @@ int Tip_Display(int lifetime, char *fmt, ...)
             return 0;
     }
 
-    MsgMngrData *msgmngr_data = stc_msgmgr->userdata; // using message canvas cause there are so many god damn text canvases
+    MsgMngrData *msgmngr_data = stc_msgmgr->userdata;
+    // using message canvas cause there are so many god damn text canvases
 
     // Create bg
     GOBJ *tip_gobj = GObj_Create(0, 0, 0);
@@ -3048,17 +2933,17 @@ int Tip_Display(int lifetime, char *fmt, ...)
     char *msg_cursor_prev, *msg_cursor_curr; // declare char pointers
     msg_cursor_prev = msg;
     msg_cursor_curr = strchr(msg_cursor_prev, '\n'); // check for occurrence
-    while (msg_cursor_curr != 0)                     // if occurrence found, increment values
-    {
+    // if occurrence found, increment values
+    while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= TIP_LINEMAX)
             assert("TIP_LINEMAX exceeded!");
 
         // Save information about this line
         line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev; // determine length of the line
-        line_num++;                                                        // increment number of newlines found
-        msg_cursor_prev = msg_cursor_curr + 1;                             // update prev cursor
-        msg_cursor_curr = strchr(msg_cursor_prev, '\n');                   // check for another occurrence
+        line_num++; // increment number of newlines found
+        msg_cursor_prev = msg_cursor_curr + 1; // update prev cursor
+        msg_cursor_curr = strchr(msg_cursor_prev, '\n'); // check for another occurrence
     }
 
     // get last lines length
@@ -3067,9 +2952,7 @@ int Tip_Display(int lifetime, char *fmt, ...)
 
     // copy each line to an individual char array
     char *msg_cursor = &msg;
-    for (int i = 0; i < line_num; i++)
-    {
-
+    for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > TIP_CHARMAX)
@@ -3092,17 +2975,16 @@ int Tip_Display(int lifetime, char *fmt, ...)
 
     return 1; // tip created
 }
-void Tip_Destroy()
-{
+
+void Tip_Destroy() {
     // check if tip exists and isnt in exit state, enter exit
-    if ((stc_tipmgr.gobj != 0) && (stc_tipmgr.state != 2))
-    {
+    if ((stc_tipmgr.gobj != 0) && (stc_tipmgr.state != 2)) {
         // apply exit anim
         JOBJ *tip_root = stc_tipmgr.gobj->hsd_object;
         JOBJ_RemoveAnimAll(tip_root);
         JOBJ_AddAnimAll(tip_root, stc_event_vars.menu_assets->tip_jointanim[1], 0, 0);
         JOBJ_ReqAnimAll(tip_root, 0);
-        JOBJ_RunAOBJCallback(tip_root, 6, 0xfb7f, AOBJ_SetRate, 1, (float)2);
+        JOBJ_RunAOBJCallback(tip_root, 6, 0xfb7f, AOBJ_SetRate, 1, (float) 2);
 
         stc_tipmgr.state = 2; // enter wait
     }
@@ -3114,8 +2996,7 @@ void Tip_Destroy()
 /// Event Menu Functions ///
 ////////////////////////////
 
-GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu)
-{
+GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu) {
     // Ensure this event has a menu
     if (start_menu == 0)
         return 0;
@@ -3153,9 +3034,7 @@ GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu)
     return gobj;
 };
 
-void EventMenu_Update(GOBJ *gobj)
-{
-
+void EventMenu_Update(GOBJ *gobj) {
     //MenuCamData *camData = gobj->userdata;
     MenuData *menuData = gobj->userdata;
     EventDesc *event_desc = menuData->event_desc;
@@ -3164,27 +3043,21 @@ void EventMenu_Update(GOBJ *gobj)
     int update_menu = 1;
 
     // if a custom menu is in use, run its function
-    if (menuData->custom_gobj_think != 0)
-    {
+    if (menuData->custom_gobj_think != 0) {
         update_menu = menuData->custom_gobj_think(menuData->custom_gobj);
     }
 
     // if this menu has an upate function, run its function
-    else if ((menuData->isPaused == 1) && (currMenu->menu_think != 0))
-    {
+    else if ((menuData->isPaused == 1) && (currMenu->menu_think != 0)) {
         update_menu = currMenu->menu_think(gobj);
     }
 
-    if (update_menu == 1)
-    {
+    if (update_menu == 1) {
         // Check if being pressed
         int isPress = 0;
-        for (int i = 0; i < 6; i++)
-        {
-
+        for (int i = 0; i < 6; i++) {
             // humans only
-            if (Fighter_GetSlotType(i) == 0)
-            {
+            if (Fighter_GetSlotType(i) == 0) {
                 GOBJ *fighter = Fighter_GetGObj(i);
                 FighterData *fighter_data = fighter->userdata;
                 int controller_index = Fighter_GetControllerPort(i);
@@ -3192,19 +3065,14 @@ void EventMenu_Update(GOBJ *gobj)
                 HSD_Pad *pad = PadGet(controller_index, PADGET_MASTER);
 
                 // in develop mode, use X+DPad up
-                if (*stc_dblevel >= 3)
-                {
-                    if ((pad->held & HSD_BUTTON_X) && (pad->down & HSD_BUTTON_DPAD_UP))
-                    {
+                if (*stc_dblevel >= 3) {
+                    if ((pad->held & HSD_BUTTON_X) && (pad->down & HSD_BUTTON_DPAD_UP)) {
                         isPress = 1;
                         menuData->controller_index = controller_index;
                         break;
                     }
-                }
-                else
-                {
-                    if ((pad->down & HSD_BUTTON_START) != 0)
-                    {
+                } else {
+                    if ((pad->down & HSD_BUTTON_START) != 0) {
                         isPress = 1;
                         menuData->controller_index = controller_index;
                         break;
@@ -3214,13 +3082,9 @@ void EventMenu_Update(GOBJ *gobj)
         }
 
         // change pause state
-        if (isPress != 0)
-        {
-
+        if (isPress != 0) {
             // pause game
-            if (menuData->isPaused == 0)
-            {
-
+            if (menuData->isPaused == 0) {
                 // set state
                 menuData->isPaused = 1;
 
@@ -3228,8 +3092,7 @@ void EventMenu_Update(GOBJ *gobj)
                 EventMenu_CreateModel(gobj, currMenu);
                 EventMenu_CreateText(gobj, currMenu);
                 EventMenu_UpdateText(gobj, currMenu);
-                if (currMenu->state == EMSTATE_OPENPOP)
-                {
+                if (currMenu->state == EMSTATE_OPENPOP) {
                     EventOption *currOption = &currMenu->options[currMenu->cursor];
                     EventMenu_CreatePopupModel(gobj, currMenu);
                     EventMenu_CreatePopupText(gobj, currMenu);
@@ -3243,9 +3106,7 @@ void EventMenu_Update(GOBJ *gobj)
                 Match_AdjustSoundOnPause(1);
             }
             // unpause game
-            else
-            {
-
+            else {
                 menuData->isPaused = 0;
 
                 // destroy menu
@@ -3259,14 +3120,12 @@ void EventMenu_Update(GOBJ *gobj)
         }
 
         // run menu logic if the menu is shown
-        else if ((menuData->isPaused == 1) && (stc_event_vars.hide_menu == 0))
-        {
+        else if ((menuData->isPaused == 1) && (stc_event_vars.hide_menu == 0)) {
             // Get the current menu
             EventMenu *currMenu = menuData->currMenu;
 
             // menu think
-            if (currMenu->state == EMSTATE_FOCUS)
-            {
+            if (currMenu->state == EMSTATE_FOCUS) {
                 // check to run custom menu think function
                 EventMenu_MenuThink(gobj, currMenu);
             }
@@ -3280,24 +3139,19 @@ void EventMenu_Update(GOBJ *gobj)
     return;
 }
 
-void EventMenu_MenuGX(GOBJ *gobj, int pass)
-{
+void EventMenu_MenuGX(GOBJ *gobj, int pass) {
     if (stc_event_vars.hide_menu == 0)
         GXLink_Common(gobj, pass);
     return;
 }
 
-void EventMenu_TextGX(GOBJ *gobj, int pass)
-{
-
+void EventMenu_TextGX(GOBJ *gobj, int pass) {
     if (stc_event_vars.hide_menu == 0)
         Text_GX(gobj, pass);
     return;
 }
 
-void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
-{
-
+void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     MenuData *menuData = gobj->userdata;
     EventDesc *event_desc = menuData->event_desc;
 
@@ -3328,17 +3182,13 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
     s16 value_max = currOption->value_num;
 
     // check for dpad down
-    if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0))
-    {
-
+    if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
         // loop to find next option
-        int count = 1;       //
+        int count = 1; //
         int cursor_next = 0; // how much to move the cursor by
-        while (((cursor + count + scroll) < option_num))
-        {
+        while (((cursor + count + scroll) < option_num)) {
             // option exists, check if its enabled
-            if (currMenu->options[cursor + count + scroll].disable == 0)
-            {
+            if (currMenu->options[cursor + count + scroll].disable == 0) {
                 cursor_next = count;
                 break;
             }
@@ -3348,13 +3198,11 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
         }
 
         // if another option exists, move down
-        if (cursor_next > 0)
-        {
+        if (cursor_next > 0) {
             cursor += cursor_next;
 
             // cursor is in bounds, move down
-            if (cursor < cursor_max)
-            {
+            if (cursor < cursor_max) {
                 isChanged = 1;
 
                 // update cursor
@@ -3365,9 +3213,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
             }
 
             // cursor overflowed, correct it
-            else
-            {
-
+            else {
                 // adjust
                 scroll -= (cursor_max - (cursor + 1));
                 cursor = (cursor_max - 1);
@@ -3384,16 +3230,13 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
         }
     }
     // check for dpad up
-    else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0))
-    {
+    else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
         // loop to find next option
-        int count = 1;       //
+        int count = 1; //
         int cursor_next = 0; // how much to move the cursor by
-        while (((cursor + scroll - count) >= 0))
-        {
+        while (((cursor + scroll - count) >= 0)) {
             // option exists, check if its enabled
-            if (currMenu->options[cursor + scroll - count].disable == 0)
-            {
+            if (currMenu->options[cursor + scroll - count].disable == 0) {
                 cursor_next = count;
                 break;
             }
@@ -3403,13 +3246,11 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
         }
 
         // if another option exists, move up
-        if (cursor_next > 0)
-        {
+        if (cursor_next > 0) {
             cursor -= cursor_next;
 
             // cursor is in bounds, move up
-            if (cursor >= 0)
-            {
+            if (cursor >= 0) {
                 isChanged = 1;
 
                 // update cursor
@@ -3420,12 +3261,10 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
             }
 
             // cursor overflowed, correct it
-            else
-            {
-
+            else {
                 // adjust
                 scroll += cursor; // effectively scroll up by adding a negative number
-                cursor = 0;       // cursor is positioned at 0
+                cursor = 0; // cursor is positioned at 0
 
                 // update cursor
                 currMenu->cursor = cursor;
@@ -3440,14 +3279,11 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
     }
 
     // check for left
-    else if (((inputs & HSD_BUTTON_LEFT) != 0) || ((inputs & HSD_BUTTON_DPAD_LEFT) != 0))
-    {
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (currOption->option_kind == OPTKIND_FLOAT))
-        {
-
+    else if (((inputs & HSD_BUTTON_LEFT) != 0) || ((inputs & HSD_BUTTON_DPAD_LEFT) != 0)) {
+        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (
+                currOption->option_kind == OPTKIND_FLOAT)) {
             option_val -= 1;
-            if (option_val >= value_min)
-            {
+            if (option_val >= value_min) {
                 isChanged = 1;
 
                 // also play sfx
@@ -3463,14 +3299,12 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
         }
     }
     // check for right
-    else if (((inputs & HSD_BUTTON_RIGHT) != 0) || ((inputs & HSD_BUTTON_DPAD_RIGHT) != 0))
-    {
+    else if (((inputs & HSD_BUTTON_RIGHT) != 0) || ((inputs & HSD_BUTTON_DPAD_RIGHT) != 0)) {
         // check for valid option kind
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (currOption->option_kind == OPTKIND_FLOAT))
-        {
+        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (
+                currOption->option_kind == OPTKIND_FLOAT)) {
             option_val += 1;
-            if (option_val < value_max)
-            {
+            if (option_val < value_max) {
                 isChanged = 1;
 
                 // also play sfx
@@ -3487,11 +3321,9 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
     }
 
     // check for A
-    else if (inputs_rapid & HSD_BUTTON_A)
-    {
+    else if (inputs_rapid & HSD_BUTTON_A) {
         // check to advance a menu
-        if ((currOption->option_kind == OPTKIND_MENU))
-        {
+        if ((currOption->option_kind == OPTKIND_MENU)) {
             // access this menu
             currMenu->state = EMSTATE_OPENSUB;
 
@@ -3512,48 +3344,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
             SFX_PlayCommon(1);
         }
 
-        /*
-        // check to create a popup
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT))
-        {
-            // access this menu
-            currMenu->state = EMSTATE_OPENPOP;
-
-            // init cursor and scroll value
-            s32 cursor = 0;
-            s32 scroll = currOption->option_val;
-
-            // correct scroll
-            s32 max_scroll;
-            if (currOption->value_num <= MENU_POPMAXOPTION)
-                max_scroll = 0;
-            else
-                max_scroll = currOption->value_num - MENU_POPMAXOPTION;
-            // check if scrolled too far
-            if (scroll > max_scroll)
-            {
-                cursor = scroll - max_scroll;
-                scroll = max_scroll;
-            }
-
-            // update cursor and scroll
-            menuData->popup_cursor = cursor;
-            menuData->popup_scroll = scroll;
-
-            // create popup menu and update
-            EventMenu_CreatePopupModel(gobj, currMenu);
-            EventMenu_CreatePopupText(gobj, currMenu);
-            EventMenu_UpdatePopupText(gobj, currOption);
-
-            // also play sfx
-            SFX_PlayCommon(1);
-        }
-        */
-
         // check to run a function
-        if ((currOption->option_kind == OPTKIND_FUNC) && (currOption->onOptionSelect != 0))
-        {
-
+        if ((currOption->option_kind == OPTKIND_FUNC) && (currOption->onOptionSelect != 0)) {
             // execute function
             currOption->onOptionSelect(gobj);
 
@@ -3565,13 +3357,10 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
         }
     }
     // check to go back a menu
-    else if (inputs_rapid & HSD_BUTTON_B)
-    {
+    else if (inputs_rapid & HSD_BUTTON_B) {
         // check if a prev menu exists
         EventMenu *prevMenu = currMenu->prev;
-        if (prevMenu != 0)
-        {
-
+        if (prevMenu != 0) {
             // clear previous menu
             EventMenu *prevMenu = currMenu->prev;
             currMenu->prev = 0;
@@ -3596,29 +3385,10 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
             // also play sfx
             SFX_PlayCommon(0);
         }
-
-        /*
-        // no previous menu, unpause
-        else
-        {
-            SFX_PlayCommon(0);
-
-            menuData->isPaused = 0;
-
-            // destroy menu
-            EventMenu_DestroyMenu(gobj);
-
-            // Unfreeze the game
-            Match_UnfreezeGame(1);
-            Match_ShowHUD();
-            Match_AdjustSoundOnPause(0);
-        }
-        */
     }
 
     // if anything changed, update text
-    if (isChanged != 0)
-    {
+    if (isChanged != 0) {
         // update menu
         EventMenu_UpdateText(gobj, currMenu);
     }
@@ -3626,9 +3396,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu)
     return;
 }
 
-void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
-{
-
+void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
     MenuData *menuData = gobj->userdata;
     EventDesc *event_desc = menuData->event_desc;
 
@@ -3649,19 +3417,16 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
     s32 value_num = currOption->value_num;
     s32 cursor_min = 0;
     s32 cursor_max = value_num;
-    if (cursor_max > MENU_POPMAXOPTION)
-    {
+    if (cursor_max > MENU_POPMAXOPTION) {
         cursor_max = MENU_POPMAXOPTION;
     }
 
     // check for dpad down
-    if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0))
-    {
+    if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
         cursor += 1;
 
         // cursor is in bounds, move down
-        if (cursor < cursor_max)
-        {
+        if (cursor < cursor_max) {
             isChanged = 1;
 
             // update cursor
@@ -3672,11 +3437,9 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
         }
 
         // cursor overflowed, check to scroll
-        else
-        {
+        else {
             // cursor+scroll is in bounds, increment scroll
-            if ((cursor + scroll) < value_num)
-            {
+            if ((cursor + scroll) < value_num) {
                 // adjust
                 scroll++;
                 cursor--;
@@ -3693,13 +3456,11 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
         }
     }
     // check for dpad up
-    else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0))
-    {
+    else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
         cursor -= 1;
 
         // cursor is in bounds, move up
-        if (cursor >= 0)
-        {
+        if (cursor >= 0) {
             isChanged = 1;
 
             // update cursor
@@ -3710,11 +3471,9 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
         }
 
         // cursor overflowed, check to scroll
-        else
-        {
+        else {
             // scroll is in bounds, decrement scroll
-            if (scroll > 0)
-            {
+            if (scroll > 0) {
                 // adjust
                 scroll--;
                 cursor++;
@@ -3732,9 +3491,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
     }
 
     // check for A
-    else if ((inputs_rapid & HSD_BUTTON_A) != 0)
-    {
-
+    else if ((inputs_rapid & HSD_BUTTON_A) != 0) {
         // update option_val
         currOption->option_val = cursor + scroll;
 
@@ -3751,9 +3508,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
         SFX_PlayCommon(1);
     }
     // check to go back a menu
-    else if ((inputs_rapid & HSD_BUTTON_B) != 0)
-    {
-
+    else if ((inputs_rapid & HSD_BUTTON_B) != 0) {
         EventMenu_DestroyPopup(gobj);
 
         // update menu
@@ -3764,8 +3519,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
     }
 
     // if anything changed, update text
-    if (isChanged != 0)
-    {
+    if (isChanged != 0) {
         // update menu
         EventMenu_UpdatePopupText(gobj, currOption);
     }
@@ -3773,9 +3527,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
     return;
 }
 
-void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
-{
-
+void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
     MenuData *menuData = gobj->userdata;
 
     // create options background
@@ -3793,8 +3545,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
     s32 option_num = menu->option_num;
     if (option_num > MENU_MAXOPTION)
         option_num = MENU_MAXOPTION;
-    for (int i = 0; i < option_num; i++)
-    {
+    for (int i = 0; i < option_num; i++) {
         // create a border jobj
         JOBJ *jobj_border = JOBJ_LoadJoint(menuAssets->popup);
         // attach to root jobj
@@ -3869,8 +3620,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
     menuData->highlight_menu = jobj_highlight;
 
     // check to create scroll bar
-    if (menuData->currMenu->option_num > MENU_MAXOPTION)
-    {
+    if (menuData->currMenu->option_num > MENU_MAXOPTION) {
         // create scroll bar
         JOBJ *scroll_jobj = JOBJ_LoadJoint(menuAssets->scroll);
         // attach to root jobj
@@ -3898,9 +3648,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
 
         // set size
         corners[1]->trans.Y = botPos;
-    }
-    else
-    {
+    } else {
         menuData->scroll_bot = 0;
         menuData->scroll_top = 0;
     }
@@ -3908,9 +3656,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
     return;
 }
 
-void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
-{
-
+void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     // Get event info
     MenuData *menuData = gobj->userdata;
     EventDesc *event_desc = menuData->event_desc;
@@ -3920,8 +3666,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
     s32 cursor = menu->cursor;
 
     // free text if it exists
-    if (menuData->text_name != 0)
-    {
+    if (menuData->text_name != 0) {
         // free text
         Text_Destroy(menuData->text_name);
         menuData->text_name = 0;
@@ -3932,8 +3677,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
         Text_Destroy(menuData->text_desc);
         menuData->text_desc = 0;
     }
-    if (menuData->text_popup != 0)
-    {
+    if (menuData->text_popup != 0) {
         Text_Destroy(menuData->text_popup);
         menuData->text_popup = 0;
     }
@@ -3990,9 +3734,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
     s32 option_num = menu->option_num;
     if (option_num > MENU_MAXOPTION)
         option_num = MENU_MAXOPTION;
-    for (int i = 0; i < option_num; i++)
-    {
-
+    for (int i = 0; i < option_num; i++) {
         // output option name
         float optionX = MENU_OPTIONNAMEXPOS;
         float optionY = MENU_OPTIONNAMEYPOS + (i * MENU_TEXTYOFFSET);
@@ -4017,8 +3759,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
     text->aspect.X = MENU_VALASPECT;
 
     // Output all values
-    for (int i = 0; i < option_num; i++)
-    {
+    for (int i = 0; i < option_num; i++) {
         // output option value
         float optionX = MENU_OPTIONVALXPOS;
         float optionY = MENU_OPTIONVALYPOS + (i * MENU_TEXTYOFFSET);
@@ -4028,9 +3769,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
     return;
 }
 
-void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
-{
-
+void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     // Get event info
     MenuData *menuData = gobj->userdata;
     EventDesc *event_desc = menuData->event_desc;
@@ -4080,17 +3819,17 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
     char *msg_cursor_prev, *msg_cursor_curr; // declare char pointers
     msg_cursor_prev = msg;
     msg_cursor_curr = strchr(msg_cursor_prev, '\n'); // check for occurrence
-    while (msg_cursor_curr != 0)                     // if occurrence found, increment values
-    {
+    // if occurrence found, increment values
+    while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= DESC_LINEMAX)
             assert("DESC_LINEMAX exceeded!");
 
         // Save information about this line
         line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev; // determine length of the line
-        line_num++;                                                        // increment number of newlines found
-        msg_cursor_prev = msg_cursor_curr + 1;                             // update prev cursor
-        msg_cursor_curr = strchr(msg_cursor_prev, '\n');                   // check for another occurrence
+        line_num++; // increment number of newlines found
+        msg_cursor_prev = msg_cursor_curr + 1; // update prev cursor
+        msg_cursor_curr = strchr(msg_cursor_prev, '\n'); // check for another occurrence
     }
 
     // get last lines length
@@ -4099,9 +3838,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
 
     // copy each line to an individual char array
     char *msg_cursor = &msg;
-    for (int i = 0; i < line_num; i++)
-    {
-
+    for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > DESC_CHARMAX)
@@ -4122,14 +3859,13 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
         Text_AddSubtext(text, 0, y_delta, msg_line);
     }
 
-    /* 
+    /*
     Update Names
     */
 
     // Output all options
     text = menuData->text_name;
-    for (int i = 0; i < option_num; i++)
-    {
+    for (int i = 0; i < option_num; i++) {
         // get this option
         EventOption *currOption = &menu->options[scroll + i];
 
@@ -4139,15 +3875,12 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
 
         // output color
         GXColor color;
-        if (currOption->disable == 0)
-        {
+        if (currOption->disable == 0) {
             color.r = 255;
             color.b = 255;
             color.g = 255;
             color.a = 255;
-        }
-        else
-        {
+        } else {
             color.r = 128;
             color.b = 128;
             color.g = 128;
@@ -4156,14 +3889,13 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
         Text_SetColor(text, i, &color);
     }
 
-    /* 
+    /*
     Update Values
     */
 
     // Output all values
     text = menuData->text_value;
-    for (int i = 0; i < option_num; i++)
-    {
+    for (int i = 0; i < option_num; i++) {
         // get this option
         EventOption *currOption = &menu->options[scroll + i];
         int optionVal = currOption->option_val;
@@ -4173,8 +3905,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
         JOBJ_SetFlags(menuData->row_joints[i][1], JOBJ_HIDDEN);
 
         // if this option has string values
-        if (currOption->option_kind == OPTKIND_STRING)
-        {
+        if (currOption->option_kind == OPTKIND_STRING) {
             // output option value
             Text_SetText(text, i, currOption->option_values[optionVal]);
 
@@ -4183,8 +3914,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
         }
 
         // if this option has int values
-        else if (currOption->option_kind == OPTKIND_INT)
-        {
+        else if (currOption->option_kind == OPTKIND_INT) {
             // output option value
             Text_SetText(text, i, currOption->option_values, optionVal);
 
@@ -4193,8 +3923,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
         }
 
         // if this option is a menu or function
-        else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC))
-        {
+        else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC)) {
             Text_SetText(text, i, &nullString);
 
             // show arrow
@@ -4203,15 +3932,12 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
 
         // output color
         GXColor color;
-        if (currOption->disable == 0)
-        {
+        if (currOption->disable == 0) {
             color.r = 255;
             color.b = 255;
             color.g = 255;
             color.a = 255;
-        }
-        else
-        {
+        } else {
             color.r = 128;
             color.b = 128;
             color.g = 128;
@@ -4225,8 +3951,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
     highlight_joint->trans.Y = cursor * MENUHIGHLIGHT_YOFFSET;
 
     // update scrollbar position
-    if (menuData->scroll_top != 0)
-    {
+    if (menuData->scroll_top != 0) {
         float curr_steps = menuData->currMenu->scroll;
         float max_steps;
         if (menuData->currMenu->option_num < MENU_MAXOPTION)
@@ -4235,7 +3960,8 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
             max_steps = menuData->currMenu->option_num - MENU_MAXOPTION;
 
         // scrollTop = -1 * ((curr_steps/max_steps) * (botY - -10))
-        menuData->scroll_top->trans.Y = -1 * (curr_steps / max_steps) * (menuData->scroll_bot->trans.Y - MENUSCROLL_MAXLENGTH);
+        menuData->scroll_top->trans.Y = -1 * (curr_steps / max_steps) * (
+                                            menuData->scroll_bot->trans.Y - MENUSCROLL_MAXLENGTH);
     }
 
     // update jobj
@@ -4244,8 +3970,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
     return;
 }
 
-void EventMenu_DestroyMenu(GOBJ *gobj)
-{
+void EventMenu_DestroyMenu(GOBJ *gobj) {
     MenuData *menuData = gobj->userdata; // userdata
 
     // remove
@@ -4266,8 +3991,7 @@ void EventMenu_DestroyMenu(GOBJ *gobj)
         EventMenu_DestroyPopup(gobj);
 
     // if custom menu gobj exists
-    if (menuData->custom_gobj != 0)
-    {
+    if (menuData->custom_gobj != 0) {
         // run on destroy function
         if (menuData->custom_gobj_destroy != 0)
             menuData->custom_gobj_destroy(menuData->custom_gobj);
@@ -4288,8 +4012,7 @@ void EventMenu_DestroyMenu(GOBJ *gobj)
     return;
 }
 
-void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu)
-{
+void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
     // init variables
     MenuData *menuData = gobj->userdata; // userdata
     s32 cursor = menu->cursor;
@@ -4369,8 +4092,7 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu)
     return;
 }
 
-void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu)
-{
+void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu) {
     // init variables
     MenuData *menuData = gobj->userdata;
     s32 cursor = menu->cursor;
@@ -4400,8 +4122,7 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu)
     float baseYPos = POPUP_OPTIONVALYPOS + (cursor * MENU_TEXTYOFFSET);
 
     // Output all values
-    for (int i = 0; i < value_num; i++)
-    {
+    for (int i = 0; i < value_num; i++) {
         // output option value
         float optionX = POPUP_OPTIONVALXPOS;
         float optionY = baseYPos + (i * POPUP_TEXTYOFFSET);
@@ -4411,8 +4132,7 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu)
     return;
 }
 
-void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
-{
+void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option) {
     // init variables
     MenuData *menuData = gobj->userdata; // userdata
     s32 cursor = menuData->popup_cursor;
@@ -4428,22 +4148,18 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
     Text *text = menuData->text_popup;
 
     // update int list
-    if (option->option_kind == OPTKIND_INT)
-    {
+    if (option->option_kind == OPTKIND_INT) {
         // Output all values
-        for (int i = 0; i < value_num; i++)
-        {
+        for (int i = 0; i < value_num; i++) {
             // output option value
             Text_SetText(text, i, "%d", scroll + i);
         }
     }
 
     // update string list
-    else if (option->option_kind == OPTKIND_STRING)
-    {
+    else if (option->option_kind == OPTKIND_STRING) {
         // Output all values
-        for (int i = 0; i < value_num; i++)
-        {
+        for (int i = 0; i < value_num; i++) {
             // output option value
             Text_SetText(text, i, option->option_values[scroll + i]);
         }
@@ -4457,8 +4173,7 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
     return;
 }
 
-void EventMenu_DestroyPopup(GOBJ *gobj)
-{
+void EventMenu_DestroyPopup(GOBJ *gobj) {
     MenuData *menuData = gobj->userdata; // userdata
 
     // remove text
@@ -4478,86 +4193,85 @@ void EventMenu_DestroyPopup(GOBJ *gobj)
 /// Member-Access Functions ///
 ///////////////////////////////
 
-EventDesc *GetEventDesc(int page, int event)
-{
+EventDesc *GetEventDesc(int page, int event) {
     EventPage *thisPage = EventPages[page];
     EventDesc *thisEvent = thisPage->events[event];
     return (thisEvent);
 }
-char *GetEventName(int page, int event)
-{
+
+char *GetEventName(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->eventName);
 }
-char *GetEventDescription(int page, int event)
-{
+
+char *GetEventDescription(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->eventDescription);
 }
-char *GetEventTut(int page, int event)
-{
+
+char *GetEventTut(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->eventTutorial);
 }
-char *GetPageName(int page)
-{
+
+char *GetPageName(int page) {
     EventPage *thisPage = EventPages[page];
     return (thisPage->name);
 }
-char *GetEventFile(int page, int event)
-{
+
+char *GetEventFile(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->eventFile);
 }
-char *GetCSSFile(int page, int event)
-{
+
+char *GetCSSFile(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->eventCSSFile);
 }
-int GetPageEventNum(int page)
-{
+
+int GetPageEventNum(int page) {
     EventPage *thisPage = EventPages[page];
     return (thisPage->eventNum);
 }
-char *GetTMVersShort()
-{
+
+char *GetTMVersShort() {
     return (TM_VersShort);
 }
-char *GetTMVersLong()
-{
+
+char *GetTMVersLong() {
     return (TM_VersLong);
 }
-char *GetTMCompile()
-{
+
+char *GetTMCompile() {
     return (TM_Compile);
 }
-int GetPageNum()
-{
+
+int GetPageNum() {
     int pageNum = (sizeof(EventPages) / 4) - 1;
     return (pageNum);
 }
-u8 GetIsChooseCPU(int page, int event)
-{
+
+u8 GetIsChooseCPU(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->isChooseCPU);
 }
-u8 GetIsSelectStage(int page, int event)
-{
+
+u8 GetIsSelectStage(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->isSelectStage);
 }
-s8 GetFighter(int page, int event)
-{
+
+s8 GetFighter(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->matchData->playerKind);
 }
-s8 GetCPUFighter(int page, int event)
-{
+
+s8 GetCPUFighter(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->matchData->cpuKind);
 }
-s16 GetStage(int page, int event)
-{
+
+s16 GetStage(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
     return (thisEvent->matchData->stage);
 }

@@ -24,12 +24,11 @@ typedef struct WavedashData WavedashData;
 typedef struct WavedashAssets WavedashAssets;
 typedef struct TargetData TargetData;
 
-struct WavedashData
-{
+struct WavedashData {
     EventDesc *event_desc;
     WavedashAssets *assets;
-    struct
-    {
+
+    struct {
         GOBJ *gobj;
         int canvas;
         Text *text_timing;
@@ -39,18 +38,19 @@ struct WavedashData
         float arrow_nextpos;
         int arrow_timer;
     } hud;
-    struct
-    {
+
+    struct {
         GOBJ *gobj;
         float scale;
         Vec3 left_offset;
         Vec3 center_offset;
         Vec3 right_offset;
     } target;
-    struct
-    {
+
+    struct {
         u8 shield_num;
     } tip;
+
     float wd_maxdstn;
     int timer;
     u8 airdodge_frame;
@@ -61,16 +61,16 @@ struct WavedashData
     float wd_angle;
     int wd_attempted;
     int wd_succeeded;
-    struct
-    {
+
+    struct {
         u16 line_index;
         Vec2 pos;
     } restore;
+
     GXColor orig_colors[WDFRAMES];
 };
 
-struct WavedashAssets
-{
+struct WavedashAssets {
     JOBJ *hud;
     void **hudmatanim; // pointer to array
     JOBJ *target_jobj;
@@ -78,14 +78,13 @@ struct WavedashAssets
     void **target_matanim;
 };
 
-enum TargetState
-{
+enum TargetState {
     TRGSTATE_SPAWN,
     TRGSTATE_WAIT,
     TRGSTATE_DESPAWN,
 };
-struct TargetData
-{
+
+struct TargetData {
     int state;
     Vec3 pos;
     int line_index;
@@ -95,9 +94,16 @@ struct TargetData
 };
 
 float Bezier(float time, float start, float end);
+
 float Target_GetWdashDistance(FighterData *hmn_data, float mag);
+
 GOBJ *Target_Spawn(WavedashData *event_data, FighterData *fighter_data);
-int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offset, int *ret_line, Vec3 *ret_pos, Vec3 *ret_slope);
+
+int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offset, int *ret_line, Vec3 *ret_pos,
+                     Vec3 *ret_slope);
+
 void Target_Think(GOBJ *target_gobj);
+
 void Wavedash_HUDCamThink(GOBJ *gobj);
+
 void Event_Exit();

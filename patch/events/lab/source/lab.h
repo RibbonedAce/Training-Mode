@@ -42,24 +42,24 @@ v2 = not released
 #define REC_RIGHTTEXTJOINT 3
 
 // export
-enum export_status
-{
+enum export_status {
     EXSTAT_NONE,
     EXSTAT_REQSAVE,
     EXSTAT_SAVEWAIT,
     EXSTAT_DONE,
 };
-enum export_menuindex
-{
+
+enum export_menuindex {
     EXMENU_SELCARD,
     EXMENU_NAME,
     EXMENU_CONFIRM,
 };
-enum export_popup
-{
+
+enum export_popup {
     EXPOP_CONFIRM,
     EXPOP_SAVE,
 };
+
 #define EXP_MEMCARDAJOBJ 9
 #define EXP_MEMCARDBJOBJ 11
 #define EXP_TEXTBOXJOBJ 12
@@ -87,13 +87,12 @@ enum export_popup
 #define RESIZE_HEIGHT (EXP_SCREENSHOT_HEIGHT * RESIZE_MULT)
 
 // input display
-typedef struct ButtonLookup
-{
+typedef struct ButtonLookup {
     u8 jobj;
     u8 dobj;
 } ButtonLookup;
-typedef enum buttons_enum
-{
+
+typedef enum buttons_enum {
     BTN_A,
     BTN_B,
     BTN_X,
@@ -108,23 +107,24 @@ typedef enum buttons_enum
     BTN_Z,
     BTN_NUM,
 } buttons_enum;
+
 static ButtonLookup button_lookup[] = {
-    {1, 0},  // A
-    {2, 0},  // B
-    {3, 0},  // X
-    {4, 0},  // Y
-    {5, 0},  // Start
-    {6, 1},  // Dpad Up
-    {6, 2},  // Dpad Right
-    {6, 3},  // Dpad Left
-    {6, 4},  // Dpad Down
+    {1, 0}, // A
+    {2, 0}, // B
+    {3, 0}, // X
+    {4, 0}, // Y
+    {5, 0}, // Start
+    {6, 1}, // Dpad Up
+    {6, 2}, // Dpad Right
+    {6, 3}, // Dpad Left
+    {6, 4}, // Dpad Down
     {11, 0}, // L
     {12, 0}, // R
     {13, 0}, // Z
 };
 static GXColor button_colors[] = {
-    {50, 180, 50, 255},   // A
-    {255, 50, 50, 255},   // B
+    {50, 180, 50, 255}, // A
+    {255, 50, 50, 255}, // B
     {127, 127, 127, 255}, // X
     {127, 127, 127, 255}, // Y
     {192, 192, 192, 255}, // Start
@@ -134,21 +134,21 @@ static GXColor button_colors[] = {
     {192, 192, 192, 255}, // Dpad Down
     {127, 127, 127, 255}, // L
     {127, 127, 127, 255}, // R
-    {0, 0, 255, 255},     // Z
+    {0, 0, 255, 255}, // Z
 };
 static int button_bits[] = {
-    HSD_BUTTON_A,          // A
-    HSD_BUTTON_B,          // B
-    HSD_BUTTON_X,          // X
-    HSD_BUTTON_Y,          // Y
-    HSD_BUTTON_START,      // Start
-    HSD_BUTTON_DPAD_UP,    // Dpad Up
+    HSD_BUTTON_A, // A
+    HSD_BUTTON_B, // B
+    HSD_BUTTON_X, // X
+    HSD_BUTTON_Y, // Y
+    HSD_BUTTON_START, // Start
+    HSD_BUTTON_DPAD_UP, // Dpad Up
     HSD_BUTTON_DPAD_RIGHT, // Dpad Right
-    HSD_BUTTON_DPAD_LEFT,  // Dpad Left
-    HSD_BUTTON_DPAD_DOWN,  // Dpad Down
-    HSD_TRIGGER_L,         // L
-    HSD_TRIGGER_R,         // R
-    HSD_TRIGGER_Z,         // Z
+    HSD_BUTTON_DPAD_LEFT, // Dpad Left
+    HSD_BUTTON_DPAD_DOWN, // Dpad Down
+    HSD_TRIGGER_L, // L
+    HSD_TRIGGER_R, // R
+    HSD_TRIGGER_Z, // Z
 };
 // GX
 #define INPUT_GXLINK 12
@@ -156,20 +156,18 @@ static int button_bits[] = {
 // params
 #define INPUT_SHELL_JOBJ 14
 #define INPUT_SHELL_DOBJ 0
-#define INPUT_COLOR_PRESSED \
-    {                       \
-        255, 255, 255, 255  \
-    }
+#define INPUT_COLOR_PRESSED { \
+    255, 255, 255, 255        \
+}
 
-typedef struct Arch_ImportData
-{
+typedef struct Arch_ImportData {
     JOBJDesc *import_button;
     JOBJDesc *import_menu;
     COBJDesc *import_cam;
     JOBJDesc *import_popup;
 } Arch_ImportData;
-typedef struct Arch_LabData
-{
+
+typedef struct Arch_LabData {
     JOBJDesc *stick;
     JOBJDesc *cstick;
     void *save_icon;
@@ -178,8 +176,8 @@ typedef struct Arch_LabData
     JOBJDesc *export_menu;
     JOBJDesc *export_popup;
 } Arch_LabData;
-typedef struct LCancelData
-{
+
+typedef struct LCancelData {
     EventDesc *eventInfo;
     u8 cpu_state;
     u8 cpu_hitshield;
@@ -187,82 +185,82 @@ typedef struct LCancelData
     u8 cpu_sdidir;
     u8 cpu_sincehit;
     s16 cpu_lasthit;
-    s16 cpu_lastshieldstun; // last move instance of the opponent in shield stun. used to tell how many times the shield was hit
-    s8 cpu_hitkind;         // how the CPU was hit, damage or shield
-    u8 cpu_hitshieldnum;    // times the CPUs shield was hit
-    u8 cpu_isactionable;    // flag that indicates if a cpu has become actionable
-    u8 cpu_groundstate;     // indicates if the player was touching ground upon being actionable
+    s16 cpu_lastshieldstun;
+    // last move instance of the opponent in shield stun. used to tell how many times the shield was hit
+    s8 cpu_hitkind; // how the CPU was hit, damage or shield
+    u8 cpu_hitshieldnum; // times the CPUs shield was hit
+    u8 cpu_isactionable; // flag that indicates if a cpu has become actionable
+    u8 cpu_groundstate; // indicates if the player was touching ground upon being actionable
     s32 timer;
     u8 cpu_isthrown; // bool for if the cpu is being thrown
     GOBJ *rec_gobj;
     u8 hmn_controller;
     u8 cpu_controller;
 } LCancelData;
-typedef struct InfoDisplayData
-{
+
+typedef struct InfoDisplayData {
     JOBJ *menuModel;
     JOBJ *botLeftEdge;
     JOBJ *botRightEdge;
     Text *text;
 } InfoDisplayData;
-typedef struct DIDraw
-{
-    int num[2];        // number of vertices
+
+typedef struct DIDraw {
+    int num[2]; // number of vertices
     Vec2 *vertices[2]; // pointer to vertex to draw
-    GXColor color;     // color of this vertex
+    GXColor color; // color of this vertex
 } DIDraw;
-typedef struct DIDrawCalculate
-{
-    Vec2 pos;       // position of vertices
-    int envFlags;   // environment flags
-    float ECBTopY;  // used for determining middle of body
+
+typedef struct DIDrawCalculate {
+    Vec2 pos; // position of vertices
+    int envFlags; // environment flags
+    float ECBTopY; // used for determining middle of body
     float ECBLeftY; // used for determining middle of body
-    float kb_Y;     // used to determine ceiling KOs
+    float kb_Y; // used to determine ceiling KOs
 } DIDrawCalculate;
-typedef struct TDIData
-{
+
+typedef struct TDIData {
     JOBJ *stick_curr[2];
     JOBJ *stick_prev[6][2];
     Text *text_curr;
 } TDIData;
-typedef struct CPUAction
-{
-    u16 state;                  // state to perform this action. -1 for last
-    u8 frameLow;                // first possible frame to perform this action
-    u8 frameHi;                 // last possible frame to perfrom this action
-    s8 stickX;                  // left stick X value
-    s8 stickY;                  // left stick Y value
-    s8 cstickX;                 // c stick X value
-    s8 cstickY;                 // c stick Y value
-    int input;                  // button to input
-    unsigned char isLast : 1;   // flag to indicate this was the final input
-    unsigned char stickDir : 3; // 0 = none, 1 = towards opponent, 2 = away from opponent, 3 = forward, 4 = backward
 
+typedef struct CPUAction {
+    u16 state; // state to perform this action. -1 for last
+    u8 frameLow; // first possible frame to perform this action
+    u8 frameHi; // last possible frame to perfrom this action
+    s8 stickX; // left stick X value
+    s8 stickY; // left stick Y value
+    s8 cstickX; // c stick X value
+    s8 cstickY; // c stick Y value
+    int input; // button to input
+    unsigned char isLast: 1; // flag to indicate this was the final input
+    unsigned char stickDir: 3; // 0 = none, 1 = towards opponent, 2 = away from opponent, 3 = forward, 4 = backward
 } CPUAction;
-typedef struct RecInputs
-{
-    unsigned char btn_dpadup : 1;
-    unsigned char btn_a : 1;
-    unsigned char btn_b : 1;
-    unsigned char btn_x : 1;
-    unsigned char btn_y : 1;
-    unsigned char btn_L : 1;
-    unsigned char btn_R : 1;
-    unsigned char btn_Z : 1;
+
+typedef struct RecInputs {
+    unsigned char btn_dpadup: 1;
+    unsigned char btn_a: 1;
+    unsigned char btn_b: 1;
+    unsigned char btn_x: 1;
+    unsigned char btn_y: 1;
+    unsigned char btn_L: 1;
+    unsigned char btn_R: 1;
+    unsigned char btn_Z: 1;
     s8 stickX;
     s8 stickY;
     s8 substickX;
     s8 substickY;
     u8 trigger;
 } RecInputs;
-typedef struct RecInputData
-{
+
+typedef struct RecInputData {
     int start_frame; // the frame these inputs start on
     int num;
     RecInputs inputs[REC_LENGTH]
 } RecInputData;
-typedef struct RecData
-{
+
+typedef struct RecData {
     int timer; // this is updated at runtime to know which frames inputs to use.
     int hmn_rndm_slot;
     RecInputData *hmn_inputs[REC_SLOTS];
@@ -273,21 +271,21 @@ typedef struct RecData
     float seek_left;
     float seek_right;
 } RecData;
-typedef struct RecordingSave
-{
+
+typedef struct RecordingSave {
     MatchInit match_data; // this will point to a struct containing match info
     Savestate savestate;
     RecInputData hmn_inputs[REC_SLOTS];
     RecInputData cpu_inputs[REC_SLOTS];
 } RecordingSave;
-typedef struct InputData
-{
+
+typedef struct InputData {
     JOBJ *controller_joint[4];
     Vec2 ltrig_origin;
     Vec2 rtrig_origin;
 } InputData;
-typedef struct ExportData
-{
+
+typedef struct ExportData {
     u16 menu_index;
     u16 menu_state;
     JOBJ *memcard_jobj[2];
@@ -316,8 +314,8 @@ typedef struct ExportData
     int cpu_id;
     int stage_id;
 } ExportData;
-typedef struct ExportMenuSettings
-{
+
+typedef struct ExportMenuSettings {
     u8 hmn_mode;
     u8 hmn_slot;
     u8 cpu_mode;
@@ -325,10 +323,10 @@ typedef struct ExportMenuSettings
     u8 loop_inputs;
     u8 auto_restore;
 } ExportMenuSettings;
-typedef struct ExportHeader
-{
-    struct rec_metadata // metadata
-    {
+
+typedef struct ExportHeader {
+    // metadata
+    struct rec_metadata {
         u16 version;
         u16 image_width;
         u16 image_height;
@@ -347,8 +345,9 @@ typedef struct ExportHeader
         u8 second;
         char filename[32];
     } metadata;
-    struct // lookup
-    {
+
+    // lookup
+    struct {
         int ofst_screenshot;
         int ofst_recording;
         int ofst_menusettings;
@@ -357,61 +356,113 @@ typedef struct ExportHeader
 } ExportHeader;
 
 void Event_Init(GOBJ *gobj);
+
 void Event_Update();
+
 void Event_Think(GOBJ *event);
 
 void Button_Think(GOBJ *button_gobj);
 
 void Lab_ChangePlayerPercent(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeFrameAdvance(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeCPUPercent(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeCPUIntang(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeModelDisplay(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeHitDisplay(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeEnvCollDisplay(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeCamMode(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeInfoPreset(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeInfoRow(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeInfoSizePos(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeInfoPlayer(GOBJ *menu_gobj, int value);
+
 void Lab_ChangeHUD(GOBJ *menu_gobj, int value);
+
 void Lab_SelectCustomTDI(GOBJ *menu_gobj);
+
 void DIDraw_GX();
+
 void Record_ChangeHMNSlot(GOBJ *menu_gobj, int value);
+
 void Record_ChangeCPUSlot(GOBJ *menu_gobj, int value);
+
 void Record_ChangeHMNMode(GOBJ *menu_gobj, int value);
+
 void Record_ChangeCPUMode(GOBJ *menu_gobj, int value);
+
 void Record_ChangeSlot(GOBJ *menu_gobj, int value);
+
 void Record_MemcardSave(GOBJ *menu_gobj);
+
 void Record_MemcardLoad(int slot, int file_no);
+
 void Record_InitState(GOBJ *menu_gobj);
+
 void Record_RestoreState(GOBJ *menu_gobj);
+
 void Record_CObjThink(GOBJ *gobj);
+
 void Record_GX(GOBJ *gobj, int pass);
+
 void Record_Think(GOBJ *rec_gobj);
+
 void Record_Update(int ply, RecInputData *inputs, int rec_mode);
+
 int Record_MenuThink(GOBJ *menu_gobj);
+
 int Record_OptimizedSave(Savestate *savestate);
+
 int Record_OptimizedLoad(Savestate *savestate);
+
 int Record_GetRandomSlot(RecInputData **input_data);
+
 int Record_GOBJToID(GOBJ *gobj);
+
 int Record_FtDataToID(FighterData *fighter_data);
+
 int Record_BoneToID(FighterData *fighter_data, JOBJ *bone);
+
 GOBJ *Record_IDToGOBJ(int id);
+
 FighterData *Record_IDToFtData(int id);
+
 JOBJ *Record_IDToBone(FighterData *fighter_data, int id);
+
 void Snap_CObjThink(GOBJ *gobj);
+
 void Record_StartExport(GOBJ *menu_gobj);
+
 void Export_Init(GOBJ *menu_gobj);
+
 int Export_Think(GOBJ *export_gobj);
+
 void Export_Destroy(GOBJ *export_gobj);
+
 void Export_SelCardInit(GOBJ *export_gobj);
+
 int Export_SelCardThink(GOBJ *export_gobj);
+
 int Export_Compress(u8 *dest, u8 *source, u32 size);
+
 void CustomTDI_Update(GOBJ *gobj);
+
 void CustomTDI_Destroy(GOBJ *gobj);
+
 void Lab_Exit(int value);
+
 void InfoDisplay_Think(GOBJ *gobj);
+
 void InfoDisplay_GX(GOBJ *gobj, int pass);
 
 static EventOption LabOptions_Main[];
@@ -444,8 +495,7 @@ static EventMenu LabMenu_Record;
 #define INFDISPTEXT_YOFFSET 30
 
 // General Options
-enum gen_option
-{
+enum gen_option {
     OPTGEN_FRAME,
     OPTGEN_FRAMEBTN,
     OPTGEN_HMNPCNT,
@@ -460,8 +510,7 @@ enum gen_option
 };
 
 // CPU Options
-enum cpu_option
-{
+enum cpu_option {
     OPTCPU_PCNT,
     OPTCPU_BEHAVE,
     OPTCPU_SHIELD,
@@ -483,8 +532,7 @@ enum cpu_option
 };
 
 // SDI Freq
-enum sdi_freq
-{
+enum sdi_freq {
     SDIFREQ_NONE,
     SDIFREQ_LOW,
     SDIFREQ_MED,
@@ -492,8 +540,7 @@ enum sdi_freq
 };
 
 // SDI Freq
-enum sdi_dir
-{
+enum sdi_dir {
     SDIDIR_RANDOM,
     SDIDIR_AWAY,
     SDIDIR_TOWARD,
@@ -523,8 +570,7 @@ enum sdi_dir
 #define OPTINF_ROW1 3
 
 // Info Display Rows
-enum infdisp_rows
-{
+enum infdisp_rows {
     INFDISPROW_NONE,
     INFDISPROW_POS,
     INFDISPROW_STATE,
@@ -556,8 +602,7 @@ enum infdisp_rows
 };
 
 // CPU States
-enum cpu_state
-{
+enum cpu_state {
     CPUSTATE_START,
     CPUSTATE_GRABBED,
     CPUSTATE_SDI,
@@ -569,8 +614,7 @@ enum cpu_state
 };
 
 // Grab Escape Options
-enum cpu_mash
-{
+enum cpu_mash {
     CPUMASH_NONE,
     CPUMASH_MED,
     CPUMASH_HIGH,
@@ -617,8 +661,7 @@ enum cpu_mash
 #define CPUGETUP_ATTACK 4
 
 // Stick Direction Definitions
-enum STICKDIR
-{
+enum STICKDIR {
     STCKDIR_NONE,
     STCKDIR_TOWARD,
     STCKDIR_AWAY,
@@ -679,36 +722,36 @@ static char *stage_names[] = {
 s8 *onload_fileno = R13 + (-0x4670);
 s8 *onload_slot = R13 + (-0x466F);
 #define IMPORT_FILESPERPAGE 10
-typedef enum ImportMenuStates
-{
+
+typedef enum ImportMenuStates {
     IMP_SELCARD,
     IMP_SELFILE,
     IMP_CONFIRM,
 };
-typedef enum ImportConfirmKind
-{
+
+typedef enum ImportConfirmKind {
     CFRM_LOAD,
     CFRM_OLD,
     CFRM_NEW,
     CFRM_DEL,
     CFRM_ERR,
 };
-typedef struct FileInfo
-{
+
+typedef struct FileInfo {
     char **file_name; // pointer to file name array
-    int file_size;    // number of files on card
-    int file_no;      // index of this file on the card
+    int file_size; // number of files on card
+    int file_no; // index of this file on the card
 } FileInfo;
-typedef struct ImportData
-{
+
+typedef struct ImportData {
     GOBJ *menu_gobj;
     u16 canvas;
     u8 menu_state;
     u8 cursor;
-    u8 memcard_inserted[2];     // memcard inserted bools
-    u16 memcard_free_files[2];  // free files on this card
+    u8 memcard_inserted[2]; // memcard inserted bools
+    u16 memcard_free_files[2]; // free files on this card
     u16 memcard_free_blocks[2]; // free blocks on this card
-    u16 memcard_slot;           // selected slot
+    u16 memcard_slot; // selected slot
     JOBJ *memcard_jobj[2];
     JOBJ *screenshot_jobj;
     JOBJ *scroll_jobj;
@@ -719,36 +762,43 @@ typedef struct ImportData
     Text *option_text;
     Text *filename_text;
     Text *fileinfo_text;
-    int file_num;         // number of files on card
-    FileInfo *file_info;  // pointer to file info array
+    int file_num; // number of files on card
+    FileInfo *file_info; // pointer to file info array
     ExportHeader *header; // pointer to header array for the files on the current page
-    u8 page;              // file page
-    u8 files_on_page;     // number of files on the current page
-    struct
-    {
+    u8 page; // file page
+    u8 files_on_page; // number of files on the current page
+    struct {
         GOBJ *gobj; // confirm gobj
         u16 canvas;
         u8 kind; // which kind of confirm dialog this is
         u8 cursor;
         Text *text;
     } confirm;
-    struct
-    {
-        _HSD_ImageDesc *orig_image;           // pointer to jobj's original image desc
-        RGB565 *image;                        // pointer to 32 byte aligned image allocation (one being displayed)
-        int loaded_num;                       // number of completed snaps loaded
-        u8 load_inprogress;                   // bool for if a file is being loaded
-        u8 file_loading;                      // page local index of the file being loaded
+
+    struct {
+        _HSD_ImageDesc *orig_image; // pointer to jobj's original image desc
+        RGB565 *image; // pointer to 32 byte aligned image allocation (one being displayed)
+        int loaded_num; // number of completed snaps loaded
+        u8 load_inprogress; // bool for if a file is being loaded
+        u8 file_loading; // page local index of the file being loaded
         void *file_data[IMPORT_FILESPERPAGE]; // pointer to each files data
-        u8 is_loaded[IMPORT_FILESPERPAGE];    // bools for which snap has been loaded
+        u8 is_loaded[IMPORT_FILESPERPAGE]; // bools for which snap has been loaded
     } snap;
 } ImportData;
+
 void Button_Create();
+
 void Button_Think(GOBJ *button_gobj);
+
 void Menu_Confirm_Init(GOBJ *menu_gobj, int kind);
+
 void Menu_Confirm_Think(GOBJ *menu_gobj);
+
 void Menu_Confirm_Exit(GOBJ *menu_gobj);
+
 GOBJ *Menu_Create();
+
 void Menu_Think(GOBJ *menu_gobj);
+
 #define MENUCAM_GXLINK 5
 #define SIS_ID 0

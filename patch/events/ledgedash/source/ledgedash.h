@@ -11,8 +11,7 @@ typedef struct LdshHitboxData LdshHitboxData;
 #define LCLTEXT_SCALE 4.5
 #define LCLJOBJ_BAR 4
 
-struct LedgedashData
-{
+struct LedgedashData {
     EventDesc *event_desc;
     LedgedashAssets *assets;
     s16 ledge_line;
@@ -20,20 +19,20 @@ struct LedgedashData
     s16 reset_timer;
     GOBJ *hitlog_gobj;
     CameraBox *cam;
-    struct
-    {
+
+    struct {
         GOBJ *gobj;
         Text *text_angle;
         Text *text_galint;
         int canvas;
         int timer;
         float airdodge_angle;
-        u8 is_release : 1;
-        u8 is_jump : 1;
-        u8 is_airdodge : 1;
-        u8 is_aerial : 1;
-        u8 is_land : 1;
-        u8 is_actionable : 1;
+        u8 is_release: 1;
+        u8 is_jump: 1;
+        u8 is_airdodge: 1;
+        u8 is_aerial: 1;
+        u8 is_land: 1;
+        u8 is_actionable: 1;
         u16 release_frame;
         u16 jump_frame;
         u16 airdodge_frame;
@@ -42,38 +41,34 @@ struct LedgedashData
         u16 actionable_frame;
         u8 action_log[30];
     } hud;
-    struct
-    {
-        s16 refresh_num;     // number of times refreshed
+
+    struct {
+        s16 refresh_num; // number of times refreshed
         u8 refresh_cond_num; // number of times tip condition has been met
-        u8 refresh_displayed : 1;
-        u8 is_input_release : 1;
-        u8 is_input_jump : 1;
+        u8 refresh_displayed: 1;
+        u8 is_input_release: 1;
+        u8 is_input_jump: 1;
     } tip;
 };
 
-struct LedgedashAssets
-{
+struct LedgedashAssets {
     JOBJ *hud;
     void **hudmatanim; // pointer to array
 };
 
-struct LdshHitboxData
-{
+struct LdshHitboxData {
     int kind;
     float size;
     Vec3 pos_curr;
     Vec3 pos_prev;
 };
 
-struct LdshHitlogData
-{
+struct LdshHitlogData {
     int num;
     LdshHitboxData hitlog[LDSH_HITBOXNUM];
 };
 
-typedef enum LDSH_ACTION
-{
+typedef enum LDSH_ACTION {
     LDACT_NONE,
     LDACT_CLIFFWAIT,
     LDACT_FALL,
@@ -84,12 +79,21 @@ typedef enum LDSH_ACTION
 };
 
 void Event_Exit();
+
 void Tips_Toggle(GOBJ *menu_gobj, int value);
+
 void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value);
+
 void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value);
+
 void Ledgedash_HUDCamThink(GOBJ *gobj);
+
 GOBJ *Ledgedash_HitLogInit();
+
 void Ledgedash_HitLogGX(GOBJ *gobj, int pass);
+
 void RebirthWait_Phys(GOBJ *fighter);
+
 int RebirthWait_IASA(GOBJ *fighter);
+
 int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir);
