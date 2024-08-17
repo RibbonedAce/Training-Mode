@@ -1314,13 +1314,12 @@ void EventInit(int page, int eventID, MatchInit *matchData) {
     s32 playerKind;
     s32 playerCostume;
     Preload *preload = Preload_GetTable();
-    // If fighter is -1, copy the player from event data
     if (eventMatchData->playerKind != -1) {
+        // If fighter is -1, copy the player from event data
         playerKind = eventMatchData->playerKind;
         playerCostume = 0;
-    }
-    // use the fighter chosen on the CSS
-    else {
+    } else {
+        // use the fighter chosen on the CSS
         playerKind = preload->fighters[0].kind;
         playerCostume = preload->fighters[0].costume;
     }
@@ -1328,8 +1327,8 @@ void EventInit(int page, int eventID, MatchInit *matchData) {
     // Determine the CPU
     s32 cpuKind;
     s32 cpuCostume;
-    // If isChooseCPU is true, use the selected CPU
     if (event->isChooseCPU == true) {
+        // If isChooseCPU is true, use the selected CPU
         cpuKind = preload->fighters[1].kind;
         cpuCostume = preload->fighters[1].costume;
 
@@ -1338,9 +1337,8 @@ void EventInit(int page, int eventID, MatchInit *matchData) {
             cpuKind = 19;
             preload->fighters[1].kind = cpuKind;
         }
-    }
-    // If isChooseCPU is false, copy the CPU from event data
-    else {
+    } else {
+        // If isChooseCPU is false, copy the CPU from event data
         cpuKind = eventMatchData->cpuKind;
         cpuCostume = 0;
         cpuCostume = 0;
@@ -1369,19 +1367,19 @@ void EventInit(int page, int eventID, MatchInit *matchData) {
     // Determine the correct HUD position for this amount of players
     int hudPos = 0;
     for (int i = 0; i < 6; i++) {
-        if (matchData->playerData[i].status != 3)
+        if (matchData->playerData[i].status != 3) {
             hudPos++;
+        }
     }
     matchData->hudPos = hudPos;
 
     // Determine the Stage
     int stage;
-    // If isSelectStage is true, use the selected stage
     if (event->isSelectStage == true) {
+        // If isSelectStage is true, use the selected stage
         stage = preload->stage;
-    }
-    // If isSelectStage is false, copy the stage from event data
-    else {
+    } else {
+        // If isSelectStage is false, copy the stage from event data
         stage = eventMatchData->stage;
     }
     // Update match struct with this stage
@@ -1509,8 +1507,9 @@ void EventLoad() {
     stc_event_vars.savestate = stc_savestate;
 
     // disable hazards if enabled
-    if (event_desc->disable_hazards == 1)
+    if (event_desc->disable_hazards == 1) {
         Hazards_Disable();
+    }
 
     // Run this event's init function
     if (evFunction->Event_Init != 0) {
@@ -1525,8 +1524,9 @@ void EventLoad() {
 };
 
 void EventMenu_MenuGX(GOBJ *gobj, int pass) {
-    if (stc_event_vars.hide_menu == 0)
+    if (stc_event_vars.hide_menu == 0) {
         GXLink_Common(gobj, pass);
+    }
     return;
 }
 
@@ -1546,8 +1546,9 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
 
     // create a border and arrow for every row
     s32 option_num = menu->option_num;
-    if (option_num > MENU_MAXOPTION)
+    if (option_num > MENU_MAXOPTION) {
         option_num = MENU_MAXOPTION;
+    }
     for (int i = 0; i < option_num; i++) {
         // create a border jobj
         JOBJ *jobj_border = JOBJ_LoadJoint(menuAssets->popup);
@@ -1646,8 +1647,9 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
         // calculate scrollbar size
         int max_steps = menuData->currMenu->option_num - MENU_MAXOPTION;
         float botPos = MENUSCROLL_MAXLENGTH + (max_steps * MENUSCROLL_PEROPTION);
-        if (botPos > MENUSCROLL_MINLENGTH)
+        if (botPos > MENUSCROLL_MINLENGTH) {
             botPos = MENUSCROLL_MINLENGTH;
+        }
 
         // set size
         corners[1]->trans.Y = botPos;
@@ -1660,8 +1662,9 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
 }
 
 void EventMenu_TextGX(GOBJ *gobj, int pass) {
-    if (stc_event_vars.hide_menu == 0)
+    if (stc_event_vars.hide_menu == 0) {
         Text_GX(gobj, pass);
+    }
     return;
 }
 
@@ -1741,8 +1744,9 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
 
     // Output all options
     s32 option_num = menu->option_num;
-    if (option_num > MENU_MAXOPTION)
+    if (option_num > MENU_MAXOPTION) {
         option_num = MENU_MAXOPTION;
+    }
     for (int i = 0; i < option_num; i++) {
         // output option name
         float optionX = MENU_OPTIONNAMEXPOS;
@@ -1785,8 +1789,9 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     s32 cursor = menu->cursor;
     s32 scroll = menu->scroll;
     s32 option_num = menu->option_num;
-    if (option_num > MENU_MAXOPTION)
+    if (option_num > MENU_MAXOPTION) {
         option_num = MENU_MAXOPTION;
+    }
     Text *text;
 
     // Update Title
@@ -1824,8 +1829,9 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     // if occurrence found, increment values
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
-        if (line_num >= DESC_LINEMAX)
+        if (line_num >= DESC_LINEMAX) {
             assert("DESC_LINEMAX exceeded!");
+        }
 
         // Save information about this line
         line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev; // determine length of the line
@@ -1843,8 +1849,9 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
-        if (line_length > DESC_CHARMAX)
+        if (line_length > DESC_CHARMAX) {
             assert("DESC_CHARMAX exceeded!");
+        }
 
         // copy char array
         char msg_line[DESC_CHARMAX + 1];
@@ -1906,26 +1913,22 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
         JOBJ_SetFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
         JOBJ_SetFlags(menuData->row_joints[i][1], JOBJ_HIDDEN);
 
-        // if this option has string values
         if (currOption->option_kind == OPTKIND_STRING) {
+            // if this option has string values
             // output option value
             Text_SetText(text, i, currOption->option_values[optionVal]);
 
             // show box
             JOBJ_ClearFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
-        }
-
-        // if this option has int values
-        else if (currOption->option_kind == OPTKIND_INT) {
+        } else if (currOption->option_kind == OPTKIND_INT) {
+            // if this option has int values
             // output option value
             Text_SetText(text, i, currOption->option_values, optionVal);
 
             // show box
             JOBJ_ClearFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
-        }
-
-        // if this option is a menu or function
-        else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC)) {
+        } else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC)) {
+            // if this option is a menu or function
             Text_SetText(text, i, &nullString);
 
             // show arrow
@@ -1956,10 +1959,11 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     if (menuData->scroll_top != 0) {
         float curr_steps = menuData->currMenu->scroll;
         float max_steps;
-        if (menuData->currMenu->option_num < MENU_MAXOPTION)
+        if (menuData->currMenu->option_num < MENU_MAXOPTION) {
             max_steps = 0;
-        else
+        } else {
             max_steps = menuData->currMenu->option_num - MENU_MAXOPTION;
+        }
 
         // scrollTop = -1 * ((curr_steps/max_steps) * (botY - -10))
         menuData->scroll_top->trans.Y = -1 * (curr_steps / max_steps) * (
@@ -2054,8 +2058,9 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu) {
     int subtext;
     int canvasIndex = menuData->canvas_popup;
     s32 value_num = option->value_num;
-    if (value_num > MENU_POPMAXOPTION)
+    if (value_num > MENU_POPMAXOPTION) {
         value_num = MENU_POPMAXOPTION;
+    }
 
     ///////////////////
     // Create Values //
@@ -2092,8 +2097,9 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option) {
     s32 cursor = menuData->popup_cursor;
     s32 scroll = menuData->popup_scroll;
     s32 value_num = option->value_num;
-    if (value_num > MENU_POPMAXOPTION)
+    if (value_num > MENU_POPMAXOPTION) {
         value_num = MENU_POPMAXOPTION;
+    }
 
     ///////////////////
     // Update Values //
@@ -2101,17 +2107,15 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option) {
 
     Text *text = menuData->text_popup;
 
-    // update int list
     if (option->option_kind == OPTKIND_INT) {
+        // update int list
         // Output all values
         for (int i = 0; i < value_num; i++) {
             // output option value
             Text_SetText(text, i, "%d", scroll + i);
         }
-    }
-
-    // update string list
-    else if (option->option_kind == OPTKIND_STRING) {
+    } else if (option->option_kind == OPTKIND_STRING) {
+        // update string list
         // Output all values
         for (int i = 0; i < value_num; i++) {
             // output option value
@@ -2160,14 +2164,16 @@ void EventMenu_DestroyMenu(GOBJ *gobj) {
     menuData->text_desc = 0;
 
     // if popup box exists
-    if (menuData->text_popup != 0)
+    if (menuData->text_popup != 0) {
         EventMenu_DestroyPopup(gobj);
+    }
 
     // if custom menu gobj exists
     if (menuData->custom_gobj != 0) {
         // run on destroy function
-        if (menuData->custom_gobj_destroy != 0)
+        if (menuData->custom_gobj_destroy != 0) {
             menuData->custom_gobj_destroy(menuData->custom_gobj);
+        }
 
         // null pointers
         menuData->custom_gobj = 0;
@@ -2196,8 +2202,9 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     int inputs_rapid = Pad_GetRapidHeld(pauser); //pad->rapidFire;
     int inputs_held = pad->held;
     int inputs = inputs_rapid;
-    if ((inputs_held & HSD_TRIGGER_R) != 0)
+    if ((inputs_held & HSD_TRIGGER_R) != 0) {
         inputs = inputs_held;
+    }
 
     // get menu variables
     int isChanged = 0;
@@ -2207,16 +2214,17 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     s32 cursor_min = 0;
     s32 option_num = currMenu->option_num;
     s32 cursor_max = option_num;
-    if (cursor_max > MENU_MAXOPTION)
+    if (cursor_max > MENU_MAXOPTION) {
         cursor_max = MENU_MAXOPTION;
+    }
 
     // get option variables
     s16 option_val = currOption->option_val;
     s16 value_min = 0;
     s16 value_max = currOption->value_num;
 
-    // check for dpad down
     if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
+        // check for dpad down
         // loop to find next option
         int count = 1; //
         int cursor_next = 0; // how much to move the cursor by
@@ -2235,8 +2243,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         if (cursor_next > 0) {
             cursor += cursor_next;
 
-            // cursor is in bounds, move down
             if (cursor < cursor_max) {
+                // cursor is in bounds, move down
                 isChanged = 1;
 
                 // update cursor
@@ -2244,10 +2252,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
 
                 // also play sfx
                 SFX_PlayCommon(2);
-            }
-
-            // cursor overflowed, correct it
-            else {
+            } else {
+                // cursor overflowed, correct it
                 // adjust
                 scroll -= (cursor_max - (cursor + 1));
                 cursor = (cursor_max - 1);
@@ -2262,9 +2268,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    }
-    // check for dpad up
-    else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
+    } else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
+        // check for dpad up
         // loop to find next option
         int count = 1; //
         int cursor_next = 0; // how much to move the cursor by
@@ -2283,8 +2288,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         if (cursor_next > 0) {
             cursor -= cursor_next;
 
-            // cursor is in bounds, move up
             if (cursor >= 0) {
+                // cursor is in bounds, move up
                 isChanged = 1;
 
                 // update cursor
@@ -2292,10 +2297,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
 
                 // also play sfx
                 SFX_PlayCommon(2);
-            }
-
-            // cursor overflowed, correct it
-            else {
+            } else {
+                // cursor overflowed, correct it
                 // adjust
                 scroll += cursor; // effectively scroll up by adding a negative number
                 cursor = 0; // cursor is positioned at 0
@@ -2310,10 +2313,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    }
-
-    // check for left
-    else if (((inputs & HSD_BUTTON_LEFT) != 0) || ((inputs & HSD_BUTTON_DPAD_LEFT) != 0)) {
+    } else if (((inputs & HSD_BUTTON_LEFT) != 0) || ((inputs & HSD_BUTTON_DPAD_LEFT) != 0)) {
+        // check for left
         if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (
                 currOption->option_kind == OPTKIND_FLOAT)) {
             option_val -= 1;
@@ -2327,13 +2328,13 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 currOption->option_val = option_val;
 
                 // run on change function if it exists
-                if (currOption->onOptionChange != 0)
+                if (currOption->onOptionChange != 0) {
                     currOption->onOptionChange(gobj, currOption->option_val);
+                }
             }
         }
-    }
-    // check for right
-    else if (((inputs & HSD_BUTTON_RIGHT) != 0) || ((inputs & HSD_BUTTON_DPAD_RIGHT) != 0)) {
+    } else if (((inputs & HSD_BUTTON_RIGHT) != 0) || ((inputs & HSD_BUTTON_DPAD_RIGHT) != 0)) {
+        // check for right
         // check for valid option kind
         if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (
                 currOption->option_kind == OPTKIND_FLOAT)) {
@@ -2348,14 +2349,13 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 currOption->option_val = option_val;
 
                 // run on change function if it exists
-                if (currOption->onOptionChange != 0)
+                if (currOption->onOptionChange != 0) {
                     currOption->onOptionChange(gobj, currOption->option_val);
+                }
             }
         }
-    }
-
-    // check for A
-    else if (inputs_rapid & HSD_BUTTON_A) {
+    } else if (inputs_rapid & HSD_BUTTON_A) {
+        // check for A
         // check to advance a menu
         if ((currOption->option_kind == OPTKIND_MENU)) {
             // access this menu
@@ -2389,9 +2389,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
             // also play sfx
             SFX_PlayCommon(1);
         }
-    }
-    // check to go back a menu
-    else if (inputs_rapid & HSD_BUTTON_B) {
+    } else if (inputs_rapid & HSD_BUTTON_B) {
+        // check to go back a menu
         // check if a prev menu exists
         EventMenu *prevMenu = currMenu->prev;
         if (prevMenu != 0) {
@@ -2440,8 +2439,9 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
     int inputs_rapid = pad->rapidFire;
     int inputs_held = pad->held;
     int inputs = inputs_rapid;
-    if ((inputs_held & HSD_TRIGGER_R) != 0)
+    if ((inputs_held & HSD_TRIGGER_R) != 0) {
         inputs = inputs_held;
+    }
 
     // get option variables
     int isChanged = 0;
@@ -2455,12 +2455,12 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
         cursor_max = MENU_POPMAXOPTION;
     }
 
-    // check for dpad down
     if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
+        // check for dpad down
         cursor += 1;
 
-        // cursor is in bounds, move down
         if (cursor < cursor_max) {
+            // cursor is in bounds, move down
             isChanged = 1;
 
             // update cursor
@@ -2468,10 +2468,8 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
 
             // also play sfx
             SFX_PlayCommon(2);
-        }
-
-        // cursor overflowed, check to scroll
-        else {
+        } else {
+            // cursor overflowed, check to scroll
             // cursor+scroll is in bounds, increment scroll
             if ((cursor + scroll) < value_num) {
                 // adjust
@@ -2488,13 +2486,12 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    }
-    // check for dpad up
-    else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
+    } else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
+        // check for dpad up
         cursor -= 1;
 
-        // cursor is in bounds, move up
         if (cursor >= 0) {
+            // cursor is in bounds, move up
             isChanged = 1;
 
             // update cursor
@@ -2502,10 +2499,8 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
 
             // also play sfx
             SFX_PlayCommon(2);
-        }
-
-        // cursor overflowed, check to scroll
-        else {
+        } else {
+            // cursor overflowed, check to scroll
             // scroll is in bounds, decrement scroll
             if (scroll > 0) {
                 // adjust
@@ -2522,16 +2517,15 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    }
-
-    // check for A
-    else if ((inputs_rapid & HSD_BUTTON_A) != 0) {
+    } else if ((inputs_rapid & HSD_BUTTON_A) != 0) {
+        // check for A
         // update option_val
         currOption->option_val = cursor + scroll;
 
         // run on change function if it exists
-        if (currOption->onOptionChange != 0)
+        if (currOption->onOptionChange != 0) {
             currOption->onOptionChange(gobj, currOption->option_val);
+        }
 
         EventMenu_DestroyPopup(gobj);
 
@@ -2540,9 +2534,8 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
 
         // play sfx
         SFX_PlayCommon(1);
-    }
-    // check to go back a menu
-    else if ((inputs_rapid & HSD_BUTTON_B) != 0) {
+    } else if ((inputs_rapid & HSD_BUTTON_B) != 0) {
+        // check to go back a menu
         EventMenu_DestroyPopup(gobj);
 
         // update menu
@@ -2569,13 +2562,11 @@ void EventMenu_Update(GOBJ *gobj) {
 
     int update_menu = 1;
 
-    // if a custom menu is in use, run its function
     if (menuData->custom_gobj_think != 0) {
+        // if a custom menu is in use, run its function
         update_menu = menuData->custom_gobj_think(menuData->custom_gobj);
-    }
-
-    // if this menu has an upate function, run its function
-    else if ((menuData->isPaused == 1) && (currMenu->menu_think != 0)) {
+    } else if ((menuData->isPaused == 1) && (currMenu->menu_think != 0)) {
+        // if this menu has an upate function, run its function
         update_menu = currMenu->menu_think(gobj);
     }
 
@@ -2608,10 +2599,10 @@ void EventMenu_Update(GOBJ *gobj) {
             }
         }
 
-        // change pause state
         if (isPress != 0) {
-            // pause game
+            // change pause state
             if (menuData->isPaused == 0) {
+                // pause game
                 // set state
                 menuData->isPaused = 1;
 
@@ -2631,9 +2622,8 @@ void EventMenu_Update(GOBJ *gobj) {
                 SFX_PlayCommon(5);
                 Match_HideHUD();
                 Match_AdjustSoundOnPause(1);
-            }
-            // unpause game
-            else {
+            } else {
+                // unpause game
                 menuData->isPaused = 0;
 
                 // destroy menu
@@ -2644,22 +2634,19 @@ void EventMenu_Update(GOBJ *gobj) {
                 Match_ShowHUD();
                 Match_AdjustSoundOnPause(0);
             }
-        }
-
-        // run menu logic if the menu is shown
-        else if ((menuData->isPaused == 1) && (stc_event_vars.hide_menu == 0)) {
+        } else if ((menuData->isPaused == 1) && (stc_event_vars.hide_menu == 0)) {
+            // run menu logic if the menu is shown
             // Get the current menu
             EventMenu *currMenu = menuData->currMenu;
 
-            // menu think
             if (currMenu->state == EMSTATE_FOCUS) {
+                // menu think
                 // check to run custom menu think function
                 EventMenu_MenuThink(gobj, currMenu);
-            }
-
-            // popup think
-            else if (currMenu->state == EMSTATE_OPENPOP)
+            } else if (currMenu->state == EMSTATE_OPENPOP) {
+                // popup think
                 EventMenu_PopupThink(gobj, currMenu);
+            }
         }
     }
 
@@ -2686,8 +2673,9 @@ void EventUpdate() {
     // run custom event update function
     if (evFunction->Event_Update != 0) {
         evFunction->Event_Update();
-    } else
+    } else {
         Develop_UpdateMatchHotkeys();
+    }
 
     return;
 }
@@ -2747,9 +2735,7 @@ void TM_CreateConsole() {
 // this function is run right after TmDt is loaded into memory on boot
 void OnFileLoad(ArchiveInfo *archive) {
     // init event menu assets
-    stc_event_vars
-            .
-            menu_assets = File_GetSymbol(archive, "evMenu");
+    stc_event_vars.menu_assets = File_GetSymbol(archive, "evMenu");
 
     // store pointer to static variables
     *event_vars_ptr = &stc_event_vars;
@@ -2887,8 +2873,9 @@ int Savestate_Save(Savestate *savestate) {
 
                 // get fighter gobj and data if they exist
                 fighter = Fighter_GetSubcharGObj(i, j);
-                if (fighter != 0)
+                if (fighter != 0) {
                     fighter_data = fighter->userdata;
+                }
 
                 // store fighter pointers
                 queue[j].fighter = fighter;
@@ -2982,8 +2969,7 @@ int Savestate_Save(Savestate *savestate) {
                         for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
                             ft_data->throw_hitbox[k].bone = BoneToID(fighter_data, ft_data->throw_hitbox[k].bone);
                             // pointers to hitbox victims
-                            for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l
-                                 ++) {
+                            for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) {
                                 ft_data->throw_hitbox[k].victims[l].victim_data = FtDataToID(
                                     ft_data->throw_hitbox[k].victims[l].victim_data);
                             }
@@ -3053,8 +3039,9 @@ int Savestate_Load(Savestate *savestate) {
 
             // get fighter gobj and data if they exist
             fighter = Fighter_GetSubcharGObj(i, j);
-            if (fighter != 0)
+            if (fighter != 0) {
                 fighter_data = fighter->userdata;
+            }
 
             // store fighter pointers
             queue[j].fighter = fighter;
@@ -3172,8 +3159,9 @@ int Savestate_Load(Savestate *savestate) {
 
                     // enter backed up state
                     GOBJ *anim_source = 0;
-                    if (fighter_data->flags.is_thrown == 1)
+                    if (fighter_data->flags.is_thrown == 1) {
                         anim_source = fighter_data->grab.grab_attacker;
+                    }
                     Fighter_SetAllHurtboxesNotUpdated(fighter);
                     ActionStateChange(ft_data->stateFrame, ft_data->stateSpeed, -1, fighter, ft_data->state, 0,
                                       anim_source);
@@ -3390,8 +3378,9 @@ int Savestate_Load(Savestate *savestate) {
                     arr[0x50 / 4]--;
                 }
                 // remove from generator? 8039ca14
-                if (ptcl->gen != 0)
+                if (ptcl->gen != 0) {
                     psRemoveParticleAppSRT(ptcl);
+                }
 
                 // delete parent jobj, 8039ca48
                 psDeletePntJObjwithParticle(ptcl);
@@ -3472,12 +3461,14 @@ void Update_Savestates() {
 
 int GOBJToID(GOBJ *gobj) {
     // ensure valid pointer
-    if (gobj == 0)
+    if (gobj == 0) {
         return -1;
+    }
 
     // ensure its a fighter
-    if (gobj->entity_class != 4)
+    if (gobj->entity_class != 4) {
         return -1;
+    }
 
     // access the data
     FighterData *ft_data = gobj->userdata;
@@ -3489,12 +3480,14 @@ int GOBJToID(GOBJ *gobj) {
 
 int FtDataToID(FighterData *fighter_data) {
     // ensure valid pointer
-    if (fighter_data == 0)
+    if (fighter_data == 0) {
         return -1;
+    }
 
     // ensure its a fighter
-    if (fighter_data->fighter == 0)
+    if (fighter_data->fighter == 0) {
         return -1;
+    }
 
     // get ply and ms
     u8 ply = fighter_data->ply;
@@ -3505,8 +3498,9 @@ int FtDataToID(FighterData *fighter_data) {
 
 int BoneToID(FighterData *fighter_data, JOBJ *bone) {
     // ensure bone exists
-    if (bone == 0)
+    if (bone == 0) {
         return -1;
+    }
 
     int bone_id = -1;
 
@@ -3530,8 +3524,9 @@ int BoneToID(FighterData *fighter_data, JOBJ *bone) {
 
 GOBJ *IDToGOBJ(int id) {
     // ensure valid pointer
-    if (id == -1)
+    if (id == -1) {
         return 0;
+    }
 
     // get ply and ms
     u8 ply = (id >> 4) & 0xF;
@@ -3545,8 +3540,9 @@ GOBJ *IDToGOBJ(int id) {
 
 FighterData *IDToFtData(int id) {
     // ensure valid pointer
-    if (id == -1)
+    if (id == -1) {
         return 0;
+    }
 
     // get ply and ms
     u8 ply = (id >> 4) & 0xF;
@@ -3561,8 +3557,9 @@ FighterData *IDToFtData(int id) {
 
 JOBJ *IDToBone(FighterData *fighter_data, int id) {
     // ensure valid pointer
-    if (id == -1)
+    if (id == -1) {
         return 0;
+    }
 
     // get the bone
     JOBJ *bone = fighter_data->bones[id].joint;
@@ -3665,8 +3662,9 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     // if occurrence found, increment values
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
-        if (line_num >= MSG_LINEMAX)
+        if (line_num >= MSG_LINEMAX) {
             assert("MSG_LINEMAX exceeded!");
+        }
 
         // Save information about this line
         line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev; // determine length of the line
@@ -3684,8 +3682,9 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
-        if (line_length > MSG_CHARMAX)
+        if (line_length > MSG_CHARMAX) {
             assert("MSG_CHARMAX exceeded!");
+        }
 
         // copy char array
         char msg_line[MSG_CHARMAX + 1];
@@ -3735,8 +3734,9 @@ void Message_Manager(GOBJ *mngr_gobj) {
                 }
 
                 // decrement state timer if above 0
-                if (this_msg_data->anim_timer > 0)
+                if (this_msg_data->anim_timer > 0) {
                     this_msg_data->anim_timer--;
+                }
 
                 switch (this_msg_data->state) {
                     case (MSGSTATE_WAIT):
@@ -3858,8 +3858,9 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num) {
 
     // Destroy text
     Text *text = msg_data->text;
-    if (text != 0)
+    if (text != 0) {
         Text_Destroy(text);
+    }
 
     // Destroy GOBJ
     GObj_Destroy(msg_gobj);
@@ -3888,8 +3889,9 @@ void Message_Add(GOBJ *msg_gobj, int queue_num) {
     GOBJ **msg_queue = &mgr_data->msg_queue[queue_num];
 
     // ensure this queue exists
-    if (queue_num >= MSGQUEUE_NUM)
+    if (queue_num >= MSGQUEUE_NUM) {
         assert("queue_num over!");
+    }
 
     // remove any existing messages of this kind
     for (int i = 0; i < MSGQUEUE_SIZE; i++) {
@@ -3942,8 +3944,9 @@ void Message_Add(GOBJ *msg_gobj, int queue_num) {
 }
 
 void Message_CObjThink(GOBJ *gobj) {
-    if (Pause_CheckStatus(1) != 2)
+    if (Pause_CheckStatus(1) != 2) {
         CObjThink_Common(gobj);
+    }
 
     return;
 }
@@ -3976,8 +3979,9 @@ void Tip_Think(GOBJ *gobj) {
             // in
             case (0): {
                 // if anim is done, enter wait
-                if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0)
+                if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0) {
                     stc_tipmgr.state = 1; // enter wait
+                }
 
                 break;
             }
@@ -4019,16 +4023,16 @@ int Tip_Display(int lifetime, char *fmt, ...) {
 
     // if tip exists
     if (stc_tipmgr.gobj != 0) {
-        // if tip is in the process of exiting
         if (stc_tipmgr.state == 2) {
+        // if tip is in the process of exiting
             // remove text
             Text_Destroy(stc_tipmgr.text);
             GObj_Destroy(stc_tipmgr.gobj);
             stc_tipmgr.gobj = 0;
-        }
-        // if is active onscreen do nothing
-        else
+        } else {
+            // if is active onscreen do nothing
             return 0;
+        }
     }
 
     MsgMngrData *msgmngr_data = stc_msgmgr->userdata;
@@ -4087,8 +4091,9 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     // if occurrence found, increment values
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
-        if (line_num >= TIP_LINEMAX)
+        if (line_num >= TIP_LINEMAX) {
             assert("TIP_LINEMAX exceeded!");
+        }
 
         // Save information about this line
         line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev; // determine length of the line
@@ -4106,8 +4111,9 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
-        if (line_length > TIP_CHARMAX)
+        if (line_length > TIP_CHARMAX) {
             assert("TIP_CHARMAX exceeded!");
+        }
 
         // copy char array
         char msg_line[TIP_CHARMAX + 1];
@@ -4149,8 +4155,9 @@ void Tip_Destroy() {
 
 GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu) {
     // Ensure this event has a menu
-    if (start_menu == 0)
+    if (start_menu == 0) {
         return 0;
+    }
 
     // Create a cobj for the event menu
     COBJDesc ***dmgScnMdls = File_GetSymbol(ACCESS_PTR(0x804d6d5c), 0x803f94d0);

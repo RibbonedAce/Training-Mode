@@ -150,10 +150,11 @@ void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
 
     // determine scale based on wd distance
     float dist = event_data->wd_maxdstn;
-    if (dist < TRGTSCL_DISTMIN)
+    if (dist < TRGTSCL_DISTMIN) {
         dist = TRGTSCL_DISTMIN;
-    else if (dist > TRGTSCL_DISTMAX)
+    } else if (dist > TRGTSCL_DISTMAX) {
         dist = TRGTSCL_DISTMAX;
+    }
     event_data->target.scale = (((dist - TRGTSCL_DISTMIN) / (TRGTSCL_DISTMAX - TRGTSCL_DISTMIN)) * (
                                     TRGTSCL_SCALEMAX - TRGTSCL_SCALEMIN)) + TRGTSCL_SCALEMIN;
 
@@ -274,7 +275,6 @@ Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
         if (event_data->since_wavedash <= 10) {
             // look for frame 1 of guard off
             if ((hmn_data->state == ASID_GUARDOFF) && (hmn_data->TM.state_frame == 0) && // just let go of shield
-
                 // only guarded for 1 frame
                 ((hmn_data->TM.state_prev[0] == ASID_GUARD) && (hmn_data->TM.state_prev_frames[0] == 1))) {
                 event_data->tip.shield_num++;
@@ -296,8 +296,9 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
     // check to enter is_wavedashing
     if (event_data->is_wavedashing == 0) {
         // increment time since wavedash
-        if (event_data->since_wavedash < 255)
+        if (event_data->since_wavedash < 255) {
             event_data->since_wavedash++;
+        }
 
         // check to enter wavedash state
         if ((hmn_data->state == ASID_LANDINGFALLSPECIAL) && hmn_data->TM.state_prev[2] == ASID_KNEEBEND) {
@@ -311,13 +312,16 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
             (hmn_data->phys.air_state == 1) || // airborne
             ((hmn_data->attack_kind >= ATKKIND_SPECIALN) && (hmn_data->attack_kind <= ATKKIND_SPECIALLW)) ||
             // any special move
-            ((hmn_data->state >= ASID_ESCAPEF) && (hmn_data->state >= ASID_ESCAPEB))) // rolls
+            // rolls
+            ((hmn_data->state >= ASID_ESCAPEF) && (hmn_data->state >= ASID_ESCAPEB))) {
             event_data->since_wavedash = 255;
+        }
     }
     // check to exit is_wavedashing
     if (event_data->is_wavedashing == 1) {
-        if ((hmn_data->state != ASID_LANDINGFALLSPECIAL))
+        if ((hmn_data->state != ASID_LANDINGFALLSPECIAL)) {
             event_data->is_wavedashing = 0;
+        }
     }
 
     //OSReport("is_wavedashing: %d since_wavedash: %d", event_data->is_wavedashing, event_data->since_wavedash);
@@ -341,16 +345,14 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
     if (event_data->timer >= 0) {
         event_data->timer++; // inc timer
 
-        // if grounded and not in kneebend, stop sequence
         if ((hmn_data->state != ASID_KNEEBEND) && (hmn_data->state != ASID_LANDINGFALLSPECIAL) && (
                 hmn_data->phys.air_state == 0)) {
+            // if grounded and not in kneebend, stop sequence
             event_data->timer = -1;
             event_data->is_airdodge = 0;
             event_data->is_early_airdodge = 0;
-        }
-
-        // run sequence logic
-        else {
+        } else {
+            // run sequence logic
             // catch early airdodge input
             if (hmn_data->input.down & (PAD_TRIGGER_L | PAD_TRIGGER_R)) {
                 event_data->airdodge_frame = event_data->timer; // save airdodge frame
@@ -374,29 +376,28 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
             int is_finished = 0;
             void *mat_anim = 0;
 
-            // look for successful WD
             if ((hmn_data->state == ASID_LANDINGFALLSPECIAL) && (hmn_data->TM.state_frame == 0) &&
                 // is in special landing
                 (hmn_data->TM.state_prev[0] == ASID_ESCAPEAIR) && // came from airdodge
                 // came from jump
                 (hmn_data->TM.state_prev[2] == ASID_KNEEBEND)) {
+                // look for successful WD
                 is_finished = 1;
                 mat_anim = event_data->assets->hudmatanim[0];
                 event_data->wd_succeeded++;
 
                 // check for perfect
                 /*if (WdOptions_Main[0].option_val == 0)*/ {
-                    if (event_data->airdodge_frame == ((int) hmn_data->attr.jump_startup_time + 1))
+                    if (event_data->airdodge_frame == ((int) hmn_data->attr.jump_startup_time + 1)) {
                         SFX_Play(303);
+                    }
                 }
-            }
-
-            // look for failed WD
-            else if ((event_data->is_early_airdodge == 1) && (
+            } else if ((event_data->is_early_airdodge == 1) && (
                          ((hmn_data->state == ASID_JUMPF) || (hmn_data->state == ASID_JUMPB)) && (
                              hmn_data->TM.state_frame >= 10)) ||
                      ((hmn_data->state == ASID_ESCAPEAIR) && (hmn_data->TM.state_frame >= 10) && (
                           hmn_data->TM.state_prev[1] == ASID_KNEEBEND))) {
+                // look for failed WD
                 is_finished = 1;
                 mat_anim = event_data->assets->hudmatanim[1];
                 SFX_PlayCommon(3);
@@ -482,27 +483,28 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
                 int jump_frame = ((WDFRAMES - 1) / 2) - (int) hmn_data->attr.jump_startup_time;
                 int input_frame = jump_frame + event_data->airdodge_frame - 1;
 
-                // update arrow position
                 if (input_frame < WDFRAMES) {
+                    // update arrow position
                     event_data->hud.arrow_prevpos = arrow_jobj->trans.X;
                     event_data->hud.arrow_nextpos = (-WDARROW_OFFSET * ((WDFRAMES - 1) / 2)) + (input_frame * 0.36);
                     JOBJ_ClearFlags(arrow_jobj, JOBJ_HIDDEN);
                     event_data->hud.arrow_timer = WDARROW_ANIMFRAMES;
-                }
-                // hide arrow for this wd attempt
-                else {
+                } else {
+                    // hide arrow for this wd attempt
                     event_data->hud.arrow_timer = 0;
                     arrow_jobj->trans.X = 0;
                     JOBJ_SetFlags(arrow_jobj, JOBJ_HIDDEN);
                 }
 
                 // updating timing text
-                if (input_frame < ((WDFRAMES - 1) / 2)) // is early
+                if (input_frame < ((WDFRAMES - 1) / 2)) {
+                    // is early
                     Text_SetText(event_data->hud.text_timing, 0, "%df Early", ((WDFRAMES - 1) / 2) - input_frame);
-                else if (input_frame == ((WDFRAMES - 1) / 2))
+                } else if (input_frame == ((WDFRAMES - 1) / 2)) {
                     Text_SetText(event_data->hud.text_timing, 0, "Perfect");
-                else if (input_frame > ((WDFRAMES - 1) / 2))
+                } else if (input_frame > ((WDFRAMES - 1) / 2)) {
                     Text_SetText(event_data->hud.text_timing, 0, "%df Late", input_frame - ((WDFRAMES - 1) / 2));
+                }
 
                 // update airdodge angle
                 Text_SetText(event_data->hud.text_angle, 0, "%.2f", fabs(event_data->wd_angle / M_1DEGREE));
@@ -613,10 +615,11 @@ GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data) {
             // select random direction
             float direction;
             int temp = HSD_Randi(2);
-            if (temp == 0)
+            if (temp == 0) {
                 direction = -1;
-            else
+            } else {
                 direction = 1;
+            }
 
             // random distance
             float distance = (HSD_Randf() * (max - min)) + min;
@@ -722,8 +725,9 @@ void Target_Think(GOBJ *target_gobj) {
     switch (target_data->state) {
         case (TRGSTATE_SPAWN): {
             // check if ended
-            if (JOBJ_CheckAObjEnd(target_jobj) == 0)
+            if (JOBJ_CheckAObjEnd(target_jobj) == 0) {
                 Target_ChangeState(target_gobj, TRGSTATE_WAIT);
+            }
 
             break;
         }
@@ -780,15 +784,18 @@ float Target_GetWdashDistance(FighterData *hmn_data, float mag) {
     while (mag > 0) {
         // get friction
         float friction = hmn_data->attr.ground_friction;
-        if (mag > hmn_data->attr.walk_maximum_velocity) // double friction if speed > walk max speed
+        // double friction if speed > walk max speed
+        if (mag > hmn_data->attr.walk_maximum_velocity) {
             friction *= ftcommon->friction_mult;
+        }
 
         // apply it
         mag -= friction;
 
         // ensure not under 0
-        if (mag < 0)
+        if (mag < 0) {
             mag = 0;
+        }
 
         distance += mag;
     }
@@ -812,8 +819,9 @@ int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offs
     is_ground += GrColl_CrawlGround(line, pos, ret_line, ret_pos, 0, ret_slope,
                                     x_offset + event_data->target.center_offset.X, 0);
 
-    if (is_ground == 3)
+    if (is_ground == 3) {
         status = 1;
+    }
 
     return status;
 }

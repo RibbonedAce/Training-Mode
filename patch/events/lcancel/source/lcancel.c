@@ -112,8 +112,9 @@ int Barrel_OnDestroy(GOBJ *barrel_gobj) {
     LCancelData *event_data = event_vars->event_gobj->userdata;
 
     // if this barrel is still the current barrel
-    if (barrel_gobj == event_data->barrel_gobj)
+    if (barrel_gobj == event_data->barrel_gobj) {
         event_data->barrel_gobj = 0;
+    }
 
     return 0;
 }
@@ -289,8 +290,9 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             // check if in first frame of aerial attack
             if ((hmn_data->state >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW)) {
                 // reset hitbox bool on first frame of aerial attack
-                if (hmn_data->TM.state_frame == 0)
+                if (hmn_data->TM.state_frame == 0) {
                     event_data->tip.hitbox_active = 0;
+                }
 
                 // check if hitbox active
                 for (int i = 0; i < (sizeof(hmn_data->hitbox) / sizeof(ftHit)); i++) {
@@ -332,12 +334,14 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             // check if in first frame of aerial attack
             if ((hmn_data->state >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW)) {
                 // reset hitbox bool on first frame of aerial attack
-                if (hmn_data->TM.state_frame == 0)
+                if (hmn_data->TM.state_frame == 0) {
                     event_data->tip.fastfall_active = 0;
+                }
 
                 // check if fastfalling
-                if (hmn_data->flags.is_fastfall == 1)
+                if (hmn_data->flags.is_fastfall == 1) {
                     event_data->tip.fastfall_active = 1;
+                }
             }
 
             // update tip conditions
@@ -405,10 +409,11 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
         if (hmn_data->phys.self_vel.Y < 0) {
             // can i fastfall?
             // did i fastfall yet?
-            if (hmn_data->flags.is_fastfall)
+            if (hmn_data->flags.is_fastfall) {
                 event_data->is_fastfall = 1; // set as fastfall this session
-            else
+            } else {
                 event_data->fastfall_frame++; // increment frames
+            }
         } else {
             // cant fastfall, reset frames
             event_data->fastfall_frame = 0;
@@ -430,10 +435,11 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
         event_data->is_fail = is_fail; // save l-cancel bool
 
         // Play appropriate sfx
-        if (is_fail == 0)
+        if (is_fail == 0) {
             SFX_PlayRaw(303, 255, 128, 20, 3);
-        else
+        } else {
             SFX_PlayCommon(3);
+        }
 
         // update timing text
         int frame_box_id;
@@ -455,10 +461,11 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
         event_data->hud.arrow_timer = LCLARROW_ANIMFRAMES;
 
         // Print airborne frames
-        if (event_data->is_fastfall)
+        if (event_data->is_fastfall) {
             Text_SetText(event_data->hud.text_air, 0, "%df", event_data->fastfall_frame - 1);
-        else
+        } else {
             Text_SetText(event_data->hud.text_air, 0, "-");
+        }
         event_data->is_fastfall = 0; // reset fastfall bool
 
         // Print succession
@@ -550,8 +557,9 @@ void LCancel_HUDCamThink(GOBJ *gobj) {
 // Tips Functions
 void Tips_Toggle(GOBJ *menu_gobj, int value) {
     // destroy existing tips when disabling
-    if (value == 1)
+    if (value == 1) {
         event_vars->Tip_Destroy();
+    }
 
     return;
 }
@@ -665,8 +673,9 @@ GOBJ *Barrel_Spawn(int pos_kind) {
             float to_y = from_y - 1000;
             int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
                                                  from_y, to_x, to_y, 0);
-            if (is_ground == 0)
+            if (is_ground == 0) {
                 goto BARREL_RANDPOS;
+            }
             break;
         }
         // random pos
@@ -689,13 +698,15 @@ GOBJ *Barrel_Spawn(int pos_kind) {
                 int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
                                                      from_y, to_x, to_y, 0);
                 raycast_num++;
-                if (is_ground == 0)
+                if (is_ground == 0) {
                     goto BARREL_RANDPOS;
+                }
 
                 // ensure it isnt too close to the previous
                 float distance = sqrtf(pow((pos.X - barrel_lastpos->X), 2) + pow((pos.Y - barrel_lastpos->Y), 2));
-                if (distance < 25)
+                if (distance < 25) {
                     goto BARREL_RANDPOS;
+                }
 
                 // ensure left and right have ground
                 Vec3 near_pos;
@@ -705,14 +716,16 @@ GOBJ *Barrel_Spawn(int pos_kind) {
                 is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
                                                  near_fromX, near_fromY, near_fromX, to_y, 0);
                 raycast_num++;
-                if (is_ground == 0)
+                if (is_ground == 0) {
                     goto BARREL_RANDPOS;
+                }
                 near_fromX = pos.X - 8;
                 is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
                                                  near_fromX, near_fromY, near_fromX, to_y, 0);
                 raycast_num++;
-                if (is_ground == 0)
+                if (is_ground == 0) {
                     goto BARREL_RANDPOS;
+                }
 
                 // output num and time
                 raytime_end = OSGetTick();

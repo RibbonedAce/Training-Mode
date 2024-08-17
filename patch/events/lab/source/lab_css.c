@@ -310,10 +310,11 @@ int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
     // ensure page exists
     if ((page >= 0) && (page <= page_total)) {
         // determine files on page
-        if (((page + 1) * IMPORT_FILESPERPAGE) < import_data.file_num)
+        if (((page + 1) * IMPORT_FILESPERPAGE) < import_data.file_num) {
             files_on_page = IMPORT_FILESPERPAGE; // page is filled with files
-        else
+        } else {
             files_on_page = import_data.file_num - (page * IMPORT_FILESPERPAGE); // remaining files
+        }
 
         // ensure page has at least one recording
         if (files_on_page > 0) {
@@ -533,10 +534,11 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
 
     // init scroll bar according to import_data.file_num
     int page_total = import_data.file_num / (IMPORT_FILESPERPAGE + 1);
-    if (page_total == 0)
+    if (page_total == 0) {
         JOBJ_SetFlagsAll(import_data.scroll_jobj, JOBJ_HIDDEN);
-    else
+    } else {
         import_data.scroll_bot->trans.Y = (-16.2 / (page_total + 1));
+    }
 
     // display orig texture
     import_data.screenshot_jobj->dobj->mobj->tobj->imagedesc = import_data.snap.orig_image;
@@ -585,17 +587,21 @@ void Menu_SelCard_Think(GOBJ *menu_gobj) {
                             import_data.memcard_free_blocks[i] = (byteNotUsed / 8192);
                             import_data.memcard_free_files[i] = filesNotUsed;
                         }
-                    } else
+                    } else {
                         is_inserted = 0;
+                    }
 
                     CARDUnmount(i);
                     stc_memcard_work->is_done = 0;
-                } else
+                } else {
                     is_inserted = 0;
-            } else
+                }
+            } else {
                 is_inserted = 1;
-        } else
+            }
+        } else {
             is_inserted = 0;
+        }
 
         import_data.memcard_inserted[i] = is_inserted;
     }
@@ -623,25 +629,23 @@ void Menu_SelCard_Think(GOBJ *menu_gobj) {
 
     Text *desc_text = import_data.desc_text;
     int cursor = import_data.cursor;
-    if (import_data.memcard_inserted[cursor] == 0)
+    if (import_data.memcard_inserted[cursor] == 0) {
         Text_SetText(desc_text, 0, "No device is inserted in Slot %s.", slots_names[cursor]);
-    else
+    } else {
         Text_SetText(desc_text, 0, "Load recording from the memory card in Slot %s.", slots_names[cursor]);
-
-    // check for exit
-    if (down & HSD_BUTTON_B) {
-        Menu_Destroy(menu_gobj);
-        SFX_PlayCommon(0);
     }
 
-    // check for A
-    else if (down & HSD_BUTTON_A) {
-        // check if valid memcard inserted
-        if (import_data.memcard_inserted[cursor] == 0)
+    if (down & HSD_BUTTON_B) {
+        // check for exit
+        Menu_Destroy(menu_gobj);
+        SFX_PlayCommon(0);
+    } else if (down & HSD_BUTTON_A) {
+        // check for A
+        if (import_data.memcard_inserted[cursor] == 0) {
+            // check if valid memcard inserted
             SFX_PlayCommon(3);
-
-        // is inserted
-        else {
+        } else {
+            // is inserted
             import_data.memcard_slot = cursor;
             SFX_PlayCommon(1);
             Menu_SelCard_Exit(menu_gobj);
@@ -676,11 +680,11 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
         int file_to_load;
         int cursor = import_data.cursor;
 
-        // check if cursor is loaded
-        if (import_data.snap.is_loaded[cursor] == 0)
+        if (import_data.snap.is_loaded[cursor] == 0) {
+            // check if cursor is loaded
             file_to_load = cursor;
-        // find nearest unloaded file
-        else {
+        } else {
+            // find nearest unloaded file
             // search for unloaded snap nearest to the cursor
             int search_up = cursor;
             int search_down = cursor;
@@ -738,23 +742,23 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
 
     // first ensure memcard is still inserted
     s32 memSize, sectorSize;
-    if (CARDProbeEx(import_data.memcard_slot, &memSize, &sectorSize) != CARD_RESULT_READY)
+    if (CARDProbeEx(import_data.memcard_slot, &memSize, &sectorSize) != CARD_RESULT_READY) {
         goto EXIT;
-
-    // if no files exist
-    if (import_data.file_num == 0) {
-        // check for exit
-        if (down & (HSD_BUTTON_B | HSD_BUTTON_A))
-            goto EXIT;
     }
 
-    // navigation think
-    else {
+    if (import_data.file_num == 0) {
+        // if no files exist
+        // check for exit
+        if (down & (HSD_BUTTON_B | HSD_BUTTON_A)) {
+            goto EXIT;
+        }
+    } else {
+        // navigation think
         // cursor movement
         if (down & (HSD_BUTTON_UP | HSD_BUTTON_DPAD_UP)) {
-            // check for cursor up
-            // if cursor is at the top of the page, try to advance to prev
             if (import_data.cursor == 0) {
+                // check for cursor up
+                // if cursor is at the top of the page, try to advance to prev
                 // try to load prev page
                 int page_result = Menu_SelFile_LoadPage(menu_gobj, import_data.page - 1);
                 if (page_result == 1) {
@@ -768,9 +772,8 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                     SFX_PlayCommon(3);
                     goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
                 }
-            }
-            // if cursor can be advanced
-            else if (import_data.cursor > 0) {
+            } else if (import_data.cursor > 0) {
+                // if cursor can be advanced
                 import_data.cursor--;
                 SFX_PlayCommon(2);
             }
@@ -790,9 +793,9 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                 goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
             }
         } else if (down & (HSD_BUTTON_DOWN | HSD_BUTTON_DPAD_DOWN)) {
-            // check for cursor down
-            // if cursor is at the end of the page, try to advance to next
             if (import_data.cursor == (IMPORT_FILESPERPAGE - 1)) {
+                // check for cursor down
+                // if cursor is at the end of the page, try to advance to next
                 // try to load next page
                 int page_result = Menu_SelFile_LoadPage(menu_gobj, import_data.page + 1);
                 if (page_result == 1) {
@@ -806,10 +809,8 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                     SFX_PlayCommon(3);
                     goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
                 }
-            }
-
-            // if cursor can be advanced
-            else if ((import_data.cursor < import_data.files_on_page - 1)) {
+            } else if ((import_data.cursor < import_data.files_on_page - 1)) {
+                // if cursor can be advanced
                 import_data.cursor++;
                 SFX_PlayCommon(2);
             }
@@ -873,32 +874,29 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
             import_data.screenshot_jobj->dobj->mobj->tobj->imagedesc = import_data.snap.orig_image;
         }
 
-        // check for exit
         if (down & HSD_BUTTON_B) {
+            // check for exit
         EXIT:
             SFX_PlayCommon(0);
             Menu_SelFile_Exit(menu_gobj);
             Menu_SelCard_Init(menu_gobj);
-        }
-
-        // check to delete
-        else if (down & HSD_BUTTON_X) {
+        } else if (down & HSD_BUTTON_X) {
+            // check to delete
             Menu_Confirm_Init(menu_gobj, CFRM_DEL);
             SFX_PlayCommon(1);
-        }
-
-        // check for select
-        else if (down & HSD_BUTTON_A) {
+        } else if (down & HSD_BUTTON_A) {
+            // check for select
             int kind; // init confirm kind
             int vers = import_data.header[cursor].metadata.version; // get version number
 
             // check if version is compatible with this release
-            if (vers == REC_VERS)
+            if (vers == REC_VERS) {
                 kind = CFRM_LOAD;
-            else if (vers > REC_VERS)
+            } else if (vers > REC_VERS) {
                 kind = CFRM_NEW;
-            else if (vers < REC_VERS)
+            } else if (vers < REC_VERS) {
                 kind = CFRM_OLD;
+            }
 
             // open confirm dialog
             Menu_Confirm_Init(menu_gobj, kind);
@@ -1111,8 +1109,9 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
 
     // first ensure memcard is still inserted
     s32 memSize, sectorSize;
-    if (CARDProbeEx(import_data.memcard_slot, &memSize, &sectorSize) != CARD_RESULT_READY)
+    if (CARDProbeEx(import_data.memcard_slot, &memSize, &sectorSize) != CARD_RESULT_READY) {
         goto EXIT;
+    }
 
     switch (import_data.confirm.kind) {
         case (CFRM_LOAD): {
@@ -1138,16 +1137,14 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             }
             Text_SetColor(import_data.confirm.text, cursor + 1, &text_gold);
 
-            // check for exit
             if (down & HSD_BUTTON_B) {
+                // check for exit
             EXIT:
                 Menu_Confirm_Exit(menu_gobj);
                 SFX_PlayCommon(0);
                 import_data.menu_state = IMP_SELFILE;
-            }
-
-            // check for select
-            else if (down & HSD_BUTTON_A) {
+            } else if (down & HSD_BUTTON_A) {
+                // check for select
                 // check which option is selected
                 if (cursor == 0) {
                     // get variables and junk
@@ -1204,8 +1201,9 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     *onload_slot = import_data.memcard_slot;
 
                     SFX_PlayCommon(1);
-                } else
+                } else {
                     goto EXIT;
+                }
             }
 
             break;
@@ -1251,16 +1249,14 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             }
             Text_SetColor(import_data.confirm.text, cursor + 1, &text_gold);
 
-            // check for back
             if (down & HSD_BUTTON_B) {
+                // check for back
             RETURN_TO_FILESEL:
                 Menu_Confirm_Exit(menu_gobj);
                 SFX_PlayCommon(0);
                 import_data.menu_state = IMP_SELFILE;
-            }
-
-            // check for confirm
-            else if (down & HSD_BUTTON_A) {
+            } else if (down & HSD_BUTTON_A) {
+                // check for confirm
                 if (cursor == 0) {
                     SFX_PlayCommon(1);
 
@@ -1274,8 +1270,9 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     // reload selfile
                     Menu_SelFile_Exit(menu_gobj); // close select file
                     Menu_SelFile_Init(menu_gobj); // open select file
-                } else
+                } else {
                     goto RETURN_TO_FILESEL;
+                }
             }
             break;
         }
@@ -1302,18 +1299,16 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             }
             Text_SetColor(import_data.confirm.text, cursor + 2, &text_gold);
 
-            // check for back
             if (down & HSD_BUTTON_B) {
+                // check for back
             NO_DELETE_CORRUPT:
                 Menu_Confirm_Exit(menu_gobj); // close dialog
                 Menu_SelFile_Exit(menu_gobj); // close select file
                 Menu_SelCard_Init(menu_gobj); // open select card
                 SFX_PlayCommon(0);
                 //import_data.menu_state = IMP_SELCARD;
-            }
-
-            // check for confirm
-            else if (down & HSD_BUTTON_A) {
+            } else if (down & HSD_BUTTON_A) {
+                // check for confirm
                 if (cursor == 0) {
                     SFX_PlayCommon(1);
 
@@ -1326,8 +1321,9 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     // reload selfile
                     Menu_SelFile_Exit(menu_gobj); // close select file
                     Menu_SelFile_Init(menu_gobj); // open select file
-                } else
+                } else {
                     goto NO_DELETE_CORRUPT;
+                }
             }
             break;
         }
