@@ -172,25 +172,6 @@ v2 = not released
 #define MENUCAM_GXLINK 5
 #define SIS_ID 0
 
-// export
-enum export_status {
-    EXSTAT_NONE,
-    EXSTAT_REQSAVE,
-    EXSTAT_SAVEWAIT,
-    EXSTAT_DONE,
-};
-
-enum export_menuindex {
-    EXMENU_SELCARD,
-    EXMENU_NAME,
-    EXMENU_CONFIRM,
-};
-
-enum export_popup {
-    EXPOP_CONFIRM,
-    EXPOP_SAVE,
-};
-
 typedef struct ButtonLookup ButtonLookup;
 typedef struct Arch_ImportData Arch_ImportData;
 typedef struct Arch_LabData Arch_LabData;
@@ -215,65 +196,6 @@ typedef struct ImportData ImportData;
 struct ButtonLookup {
     u8 jobj;
     u8 dobj;
-};
-
-enum buttons_enum {
-    BTN_A,
-    BTN_B,
-    BTN_X,
-    BTN_Y,
-    BTN_START,
-    BTN_DPADUP,
-    BTN_DPADRIGHT,
-    BTN_DPADLEFT,
-    BTN_DPADDOWN,
-    BTN_L,
-    BTN_R,
-    BTN_Z,
-    BTN_NUM,
-};
-
-static ButtonLookup button_lookup[] = {
-    {1, 0}, // A
-    {2, 0}, // B
-    {3, 0}, // X
-    {4, 0}, // Y
-    {5, 0}, // Start
-    {6, 1}, // Dpad Up
-    {6, 2}, // Dpad Right
-    {6, 3}, // Dpad Left
-    {6, 4}, // Dpad Down
-    {11, 0}, // L
-    {12, 0}, // R
-    {13, 0}, // Z
-};
-static GXColor button_colors[] = {
-    {50, 180, 50, 255}, // A
-    {255, 50, 50, 255}, // B
-    {127, 127, 127, 255}, // X
-    {127, 127, 127, 255}, // Y
-    {192, 192, 192, 255}, // Start
-    {192, 192, 192, 255}, // Dpad Up
-    {192, 192, 192, 255}, // Dpad Right
-    {192, 192, 192, 255}, // Dpad Left
-    {192, 192, 192, 255}, // Dpad Down
-    {127, 127, 127, 255}, // L
-    {127, 127, 127, 255}, // R
-    {0, 0, 255, 255}, // Z
-};
-static int button_bits[] = {
-    HSD_BUTTON_A, // A
-    HSD_BUTTON_B, // B
-    HSD_BUTTON_X, // X
-    HSD_BUTTON_Y, // Y
-    HSD_BUTTON_START, // Start
-    HSD_BUTTON_DPAD_UP, // Dpad Up
-    HSD_BUTTON_DPAD_RIGHT, // Dpad Right
-    HSD_BUTTON_DPAD_LEFT, // Dpad Left
-    HSD_BUTTON_DPAD_DOWN, // Dpad Down
-    HSD_TRIGGER_L, // L
-    HSD_TRIGGER_R, // R
-    HSD_TRIGGER_Z, // Z
 };
 
 struct Arch_ImportData {
@@ -471,6 +393,294 @@ struct ExportHeader {
     } lookup;
 };
 
+struct FileInfo {
+    char **file_name; // pointer to file name array
+    int file_size; // number of files on card
+    int file_no; // index of this file on the card
+};
+
+struct ImportData {
+    GOBJ *menu_gobj;
+    u16 canvas;
+    u8 menu_state;
+    u8 cursor;
+    u8 memcard_inserted[2]; // memcard inserted bools
+    u16 memcard_free_files[2]; // free files on this card
+    u16 memcard_free_blocks[2]; // free blocks on this card
+    u16 memcard_slot; // selected slot
+    JOBJ *memcard_jobj[2];
+    JOBJ *screenshot_jobj;
+    JOBJ *scroll_jobj;
+    JOBJ *scroll_top;
+    JOBJ *scroll_bot;
+    Text *title_text;
+    Text *desc_text;
+    Text *option_text;
+    Text *filename_text;
+    Text *fileinfo_text;
+    int file_num; // number of files on card
+    FileInfo *file_info; // pointer to file info array
+    ExportHeader *header; // pointer to header array for the files on the current page
+    u8 page; // file page
+    u8 files_on_page; // number of files on the current page
+    struct {
+        GOBJ *gobj; // confirm gobj
+        u16 canvas;
+        u8 kind; // which kind of confirm dialog this is
+        u8 cursor;
+        Text *text;
+    } confirm;
+
+    struct {
+        _HSD_ImageDesc *orig_image; // pointer to jobj's original image desc
+        RGB565 *image; // pointer to 32 byte aligned image allocation (one being displayed)
+        int loaded_num; // number of completed snaps loaded
+        u8 load_inprogress; // bool for if a file is being loaded
+        u8 file_loading; // page local index of the file being loaded
+        void *file_data[IMPORT_FILESPERPAGE]; // pointer to each files data
+        u8 is_loaded[IMPORT_FILESPERPAGE]; // bools for which snap has been loaded
+    } snap;
+};
+
+// export
+enum export_status {
+    EXSTAT_NONE,
+    EXSTAT_REQSAVE,
+    EXSTAT_SAVEWAIT,
+    EXSTAT_DONE,
+};
+
+enum export_menuindex {
+    EXMENU_SELCARD,
+    EXMENU_NAME,
+    EXMENU_CONFIRM,
+};
+
+enum export_popup {
+    EXPOP_CONFIRM,
+    EXPOP_SAVE,
+};
+
+enum buttons_enum {
+    BTN_A,
+    BTN_B,
+    BTN_X,
+    BTN_Y,
+    BTN_START,
+    BTN_DPADUP,
+    BTN_DPADRIGHT,
+    BTN_DPADLEFT,
+    BTN_DPADDOWN,
+    BTN_L,
+    BTN_R,
+    BTN_Z,
+    BTN_NUM,
+};
+
+enum CPU_ACTIONS {
+    CPUACT_NONE,
+    CPUACT_SHIELD,
+    CPUACT_GRAB,
+    CPUACT_UPB,
+    CPUACT_DOWNB,
+    CPUACT_SPOTDODGE,
+    CPUACT_ROLLAWAY,
+    CPUACT_ROLLTOWARDS,
+    CPUACT_ROLLRDM,
+    CPUACT_NAIR,
+    CPUACT_FAIR,
+    CPUACT_DAIR,
+    CPUACT_BAIR,
+    CPUACT_UAIR,
+    CPUACT_SHORTHOP,
+    CPUACT_FULLHOP,
+    CPUACT_JUMPAWAY,
+    CPUACT_JUMPTOWARDS,
+    CPUACT_AIRDODGE,
+    CPUACT_FFTUMBLE,
+    CPUACT_FFWIGGLE,
+    CPUACT_JAB,
+    CPUACT_FTILT,
+    CPUACT_UTILT,
+    CPUACT_DTILT,
+    CPUACT_USMASH,
+    CPUACT_DSMASH,
+    CPUACT_FSMASH,
+};
+
+// General Options
+enum gen_option {
+    OPTGEN_FRAME,
+    OPTGEN_FRAMEBTN,
+    OPTGEN_HMNPCNT,
+    OPTGEN_MODEL,
+    OPTGEN_HIT,
+    OPTGEN_COLL,
+    OPTGEN_CAM,
+    OPTGEN_HUD,
+    OPTGEN_DI,
+    OPTGEN_INPUT,
+    OPTGEN_STALE,
+};
+
+// CPU Options
+enum cpu_option {
+    OPTCPU_PCNT,
+    OPTCPU_BEHAVE,
+    OPTCPU_SHIELD,
+    OPTCPU_INTANG,
+    OPTCPU_SDIFREQ,
+    OPTCPU_SDIDIR,
+    OPTCPU_TDI,
+    OPTCPU_CUSTOMTDI,
+    OPTCPU_TECH,
+    OPTCPU_GETUP,
+    OPTCPU_MASH,
+    //OPTCPU_RESET,
+    OPTCPU_CTRGRND,
+    OPTCPU_CTRAIR,
+    OPTCPU_CTRSHIELD,
+    OPTCPU_CTRFRAMES,
+    OPTCPU_CTRHITS,
+    OPTCPU_SHIELDHITS,
+};
+
+// SDI Freq
+enum sdi_freq {
+    SDIFREQ_NONE,
+    SDIFREQ_LOW,
+    SDIFREQ_MED,
+    SDIFREQ_HIGH,
+};
+
+// SDI Freq
+enum sdi_dir {
+    SDIDIR_RANDOM,
+    SDIDIR_AWAY,
+    SDIDIR_TOWARD,
+};
+
+// Info Display Rows
+enum infdisp_rows {
+    INFDISPROW_NONE,
+    INFDISPROW_POS,
+    INFDISPROW_STATE,
+    INFDISPROW_FRAME,
+    INFDISPROW_SELFVEL,
+    INFDISPROW_KBVEL,
+    INFDISPROW_TOTALVEL,
+    INFDISPROW_ENGLSTICK,
+    INFDISPROW_SYSLSTICK,
+    INFDISPROW_ENGCSTICK,
+    INFDISPROW_SYSCSTICK,
+    INFDISPROW_ENGTRIGGER,
+    INFDISPROW_SYSTRIGGER,
+    INFDISPROW_LEDGECOOLDOWN,
+    INFDISPROW_INTANGREMAIN,
+    INFDISPROW_HITSTOP,
+    INFDISPROW_HITSTUN,
+    INFDISPROW_SHIELDHEALTH,
+    INFDISPROW_SHIELDSTUN,
+    INFDISPROW_GRIP,
+    INFDISPROW_ECBLOCK,
+    INFDISPROW_ECBBOT,
+    INFDISPROW_JUMPS,
+    INFDISPROW_WALLJUMPS,
+    INFDISPROW_JAB,
+    INFDISPROW_LINE,
+    INFDISPROW_BLASTLR,
+    INFDISPROW_BLASTUD,
+};
+
+// CPU States
+enum cpu_state {
+    CPUSTATE_START,
+    CPUSTATE_GRABBED,
+    CPUSTATE_SDI,
+    CPUSTATE_TDI,
+    CPUSTATE_TECH,
+    CPUSTATE_GETUP,
+    CPUSTATE_COUNTER,
+    CPUSTATE_RECOVER,
+};
+
+// Grab Escape Options
+enum cpu_mash {
+    CPUMASH_NONE,
+    CPUMASH_MED,
+    CPUMASH_HIGH,
+    CPUMASH_PERFECT,
+};
+
+// Stick Direction Definitions
+enum STICKDIR {
+    STCKDIR_NONE,
+    STCKDIR_TOWARD,
+    STCKDIR_AWAY,
+    STCKDIR_FRONT,
+    STCKDIR_BACK,
+    STICKDIR_RDM,
+};
+
+enum ImportMenuStates {
+    IMP_SELCARD,
+    IMP_SELFILE,
+    IMP_CONFIRM,
+};
+
+enum ImportConfirmKind {
+    CFRM_LOAD,
+    CFRM_OLD,
+    CFRM_NEW,
+    CFRM_DEL,
+    CFRM_ERR,
+};
+
+static ButtonLookup button_lookup[] = {
+    {1, 0}, // A
+    {2, 0}, // B
+    {3, 0}, // X
+    {4, 0}, // Y
+    {5, 0}, // Start
+    {6, 1}, // Dpad Up
+    {6, 2}, // Dpad Right
+    {6, 3}, // Dpad Left
+    {6, 4}, // Dpad Down
+    {11, 0}, // L
+    {12, 0}, // R
+    {13, 0}, // Z
+};
+
+static GXColor button_colors[] = {
+    {50, 180, 50, 255}, // A
+    {255, 50, 50, 255}, // B
+    {127, 127, 127, 255}, // X
+    {127, 127, 127, 255}, // Y
+    {192, 192, 192, 255}, // Start
+    {192, 192, 192, 255}, // Dpad Up
+    {192, 192, 192, 255}, // Dpad Right
+    {192, 192, 192, 255}, // Dpad Left
+    {192, 192, 192, 255}, // Dpad Down
+    {127, 127, 127, 255}, // L
+    {127, 127, 127, 255}, // R
+    {0, 0, 255, 255}, // Z
+};
+
+static int button_bits[] = {
+    HSD_BUTTON_A, // A
+    HSD_BUTTON_B, // B
+    HSD_BUTTON_X, // X
+    HSD_BUTTON_Y, // Y
+    HSD_BUTTON_START, // Start
+    HSD_BUTTON_DPAD_UP, // Dpad Up
+    HSD_BUTTON_DPAD_RIGHT, // Dpad Right
+    HSD_BUTTON_DPAD_LEFT, // Dpad Left
+    HSD_BUTTON_DPAD_DOWN, // Dpad Down
+    HSD_TRIGGER_L, // L
+    HSD_TRIGGER_R, // R
+    HSD_TRIGGER_Z, // Z
+};
+
 void Event_Init(GOBJ *gobj);
 
 void Event_Update();
@@ -589,120 +799,6 @@ static EventMenu LabMenu_InfoDisplay;
 static EventMenu LabMenu_CPU;
 static EventMenu LabMenu_Record;
 
-// General Options
-enum gen_option {
-    OPTGEN_FRAME,
-    OPTGEN_FRAMEBTN,
-    OPTGEN_HMNPCNT,
-    OPTGEN_MODEL,
-    OPTGEN_HIT,
-    OPTGEN_COLL,
-    OPTGEN_CAM,
-    OPTGEN_HUD,
-    OPTGEN_DI,
-    OPTGEN_INPUT,
-    OPTGEN_STALE,
-};
-
-// CPU Options
-enum cpu_option {
-    OPTCPU_PCNT,
-    OPTCPU_BEHAVE,
-    OPTCPU_SHIELD,
-    OPTCPU_INTANG,
-    OPTCPU_SDIFREQ,
-    OPTCPU_SDIDIR,
-    OPTCPU_TDI,
-    OPTCPU_CUSTOMTDI,
-    OPTCPU_TECH,
-    OPTCPU_GETUP,
-    OPTCPU_MASH,
-    //OPTCPU_RESET,
-    OPTCPU_CTRGRND,
-    OPTCPU_CTRAIR,
-    OPTCPU_CTRSHIELD,
-    OPTCPU_CTRFRAMES,
-    OPTCPU_CTRHITS,
-    OPTCPU_SHIELDHITS,
-};
-
-// SDI Freq
-enum sdi_freq {
-    SDIFREQ_NONE,
-    SDIFREQ_LOW,
-    SDIFREQ_MED,
-    SDIFREQ_HIGH,
-};
-
-// SDI Freq
-enum sdi_dir {
-    SDIDIR_RANDOM,
-    SDIDIR_AWAY,
-    SDIDIR_TOWARD,
-};
-
-// Info Display Rows
-enum infdisp_rows {
-    INFDISPROW_NONE,
-    INFDISPROW_POS,
-    INFDISPROW_STATE,
-    INFDISPROW_FRAME,
-    INFDISPROW_SELFVEL,
-    INFDISPROW_KBVEL,
-    INFDISPROW_TOTALVEL,
-    INFDISPROW_ENGLSTICK,
-    INFDISPROW_SYSLSTICK,
-    INFDISPROW_ENGCSTICK,
-    INFDISPROW_SYSCSTICK,
-    INFDISPROW_ENGTRIGGER,
-    INFDISPROW_SYSTRIGGER,
-    INFDISPROW_LEDGECOOLDOWN,
-    INFDISPROW_INTANGREMAIN,
-    INFDISPROW_HITSTOP,
-    INFDISPROW_HITSTUN,
-    INFDISPROW_SHIELDHEALTH,
-    INFDISPROW_SHIELDSTUN,
-    INFDISPROW_GRIP,
-    INFDISPROW_ECBLOCK,
-    INFDISPROW_ECBBOT,
-    INFDISPROW_JUMPS,
-    INFDISPROW_WALLJUMPS,
-    INFDISPROW_JAB,
-    INFDISPROW_LINE,
-    INFDISPROW_BLASTLR,
-    INFDISPROW_BLASTUD,
-};
-
-// CPU States
-enum cpu_state {
-    CPUSTATE_START,
-    CPUSTATE_GRABBED,
-    CPUSTATE_SDI,
-    CPUSTATE_TDI,
-    CPUSTATE_TECH,
-    CPUSTATE_GETUP,
-    CPUSTATE_COUNTER,
-    CPUSTATE_RECOVER,
-};
-
-// Grab Escape Options
-enum cpu_mash {
-    CPUMASH_NONE,
-    CPUMASH_MED,
-    CPUMASH_HIGH,
-    CPUMASH_PERFECT,
-};
-
-// Stick Direction Definitions
-enum STICKDIR {
-    STCKDIR_NONE,
-    STCKDIR_TOWARD,
-    STCKDIR_AWAY,
-    STCKDIR_FRONT,
-    STCKDIR_BACK,
-    STICKDIR_RDM,
-};
-
 static char *stage_names[] = {
     "",
     "",
@@ -747,69 +843,6 @@ static char *stage_names[] = {
 // CSS Import
 s8 *onload_fileno = R13 + (-0x4670);
 s8 *onload_slot = R13 + (-0x466F);
-
-enum ImportMenuStates {
-    IMP_SELCARD,
-    IMP_SELFILE,
-    IMP_CONFIRM,
-};
-
-enum ImportConfirmKind {
-    CFRM_LOAD,
-    CFRM_OLD,
-    CFRM_NEW,
-    CFRM_DEL,
-    CFRM_ERR,
-};
-
-struct FileInfo {
-    char **file_name; // pointer to file name array
-    int file_size; // number of files on card
-    int file_no; // index of this file on the card
-};
-
-struct ImportData {
-    GOBJ *menu_gobj;
-    u16 canvas;
-    u8 menu_state;
-    u8 cursor;
-    u8 memcard_inserted[2]; // memcard inserted bools
-    u16 memcard_free_files[2]; // free files on this card
-    u16 memcard_free_blocks[2]; // free blocks on this card
-    u16 memcard_slot; // selected slot
-    JOBJ *memcard_jobj[2];
-    JOBJ *screenshot_jobj;
-    JOBJ *scroll_jobj;
-    JOBJ *scroll_top;
-    JOBJ *scroll_bot;
-    Text *title_text;
-    Text *desc_text;
-    Text *option_text;
-    Text *filename_text;
-    Text *fileinfo_text;
-    int file_num; // number of files on card
-    FileInfo *file_info; // pointer to file info array
-    ExportHeader *header; // pointer to header array for the files on the current page
-    u8 page; // file page
-    u8 files_on_page; // number of files on the current page
-    struct {
-        GOBJ *gobj; // confirm gobj
-        u16 canvas;
-        u8 kind; // which kind of confirm dialog this is
-        u8 cursor;
-        Text *text;
-    } confirm;
-
-    struct {
-        _HSD_ImageDesc *orig_image; // pointer to jobj's original image desc
-        RGB565 *image; // pointer to 32 byte aligned image allocation (one being displayed)
-        int loaded_num; // number of completed snaps loaded
-        u8 load_inprogress; // bool for if a file is being loaded
-        u8 file_loading; // page local index of the file being loaded
-        void *file_data[IMPORT_FILESPERPAGE]; // pointer to each files data
-        u8 is_loaded[IMPORT_FILESPERPAGE]; // bools for which snap has been loaded
-    } snap;
-};
 
 void Button_Create();
 

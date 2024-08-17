@@ -1,4 +1,5 @@
 #include "lab.h"
+
 static char nullString[] = " ";
 
 // CPU Action Definitions
@@ -857,37 +858,6 @@ static CPUAction *Lab_CPUActions[] = {
     &Lab_CPUActionUSmash,
     &Lab_CPUActionDSmash,
     &Lab_CPUActionFSmash,
-};
-
-enum CPU_ACTIONS {
-    CPUACT_NONE,
-    CPUACT_SHIELD,
-    CPUACT_GRAB,
-    CPUACT_UPB,
-    CPUACT_DOWNB,
-    CPUACT_SPOTDODGE,
-    CPUACT_ROLLAWAY,
-    CPUACT_ROLLTOWARDS,
-    CPUACT_ROLLRDM,
-    CPUACT_NAIR,
-    CPUACT_FAIR,
-    CPUACT_DAIR,
-    CPUACT_BAIR,
-    CPUACT_UAIR,
-    CPUACT_SHORTHOP,
-    CPUACT_FULLHOP,
-    CPUACT_JUMPAWAY,
-    CPUACT_JUMPTOWARDS,
-    CPUACT_AIRDODGE,
-    CPUACT_FFTUMBLE,
-    CPUACT_FFWIGGLE,
-    CPUACT_JAB,
-    CPUACT_FTILT,
-    CPUACT_UTILT,
-    CPUACT_DTILT,
-    CPUACT_USMASH,
-    CPUACT_DSMASH,
-    CPUACT_FSMASH,
 };
 
 static char *CPU_ACTIONS_NAMES[] = {

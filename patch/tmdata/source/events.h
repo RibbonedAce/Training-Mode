@@ -862,6 +862,54 @@ struct EventVars {
     DevText *db_console_text;
 };
 
+struct MsgData {
+    Text *text; // text pointer
+    int kind; // the type of message this is
+    int state; // unused atm
+    int prev_index; // used to animate the messages position during shifts
+    int orig_index; // used to tell if the message moved throughout the course of the frame
+    int anim_timer; // used to track animation frame
+    int lifetime; // amount of frames after spawning to kill this message
+    int alive_timer; // amount of frames this message has been alive for
+};
+
+struct MsgMngrData {
+    COBJ *cobj;
+    int state;
+    int canvas;
+    GOBJ *msg_queue[MSGQUEUE_NUM][MSGQUEUE_SIZE]; // array 7 is for miscellaneous messages, not related to a player
+};
+
+struct TipMgr {
+    GOBJ *gobj; // tip gobj
+    Text *text; // tip text object
+    int state; // state this tip is in. 0 = in, 1 = wait, 2 = out
+    int lifetime; // tips time spent onscreen
+};
+
+enum MsgState {
+    MSGSTATE_WAIT,
+    MSGSTATE_SHIFT,
+    MSGSTATE_DELETE,
+};
+
+enum MsgArea {
+    MSGKIND_P1,
+    MSGKIND_P2,
+    MSGKIND_P3,
+    MSGKIND_P4,
+    MSGKIND_P5,
+    MSGKIND_P6,
+    MSGKIND_GENERAL,
+};
+
+enum MsgColors {
+    MSGCOLOR_WHITE,
+    MSGCOLOR_GREEN,
+    MSGCOLOR_RED,
+    MSGCOLOR_YELLOW
+};
+
 // Function prototypes
 EventDesc *GetEventDesc(int page, int event);
 
@@ -928,61 +976,12 @@ void Message_CObjThink(GOBJ *gobj);
 
 float BezierBlend(float t);
 
-enum MsgState {
-    MSGSTATE_WAIT,
-    MSGSTATE_SHIFT,
-    MSGSTATE_DELETE,
-};
-
-enum MsgArea {
-    MSGKIND_P1,
-    MSGKIND_P2,
-    MSGKIND_P3,
-    MSGKIND_P4,
-    MSGKIND_P5,
-    MSGKIND_P6,
-    MSGKIND_GENERAL,
-};
-
-struct MsgData {
-    Text *text; // text pointer
-    int kind; // the type of message this is
-    int state; // unused atm
-    int prev_index; // used to animate the messages position during shifts
-    int orig_index; // used to tell if the message moved throughout the course of the frame
-    int anim_timer; // used to track animation frame
-    int lifetime; // amount of frames after spawning to kill this message
-    int alive_timer; // amount of frames this message has been alive for
-};
-
-struct MsgMngrData {
-    COBJ *cobj;
-    int state;
-    int canvas;
-    GOBJ *msg_queue[MSGQUEUE_NUM][MSGQUEUE_SIZE]; // array 7 is for miscellaneous messages, not related to a player
-};
-
 static GOBJ *stc_msgmgr;
 static float stc_msg_queue_offsets[] = {5.15, 5.15, 5.15, 5.15, 5.15, 5.15, -5.15};
 // Y offsets for each message in the queue
 static Vec3 stc_msg_queue_general_pos = {-21, 18.5, 0};
-
-enum MsgColors {
-    MSGCOLOR_WHITE,
-    MSGCOLOR_GREEN,
-    MSGCOLOR_RED,
-    MSGCOLOR_YELLOW
-};
-
 static GXColor stc_msg_colors[] = {
     {255, 255, 255, 255}, {141, 255, 110, 255}, {255, 162, 186, 255}, {255, 240, 0, 255},
-};
-
-struct TipMgr {
-    GOBJ *gobj; // tip gobj
-    Text *text; // tip text object
-    int state; // state this tip is in. 0 = in, 1 = wait, 2 = out
-    int lifetime; // tips time spent onscreen
 };
 
 int Tip_Display(int lifetime, char *fmt, ...);

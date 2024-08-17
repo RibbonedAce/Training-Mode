@@ -78,12 +78,6 @@ struct WavedashData {
     GXColor orig_colors[WDFRAMES];
 };
 
-enum TargetState {
-    TRGSTATE_SPAWN,
-    TRGSTATE_WAIT,
-    TRGSTATE_DESPAWN,
-};
-
 struct TargetData {
     int state;
     Vec3 pos;
@@ -91,6 +85,12 @@ struct TargetData {
     float left;
     float right;
     CameraBox *cam;
+};
+
+enum TargetState {
+    TRGSTATE_SPAWN,
+    TRGSTATE_WAIT,
+    TRGSTATE_DESPAWN,
 };
 
 float Bezier(float time, float start, float end);
