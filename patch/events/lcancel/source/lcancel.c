@@ -224,7 +224,7 @@ void LCancel_Init(LCancelData *event_data) {
     arrow_jobj->trans.X = 0;
     JOBJ_SetFlags(arrow_jobj, JOBJ_HIDDEN);
 
-    return 0;
+    return;
 }
 
 // Init Function

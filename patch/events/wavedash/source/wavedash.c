@@ -134,7 +134,7 @@ void Wavedash_Init(WavedashData *event_data) {
     // init timer
     event_data->timer = -1;
     event_data->since_wavedash = 255;
-    return 0;
+    return;
 }
 
 // Target functions

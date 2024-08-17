@@ -195,7 +195,7 @@ void Ledgedash_HUDInit(LedgedashData *event_data) {
         d = d->next;
     }
 
-    return 0;
+    return;
 }
 
 void Fighter_UpdatePosition(GOBJ *fighter) {
@@ -586,9 +586,9 @@ void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data) {
             // look for land
             else if (((hmn_data->state == ASID_LANDING) || (hmn_data->state == ASID_LANDINGFALLSPECIAL)) || (
                          (hmn_data->state == ASID_WAIT) && (hmn_data->TM.state_frame == 0) && (
-                             (hmn_data->TM.state_prev != ASID_LANDING) || (
+                             (hmn_data->TM.state_prev[0] != ASID_LANDING) || (
                                  // this is first frame of a no impact land
-                                 hmn_data->TM.state_prev != ASID_LANDINGFALLSPECIAL)))) {
+                                 hmn_data->TM.state_prev[0] != ASID_LANDINGFALLSPECIAL)))) {
                 event_data->hud.is_land = 1;
                 event_data->hud.action_log[curr_frame] = LDACT_LANDING;
             }
@@ -723,7 +723,7 @@ void Ledgedash_HitLogThink(LedgedashData *event_data, GOBJ *hmn) {
             ItemData *this_itemdata = this_item->userdata;
 
             // ensure belongs to the fighter
-            if (this_itemdata->fighter == hmn) {
+            if (this_itemdata->fighter->fighter == hmn) {
                 // iterate through item hitboxes
                 for (int i = 0; i < sizeof(hmn_data->hitbox) / sizeof(ftHit); i++) {
                     itHit *this_hit = &this_itemdata->hitbox[i];

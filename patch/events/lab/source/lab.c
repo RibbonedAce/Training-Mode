@@ -4958,17 +4958,6 @@ void Record_MemcardLoad(int slot, int file_no) {
     return;
 }
 
-int Record_MenuThink(GOBJ *menu_gobj) {
-    int is_update = 1;
-
-    // check to run export logic
-    if (export_status != EXSTAT_NONE) {
-        is_update = Record_ExportThink();
-    }
-
-    return is_update;
-}
-
 void Record_StartExport(GOBJ *menu_gobj) {
     export_status = EXSTAT_REQSAVE;
 
@@ -5238,7 +5227,7 @@ void Export_ConfirmInit(GOBJ *export_gobj) {
     export_data->confirm_state = EXPOP_CONFIRM;
     export_data->confirm_cursor = 0;
 
-    return 0;
+    return;
 }
 
 void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj) {
