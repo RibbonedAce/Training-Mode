@@ -62,7 +62,7 @@ static EventOption LcOptions_Main[] = {
         .onOptionSelect = Event_Exit,
     },
 };
-static EventMenu LabMenu_Main = {
+static EventMenu LClMenu_Main = {
     .name = "L-Cancel Training",                                // the name of this menu
     .option_num = sizeof(LcOptions_Main) / sizeof(EventOption), // number of options this menu contains
     .scroll = 0,                                                // runtime variable used for how far down in the menu to start
@@ -909,4 +909,5 @@ float Bezier(float time, float start, float end)
 }
 
 // Initial Menu
-static EventMenu *Event_Menu = &LabMenu_Main;
+static EventMenu *Event_Menu = &LClMenu_Main;
+EventMenu **menu_start = &Event_Menu;

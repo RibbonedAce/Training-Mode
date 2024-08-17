@@ -6793,3 +6793,4 @@ void Event_Think(GOBJ *event)
 }
 // Initial Menu
 static EventMenu *Event_Menu = &LabMenu_Main;
+EventMenu **menu_start = &Event_Menu;

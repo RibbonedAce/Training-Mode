@@ -857,3 +857,4 @@ Tips_Think(WavedashData *event_data, FighterData *hmn_data)
 
 // Initial Menu
 static EventMenu *Event_Menu = &WdMenu_Main;
+EventMenu **menu_start = &Event_Menu;
