@@ -3308,7 +3308,7 @@ int Savestate_Load(Savestate *savestate) {
 
                         // check to delete
                         ItemData *item_data = item->userdata;
-                        if (fighter == item_data->fighter) {
+                        if (fighter == item_data->fighter->fighter) {
                             // destroy it
                             Item_Destroy(item);
                         }
