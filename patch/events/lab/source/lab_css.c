@@ -62,8 +62,6 @@ void OnCSSLoad(ArchiveInfo *archive) {
     event_desc->isSelectStage = 1;
     event_desc->matchData->stage = -1;
     *onload_fileno = -1;
-
-    return;
 }
 
 // Button Functions
@@ -88,8 +86,6 @@ void Button_Create() {
     button_text->trans.X = button_jobj->trans.X + (0 * (scale->X / 4.0));
     button_text->trans.Y = (button_jobj->trans.Y * -1) + (-1.6 * (scale->Y / 4.0));
     Text_AddSubtext(button_text, 0, 0, "Import");
-
-    return;
 }
 
 void Button_Think(GOBJ *button_gobj) {
@@ -114,8 +110,6 @@ void Button_Think(GOBJ *button_gobj) {
         import_data.menu_gobj = Menu_Create();
         SFX_PlayCommon(1);
     }
-
-    return;
 }
 
 // Select Card
@@ -151,8 +145,6 @@ void Menu_SelCard_Init(GOBJ *menu_gobj) {
 
     // edit description
     Text_SetText(import_data.desc_text, 0, "");
-
-    return;
 }
 
 // Import Menu Functions
@@ -221,8 +213,6 @@ void Menu_SelCard_Exit(GOBJ *menu_gobj) {
     // destroy memcard text
     Text_Destroy(import_data.option_text);
     import_data.option_text = 0;
-
-    return;
 }
 
 void Menu_SelFile_Exit(GOBJ *menu_gobj) {
@@ -257,8 +247,6 @@ void Menu_SelFile_Exit(GOBJ *menu_gobj) {
             import_data.snap.file_data[i] = 0;
         }
     }
-
-    return;
 }
 
 void Menu_Destroy(GOBJ *menu_gobj) {
@@ -288,16 +276,12 @@ void Menu_Destroy(GOBJ *menu_gobj) {
     // enable CSS inputs
     *stc_css_exitkind = 0;
     *stc_css_delay = 0;
-
-    return;
 }
 
 void Memcard_Wait() {
     while (stc_memcard_work->is_done == 0) {
         blr2();
     }
-
-    return;
 }
 
 int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
@@ -541,8 +525,6 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
         Menu_Confirm_Init(menu_gobj, CFRM_ERR);
         SFX_PlayCommon(3);
     }
-
-    return;
 }
 
 void Menu_SelCard_Think(GOBJ *menu_gobj) {
@@ -643,8 +625,6 @@ void Menu_SelCard_Think(GOBJ *menu_gobj) {
             Menu_SelFile_Init(menu_gobj);
         }
     }
-
-    return;
 }
 
 void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
@@ -722,8 +702,6 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
         import_data.snap.load_inprogress = 1;
         import_data.snap.file_loading = file_to_load;
     }
-
-    return;
 }
 
 void Menu_SelFile_Think_Exit(GOBJ *menu_gobj) {
@@ -913,8 +891,6 @@ void Menu_Think(GOBJ *menu_gobj) {
             break;
         }
     }
-
-    return;
 }
 
 void Menu_SelFile_DeleteUnsupported(GOBJ *menu_gobj) {
@@ -971,8 +947,6 @@ void Menu_SelFile_DeleteUnsupported(GOBJ *menu_gobj) {
 
     // free temp read buffer
     HSD_Free(buffer);
-
-    return;
 }
 
 int Menu_SelFile_DeleteFile(GOBJ *menu_gobj, int file_index) {
@@ -1076,8 +1050,6 @@ void Menu_Confirm_Init(GOBJ *menu_gobj, int kind) {
             break;
         }
     }
-
-    return;
 }
 
 void Menu_No_Delete_Corrupt(GOBJ *menu_gobj) {
@@ -1314,8 +1286,6 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             break;
         }
     }
-
-    return;
 }
 
 void Menu_Confirm_Exit(GOBJ *menu_gobj) {
@@ -1326,6 +1296,4 @@ void Menu_Confirm_Exit(GOBJ *menu_gobj) {
     // destroy gobj
     GObj_Destroy(import_data.confirm.gobj);
     import_data.confirm.gobj = 0;
-
-    return;
 }

@@ -132,7 +132,6 @@ void Wavedash_Init(WavedashData *event_data) {
     // init timer
     event_data->timer = -1;
     event_data->since_wavedash = 255;
-    return;
 }
 
 // Target functions
@@ -171,8 +170,6 @@ void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
 
     // free jobj
     JOBJ_RemoveAll(target);
-
-    return;
 }
 
 // Init Function
@@ -194,8 +191,6 @@ void Event_Init(GOBJ *gobj) {
 
     // init target
     Target_Init(event_data, hmn_data);
-
-    return;
 }
 
 void Target_ChangeState(GOBJ *target_gobj, int state) {
@@ -210,8 +205,6 @@ void Target_ChangeState(GOBJ *target_gobj, int state) {
     JOBJ_AddAnimAll(target_jobj, event_data->assets->target_jointanim[state], event_data->assets->target_matanim[state],
                     0);
     JOBJ_ReqAnimAll(target_jobj, 0); // req anim
-
-    return;
 }
 
 void Target_Manager(WavedashData *event_data, FighterData *hmn_data) {
@@ -258,8 +251,6 @@ void Target_Manager(WavedashData *event_data, FighterData *hmn_data) {
             break;
         }
     }
-
-    return;
 }
 
 // Tips
@@ -284,8 +275,6 @@ void Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
             }
         }
     }
-
-    return;
 }
 
 void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
@@ -542,8 +531,6 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
         arrow_jobj->trans.X = xpos;
         JOBJ_SetMtxDirtySub(arrow_jobj);
     }
-
-    return;
 }
 
 // Think Function
@@ -556,8 +543,6 @@ void Event_Think(GOBJ *event) {
     hmn_data->shield.health = 60;
 
     Wavedash_Think(event_data, hmn_data);
-
-    return;
 }
 
 void Event_Exit() {
@@ -572,7 +557,6 @@ void Event_Exit() {
     // unfreeze
     HSD_Update *update = (HSD_Update *)HSD_UPDATE;
     update->pause_develop = 0;
-    return;
 }
 
 void Wavedash_HUDCamThink(GOBJ *gobj) {
@@ -580,8 +564,6 @@ void Wavedash_HUDCamThink(GOBJ *gobj) {
     if ((WdOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
         CObjThink_Common(gobj);
     }
-
-    return;
 }
 
 float Bezier(float time, float start, float end) {
@@ -762,8 +744,6 @@ void Target_Think(GOBJ *target_gobj) {
         }
         default:
     }
-
-    return;
 }
 
 float Target_GetWdashDistance(FighterData *hmn_data, float mag) {

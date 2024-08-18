@@ -75,8 +75,6 @@ void Barrel_Break(GOBJ *barrel_gobj) {
     barrel_data->itemVar2 = 40;
     barrel_data->xdcf3 = 1;
     ItemStateChange(barrel_gobj, 7, 2);
-
-    return;
 }
 
 int Barrel_OnHurt(GOBJ *barrel_gobj) {
@@ -222,8 +220,6 @@ void LCancel_Init(LCancelData *event_data) {
     event_data->hud.arrow_timer = 0;
     arrow_jobj->trans.X = 0;
     JOBJ_SetFlags(arrow_jobj, JOBJ_HIDDEN);
-
-    return;
 }
 
 // Init Function
@@ -238,8 +234,6 @@ void Event_Init(GOBJ *gobj) {
 
     // create HUD
     LCancel_Init(event_data);
-
-    return;
 }
 
 void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
@@ -383,7 +377,6 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             }
         }
     }
-    return;
 }
 
 void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
@@ -496,8 +489,6 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
     // update HUD anim
     JOBJ_AnimAll(hud_jobj);
-
-    return;
 }
 
 // Think Function
@@ -510,8 +501,6 @@ void Event_Think(GOBJ *event) {
 
     LCancel_Think(event_data, hmn_data);
     Barrel_Think(event_data);
-
-    return;
 }
 
 void Event_Exit() {
@@ -526,7 +515,6 @@ void Event_Exit() {
     // unfreeze
     HSD_Update *update = (HSD_Update *)HSD_UPDATE;
     update->pause_develop = 0;
-    return;
 }
 
 void LCancel_HUDCamThink(GOBJ *gobj) {
@@ -534,8 +522,6 @@ void LCancel_HUDCamThink(GOBJ *gobj) {
     if ((LcOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
         CObjThink_Common(gobj);
     }
-
-    return;
 }
 
 // Tips Functions
@@ -544,8 +530,6 @@ void Tips_Toggle(GOBJ *menu_gobj, int value) {
     if (value == 1) {
         event_vars->Tip_Destroy();
     }
-
-    return;
 }
 
 // Barrel Functions
@@ -630,8 +614,6 @@ void Barrel_Think(LCancelData *event_data) {
             break;
         }
     }
-
-    return;
 }
 
 void Barrel_Rand_Pos(Vec3 *pos, Vec3 *barrel_lastpos) {
@@ -752,7 +734,6 @@ GOBJ *Barrel_Spawn(int pos_kind) {
 }
 
 void Barrel_Null() {
-    return;
 }
 
 // Misc

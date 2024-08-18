@@ -1732,8 +1732,6 @@ void Lab_ChangePlayerPercent(GOBJ *menu_gobj, int value) {
 
     fighter_data->dmg.percent = value;
     Fighter_SetHUDDamage(0, value);
-
-    return;
 }
 
 void Lab_ChangeFrameAdvance(GOBJ *menu_gobj, int value) {
@@ -1744,8 +1742,6 @@ void Lab_ChangeFrameAdvance(GOBJ *menu_gobj, int value) {
         // apply colanim
         LabOptions_General[OPTGEN_FRAMEBTN].disable = 0;
     }
-
-    return;
 }
 
 void Lab_ChangeCPUPercent(GOBJ *menu_gobj, int value) {
@@ -1754,8 +1750,6 @@ void Lab_ChangeCPUPercent(GOBJ *menu_gobj, int value) {
 
     fighter_data->dmg.percent = value;
     Fighter_SetHUDDamage(1, value);
-
-    return;
 }
 
 void Lab_ChangeCPUIntang(GOBJ *menu_gobj, int value) {
@@ -1769,8 +1763,6 @@ void Lab_ChangeCPUIntang(GOBJ *menu_gobj, int value) {
         // apply colanim
         Fighter_ApplyOverlay(fighter_data, INTANG_COLANIM, 0);
     }
-
-    return;
 }
 
 void Lab_ChangeModelDisplay(GOBJ *menu_gobj, int value) {
@@ -1787,8 +1779,6 @@ void Lab_ChangeModelDisplay(GOBJ *menu_gobj, int value) {
         // get next fighter
         this_fighter = this_fighter->next;
     }
-
-    return;
 }
 
 void Lab_ChangeHitDisplay(GOBJ *menu_gobj, int value) {
@@ -1805,13 +1795,10 @@ void Lab_ChangeHitDisplay(GOBJ *menu_gobj, int value) {
         // get next fighter
         this_fighter = this_fighter->next;
     }
-
-    return;
 }
 
 void Lab_ChangeEnvCollDisplay(GOBJ *menu_gobj, int value) {
     stc_matchcam->show_coll = value;
-    return;
 }
 
 void Lab_ChangeCamMode(GOBJ *menu_gobj, int value) {
@@ -1832,8 +1819,6 @@ void Lab_ChangeCamMode(GOBJ *menu_gobj, int value) {
         Match_SetDevelopCamera();
     }
     Match_CorrectCamera();
-
-    return;
 }
 
 void Lab_ChangeInfoRow(GOBJ *menu_gobj, int value) {
@@ -1900,11 +1885,9 @@ void Lab_ChangeInfoPreset(GOBJ *menu_gobj, int value) {
 }
 
 void Lab_ChangeInfoSizePos(GOBJ *menu_gobj, int value) {
-    return;
 }
 
 void Lab_ChangeInfoPlayer(GOBJ *menu_gobj, int value) {
-    return;
 }
 
 void Lab_ChangeHUD(GOBJ *menu_gobj, int value) {
@@ -1915,7 +1898,6 @@ void Lab_ChangeHUD(GOBJ *menu_gobj, int value) {
     } else {
         *hideHUD = 0;
     }
-    return;
 }
 
 void Lab_Exit(int value) {
@@ -1929,9 +1911,6 @@ void Lab_Exit(int value) {
 
     // Unfreeze
     LabOptions_General[OPTGEN_FRAME].option_val = 0;
-    //HSD_Update *update = HSD_UPDATE;
-    //update->pause_develop = 0;
-    return;
 }
 
 // Event Functions
@@ -2005,7 +1984,6 @@ GOBJ *InfoDisplay_Init() {
 
 void InfoDisplay_GX(GOBJ *gobj, int pass) {
     GXLink_Common(gobj, pass);
-    return;
 }
 
 void InfoDisplay_Think(GOBJ *gobj) {
@@ -2316,8 +2294,6 @@ void InfoDisplay_Think(GOBJ *gobj) {
         JOBJ_SetFlags(idData->menuModel, JOBJ_HIDDEN);
         idData->text->hidden = 1;
     }
-
-    return;
 }
 
 float Fighter_GetOpponentDir(FighterData *from, FighterData *to) {
@@ -2872,7 +2848,6 @@ void Lab_CPUThink_TDI(LCancelData *eventData, FighterData *hmn_data, FighterData
     cpu_data->input.timer_lstick_tilt_x = 5;
     cpu_data->input.lstick_y = ((float) cpu_data->cpu.lstickY * 0.0078125);
     cpu_data->input.timer_lstick_tilt_y = 5;
-    return;
 }
 
 void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
@@ -3214,8 +3189,6 @@ void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
             fighter = fighter->next;
         }
     }
-
-    return;
 }
 
 int Update_CheckPause() {
@@ -3304,8 +3277,6 @@ void DIDraw_Init() {
             didraws[i].vertices[j] = 0;
         }
     }
-
-    return;
 }
 
 void DIDraw_Update() {
@@ -3683,8 +3654,6 @@ void DIDraw_Update() {
             }
         }
     }
-
-    return;
 }
 
 void DIDraw_GX() {
@@ -3714,7 +3683,6 @@ void DIDraw_GX() {
             }
         }
     }
-    return;
 }
 
 void Update_Camera() {
@@ -3756,8 +3724,6 @@ void Update_Camera() {
             }
         }
     }
-
-    return;
 }
 
 void Lab_SelectCustomTDI(GOBJ *menu_gobj) {
@@ -3855,14 +3821,6 @@ void Lab_SelectCustomTDI(GOBJ *menu_gobj) {
     // set pointers to custom gobj
     menu_data->custom_gobj = tdi_gobj;
     menu_data->custom_gobj_destroy = CustomTDI_Destroy;
-
-    return;
-
-    /*
-    // Change color
-    GXColor gx_color = TEXT_BGCOLOR;
-    popup_joint->dobj->mobj->mat->diffuse = gx_color;
-*/
 }
 
 void CustomTDI_Update(GOBJ *gobj) {
@@ -3952,8 +3910,6 @@ void CustomTDI_Update(GOBJ *gobj) {
 
     // update jobj
     JOBJ_SetMtxDirtySub(gobj->hsd_object);
-
-    return;
 }
 
 void CustomTDI_Destroy(GOBJ *gobj) {
@@ -3982,8 +3938,6 @@ void CustomTDI_Destroy(GOBJ *gobj) {
 
     // play sfx
     SFX_PlayCommon(0);
-
-    return;
 }
 
 void Inputs_GX(GOBJ *gobj, int pass) {
@@ -3991,8 +3945,6 @@ void Inputs_GX(GOBJ *gobj, int pass) {
     if ((LabOptions_General[OPTGEN_INPUT].option_val == 1) && (Pause_CheckStatus(1) != 2)) {
         GXLink_Common(gobj, pass);
     }
-
-    return;
 }
 
 void Inputs_Think(GOBJ *gobj) {
@@ -4064,8 +4016,6 @@ void Inputs_Think(GOBJ *gobj) {
         Match_ShowTimer();
         JOBJ_SetFlags(root, JOBJ_HIDDEN);
     }
-
-    return;
 }
 
 void Inputs_Init() {
@@ -4121,8 +4071,6 @@ void Inputs_Init() {
 
     GObj_AddObject(input_gobj, 3, root); // add to gobj
     GObj_AddGXLink(input_gobj, Inputs_GX, INPUT_GXLINK, INPUT_GXPRI); // add gx link
-
-    return;
 }
 
 // Recording Functions
@@ -4224,8 +4172,6 @@ void Record_CObjThink(GOBJ *gobj) {
                                            LabOptions_Record[OPTREC_HMNMODE].option_val != 0))) {
         CObjThink_Common(gobj);
     }
-
-    return;
 }
 
 int Record_GetCurrFrame() {
@@ -4388,8 +4334,6 @@ void Record_GX(GOBJ *gobj, int pass) {
     }
 
     GXLink_Common(gobj, pass);
-
-    return;
 }
 
 void Record_Think(GOBJ *rec_gobj) {
@@ -4471,8 +4415,6 @@ void Record_Think(GOBJ *rec_gobj) {
         int cpu_mode = LabOptions_Record[OPTREC_CPUMODE].option_val;
         Record_Update(1, cpu_inputs, cpu_mode);
     }
-
-    return;
 }
 
 void Record_Update(int ply, RecInputData *input_data, int rec_mode) {
@@ -4580,8 +4522,6 @@ void Record_Update(int ply, RecInputData *input_data, int rec_mode) {
             }
         }
     }
-
-    return;
 }
 
 void Record_OnSuccessfulSave() {
@@ -4612,21 +4552,16 @@ void Record_OnSuccessfulSave() {
 
     // take screenshot
     snap_status = 1;
-
-    return;
 }
 
 void Record_InitState(GOBJ *menu_gobj) {
     if (event_vars->Savestate_Save(rec_state)) {
         Record_OnSuccessfulSave();
     }
-    return;
 }
 
 void Record_RestoreState(GOBJ *menu_gobj) {
     event_vars->Savestate_Load(rec_state);
-
-    return;
 }
 
 void Record_ChangeHMNSlot(GOBJ *menu_gobj, int value) {
@@ -4644,8 +4579,6 @@ void Record_ChangeHMNSlot(GOBJ *menu_gobj, int value) {
 
     // reload save
     event_vars->Savestate_Load(rec_state);
-
-    return;
 }
 
 void Record_ChangeCPUSlot(GOBJ *menu_gobj, int value) {
@@ -4663,8 +4596,6 @@ void Record_ChangeCPUSlot(GOBJ *menu_gobj, int value) {
 
     // reload save
     event_vars->Savestate_Load(rec_state);
-
-    return;
 }
 
 void Record_ChangeHMNMode(GOBJ *menu_gobj, int value) {
@@ -4689,8 +4620,6 @@ void Record_ChangeHMNMode(GOBJ *menu_gobj, int value) {
         LabOptions_Record[OPTREC_LOOP].disable = 1;
         LabOptions_Record[OPTREC_AUTOLOAD].disable = 1;
     }
-
-    return;
 }
 
 void Record_ChangeCPUMode(GOBJ *menu_gobj, int value) {
@@ -4716,8 +4645,6 @@ void Record_ChangeCPUMode(GOBJ *menu_gobj, int value) {
         LabOptions_Record[OPTREC_LOOP].disable = 1;
         LabOptions_Record[OPTREC_AUTOLOAD].disable = 1;
     }
-
-    return;
 }
 
 int Record_GetRandomSlot(RecInputData **input_data) {
@@ -4745,8 +4672,6 @@ void Memcard_Wait() {
     while (stc_memcard_work->is_done == 0) {
         blr2();
     }
-
-    return;
 }
 
 void Record_MemcardLoad(int slot, int file_no) {
@@ -4886,14 +4811,10 @@ void Record_MemcardLoad(int slot, int file_no) {
         int load_time = OSTicksToMilliseconds(load_post_tick - load_pre_tick);
         OSReport("processed memcard load in %dms\n", load_time);
     }
-
-    return;
 }
 
 void Record_StartExport(GOBJ *menu_gobj) {
     export_status = EXSTAT_REQSAVE;
-
-    return;
 }
 
 void Snap_CObjThink(GOBJ *gobj) {
@@ -4909,8 +4830,6 @@ void Snap_CObjThink(GOBJ *gobj) {
         }
         default:
     }
-
-    return;
 }
 
 void Savestates_Update() {
@@ -4953,8 +4872,6 @@ void Savestates_Update() {
             }
         }
     }
-
-    return;
 }
 
 int RowPixelToBlockPixel(int pixel_x, int pixel_y, int width, int height) {
@@ -4989,8 +4906,6 @@ void ImageScale(RGB565 *out_img, RGB565 *in_img, int OutWidth, int OutHeight, in
             out_img[in_pixel] = in_img[out_pixel];
         }
     }
-
-    return;
 }
 
 void Export_Init(GOBJ *menu_gobj) {
@@ -5105,8 +5020,6 @@ void Export_Init(GOBJ *menu_gobj) {
     menu_data->custom_gobj = export_gobj; // set custom gobj
     menu_data->custom_gobj_think = Export_Think; // set think function
     menu_data->custom_gobj_destroy = Export_Destroy; // set destroy function
-
-    return;
 }
 
 void Export_EnterNameExit(GOBJ *export_gobj) {
@@ -5157,8 +5070,6 @@ void Export_ConfirmInit(GOBJ *export_gobj) {
     export_data->menu_index = EXMENU_CONFIRM;
     export_data->confirm_state = EXPOP_CONFIRM;
     export_data->confirm_cursor = 0;
-
-    return;
 }
 
 void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj) {
@@ -5194,8 +5105,6 @@ void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj) {
             Text_SetColor(text_keyboard, this_subtext, color);
         }
     }
-
-    return;
 }
 
 int Export_EnterName_Exit(GOBJ *export_gobj) {
@@ -5682,8 +5591,6 @@ void Export_Destroy(GOBJ *export_gobj) {
     menu_data->custom_gobj = 0;
     menu_data->custom_gobj_think = 0;
     menu_data->custom_gobj_destroy = 0;
-
-    return;
 }
 
 void Export_SelCardInit(GOBJ *export_gobj) {
@@ -5746,8 +5653,6 @@ void Export_SelCardInit(GOBJ *export_gobj) {
     // init cursor
     export_data->menu_index = EXMENU_SELCARD;
     export_data->slot = 0;
-
-    return;
 }
 
 void Export_EnterNameInit(GOBJ *export_gobj) {
@@ -5852,8 +5757,6 @@ void Export_EnterNameInit(GOBJ *export_gobj) {
     // init menu variables
     export_data->menu_index = EXMENU_NAME;
     export_data->filename_cursor = 0;
-
-    return;
 }
 
 int Export_SelCardThink(GOBJ *export_gobj) {
@@ -6051,8 +5954,6 @@ void Event_Init(GOBJ *gobj) {
     if (*onload_fileno != -1) {
         Record_MemcardLoad(*onload_slot, *onload_fileno);
     }
-
-    return;
 }
 
 // Update Function
@@ -6255,6 +6156,4 @@ void Event_Think(GOBJ *event) {
     if ((LabOptions_Record[OPTREC_CPUMODE].option_val == 0) && (LabOptions_Record[OPTREC_HMNMODE].option_val == 0)) {
         LCancel_CPUThink(event, hmn, cpu);
     }
-
-    return;
 }
