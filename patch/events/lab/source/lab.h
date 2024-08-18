@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
@@ -731,8 +733,8 @@ static EventMenu LabMenu_CPU;
 static EventMenu LabMenu_Record;
 
 // CSS Import
-s8 *onload_fileno = R13 + (-0x4670);
-s8 *onload_slot = R13 + (-0x466F);
+s8 *onload_fileno = (s8 *)(R13 + (-0x4670));
+s8 *onload_slot = (s8 *)(R13 + (-0x466F));
 
 void Event_Init(GOBJ *gobj);
 

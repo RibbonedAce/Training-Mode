@@ -1,5 +1,4 @@
 #include "events.h"
-#include <stdarg.h>
 
 #define TIP_TXTSIZE 4.7
 #define TIP_TXTSIZEX TIP_TXTSIZE * 0.85
@@ -18,9 +17,6 @@
 ////////////////////////
 /// Static Variables ///
 ////////////////////////
-
-static EventDesc *static_eventInfo;
-static MenuData *static_menuData;
 
 static EventVars stc_event_vars = {
     .event_desc = 0,
@@ -1220,7 +1216,7 @@ static EventPage Spacie_Page = {
 /// Page Order ///
 //////////////////
 
-static EventPage **EventPages[] = {
+static EventPage *EventPages[] = {
     &Minigames_Page,
     &General_Page,
     &Spacie_Page,
@@ -1235,10 +1231,6 @@ static TipMgr stc_tipmgr;
 ///////////////////////
 
 void Event_Init(GOBJ *gobj) {
-    int *EventData = gobj->userdata;
-    EventDesc *event_desc = EventData[0];
-
-    return;
 }
 
 void EventInit(int page, int eventID, MatchInit *matchData) {
@@ -1445,6 +1437,7 @@ void Hazards_Disable() {
 
             break;
         }
+        default:
     }
 
     // Certain stages have an essential ragdoll function
@@ -1480,7 +1473,7 @@ void EventLoad() {
     int pri = event_desc->callbackPriority;
     void *cb = evFunction->Event_Think;
     GOBJ *gobj = GObj_Create(0, 7, 0);
-    int *userdata = calloc(EVENT_DATASIZE);
+    EventDesc **userdata = calloc(EVENT_DATASIZE);
     GObj_AddUserData(gobj, 4, HSD_Free, userdata);
     GObj_AddProc(gobj, cb, pri);
 
@@ -1517,7 +1510,7 @@ void EventLoad() {
     }
 
     // Store update function
-    HSD_Update *update = HSD_UPDATE;
+    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
     update->onFrame = EventUpdate;
 
     return;
@@ -1555,7 +1548,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
         // attach to root jobj
         JOBJ_AddChild(gobj->hsd_object, jobj_border);
         // move it into position
-        JOBJ_GetChild(jobj_border, &corners, 2, 3, 4, 5, -1);
+        JOBJ_GetChild(jobj_border, (int)&corners, 2, 3, 4, 5, -1);
         // Modify scale and position
         jobj_border->trans.Z = ROWBOX_Z;
         jobj_border->scale.X = 1;
@@ -1604,7 +1597,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
     // attach to root jobj
     JOBJ_AddChild(gobj->hsd_object, jobj_highlight);
     // move it into position
-    JOBJ_GetChild(jobj_highlight, &corners, 2, 3, 4, 5, -1);
+    JOBJ_GetChild(jobj_highlight, (int)&corners, 2, 3, 4, 5, -1);
     // Modify scale and position
     jobj_highlight->trans.Z = MENUHIGHLIGHT_Z;
     jobj_highlight->scale.X = MENUHIGHLIGHT_SCALE;
@@ -1630,7 +1623,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
         // attach to root jobj
         JOBJ_AddChild(gobj->hsd_object, scroll_jobj);
         // move it into position
-        JOBJ_GetChild(scroll_jobj, &corners, 2, 3, -1);
+        JOBJ_GetChild(scroll_jobj, (int)&corners, 2, 3, -1);
         // scale scrollbar accordingly
         scroll_jobj->scale.X = MENUSCROLL_SCALE;
         scroll_jobj->scale.Y = MENUSCROLL_SCALEY;
@@ -1640,7 +1633,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
         scroll_jobj->trans.Z = MENUSCROLL_Z;
         menuData->scroll_top = corners[0];
         menuData->scroll_bot = corners[1];
-        GXColor highlight = MENUSCROLL_COLOR;
+        highlight = MENUSCROLL_COLOR;
         scroll_jobj->dobj->next->mobj->mat->alpha = 0.6;
         scroll_jobj->dobj->next->mobj->mat->diffuse = highlight;
 
@@ -1671,11 +1664,9 @@ void EventMenu_TextGX(GOBJ *gobj, int pass) {
 void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     // Get event info
     MenuData *menuData = gobj->userdata;
-    EventDesc *event_desc = menuData->event_desc;
     Text *text;
     int subtext;
     int canvasIndex = menuData->canvas_menu;
-    s32 cursor = menu->cursor;
 
     // free text if it exists
     if (menuData->text_name != 0) {
@@ -1714,7 +1705,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     // output menu title
     float optionX = MENU_TITLEXPOS;
     float optionY = MENU_TITLEYPOS;
-    subtext = Text_AddSubtext(text, optionX, optionY, &nullString);
+    subtext = Text_AddSubtext(text, optionX, optionY, nullString);
     Text_SetScale(text, subtext, MENU_TITLESCALE, MENU_TITLESCALE);
 
     /**************************
@@ -1749,9 +1740,9 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     }
     for (int i = 0; i < option_num; i++) {
         // output option name
-        float optionX = MENU_OPTIONNAMEXPOS;
-        float optionY = MENU_OPTIONNAMEYPOS + (i * MENU_TEXTYOFFSET);
-        subtext = Text_AddSubtext(text, optionX, optionY, &nullString);
+        optionX = MENU_OPTIONNAMEXPOS;
+        optionY = MENU_OPTIONNAMEYPOS + (i * MENU_TEXTYOFFSET);
+        subtext = Text_AddSubtext(text, optionX, optionY, nullString);
     }
 
     /********************
@@ -1774,9 +1765,9 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     // Output all values
     for (int i = 0; i < option_num; i++) {
         // output option value
-        float optionX = MENU_OPTIONVALXPOS;
-        float optionY = MENU_OPTIONVALYPOS + (i * MENU_TEXTYOFFSET);
-        subtext = Text_AddSubtext(text, optionX, optionY, &nullString);
+        optionX = MENU_OPTIONVALXPOS;
+        optionY = MENU_OPTIONVALYPOS + (i * MENU_TEXTYOFFSET);
+        subtext = Text_AddSubtext(text, optionX, optionY, nullString);
     }
 
     return;
@@ -1785,7 +1776,6 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
 void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     // Get event info
     MenuData *menuData = gobj->userdata;
-    EventDesc *event_desc = menuData->event_desc;
     s32 cursor = menu->cursor;
     s32 scroll = menu->scroll;
     s32 option_num = menu->option_num;
@@ -1845,7 +1835,6 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev;
 
     // copy each line to an individual char array
-    char *msg_cursor = &msg;
     for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
@@ -1876,10 +1865,9 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     text = menuData->text_name;
     for (int i = 0; i < option_num; i++) {
         // get this option
-        EventOption *currOption = &menu->options[scroll + i];
+        currOption = &menu->options[scroll + i];
 
         // output option name
-        int optionVal = currOption->option_val;
         Text_SetText(text, i, currOption->option_name);
 
         // output color
@@ -1906,7 +1894,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     text = menuData->text_value;
     for (int i = 0; i < option_num; i++) {
         // get this option
-        EventOption *currOption = &menu->options[scroll + i];
+        currOption = &menu->options[scroll + i];
         int optionVal = currOption->option_val;
 
         // hide row models
@@ -1923,16 +1911,15 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
         } else if (currOption->option_kind == OPTKIND_INT) {
             // if this option has int values
             // output option value
-            Text_SetText(text, i, currOption->option_values, optionVal);
+            char optionText[6];
+            sprintf(optionText, "%d", optionVal);
+            Text_SetText(text, i, optionText);
 
             // show box
             JOBJ_ClearFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
         } else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC)) {
             // if this option is a menu or function
-            Text_SetText(text, i, &nullString);
-
-            // show arrow
-            //JOBJ_ClearFlags(menuData->row_joints[i][1], JOBJ_HIDDEN);
+            Text_SetText(text, i, nullString);
         }
 
         // output color
@@ -1980,7 +1967,6 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
     // init variables
     MenuData *menuData = gobj->userdata; // userdata
     s32 cursor = menu->cursor;
-    EventOption *option = &menu->options[cursor];
 
     // create options background
     evMenu *menuAssets = stc_event_vars.menu_assets;
@@ -1993,7 +1979,7 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
 
     // Get each corner's joints
     JOBJ *corners[4];
-    JOBJ_GetChild(popup_joint, &corners, 2, 3, 4, 5, -1);
+    JOBJ_GetChild(popup_joint, (int)&corners, 2, 3, 4, 5, -1);
 
     // Modify scale and position
     popup_joint->scale.X = POPUP_SCALE;
@@ -2027,7 +2013,7 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
     // attach to root jobj
     JOBJ_AddChild(popup_gobj->hsd_object, jobj_highlight);
     // move it into position
-    JOBJ_GetChild(jobj_highlight, &corners, 2, 3, 4, 5, -1);
+    JOBJ_GetChild(jobj_highlight, (int)&corners, 2, 3, 4, 5, -1);
     // Modify scale and position
     jobj_highlight->trans.Z = POPUPHIGHLIGHT_Z;
     jobj_highlight->scale.X = 1;
@@ -2055,7 +2041,6 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu) {
     MenuData *menuData = gobj->userdata;
     s32 cursor = menu->cursor;
     EventOption *option = &menu->options[cursor];
-    int subtext;
     int canvasIndex = menuData->canvas_popup;
     s32 value_num = option->value_num;
     if (value_num > MENU_POPMAXOPTION) {
@@ -2085,7 +2070,7 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu) {
         // output option value
         float optionX = POPUP_OPTIONVALXPOS;
         float optionY = baseYPos + (i * POPUP_TEXTYOFFSET);
-        subtext = Text_AddSubtext(text, optionX, optionY, &nullString);
+        Text_AddSubtext(text, optionX, optionY, nullString);
     }
 
     return;
@@ -2193,7 +2178,6 @@ void EventMenu_DestroyMenu(GOBJ *gobj) {
 
 void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     MenuData *menuData = gobj->userdata;
-    EventDesc *event_desc = menuData->event_desc;
 
     // get player who paused
     u8 pauser = menuData->controller_index;
@@ -2211,7 +2195,6 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     s32 cursor = currMenu->cursor;
     s32 scroll = currMenu->scroll;
     EventOption *currOption = &currMenu->options[cursor + scroll];
-    s32 cursor_min = 0;
     s32 option_num = currMenu->option_num;
     s32 cursor_max = option_num;
     if (cursor_max > MENU_MAXOPTION) {
@@ -2395,7 +2378,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         EventMenu *prevMenu = currMenu->prev;
         if (prevMenu != 0) {
             // clear previous menu
-            EventMenu *prevMenu = currMenu->prev;
+            prevMenu = currMenu->prev;
             currMenu->prev = 0;
 
             // reset this menu's cursor
@@ -2431,7 +2414,6 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
 
 void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
     MenuData *menuData = gobj->userdata;
-    EventDesc *event_desc = menuData->event_desc;
 
     // get player who paused
     u8 pauser = menuData->controller_index; // get their  inputs
@@ -2449,7 +2431,6 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
     s32 scroll = menuData->popup_scroll;
     EventOption *currOption = &currMenu->options[currMenu->cursor + currMenu->scroll];
     s32 value_num = currOption->value_num;
-    s32 cursor_min = 0;
     s32 cursor_max = value_num;
     if (cursor_max > MENU_POPMAXOPTION) {
         cursor_max = MENU_POPMAXOPTION;
@@ -2557,7 +2538,6 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
 void EventMenu_Update(GOBJ *gobj) {
     //MenuCamData *camData = gobj->userdata;
     MenuData *menuData = gobj->userdata;
-    EventDesc *event_desc = menuData->event_desc;
     EventMenu *currMenu = menuData->currMenu;
 
     int update_menu = 1;
@@ -2576,8 +2556,6 @@ void EventMenu_Update(GOBJ *gobj) {
         for (int i = 0; i < 6; i++) {
             // humans only
             if (Fighter_GetSlotType(i) == 0) {
-                GOBJ *fighter = Fighter_GetGObj(i);
-                FighterData *fighter_data = fighter->userdata;
                 int controller_index = Fighter_GetControllerPort(i);
 
                 HSD_Pad *pad = PadGet(controller_index, PADGET_MASTER);
@@ -2637,7 +2615,7 @@ void EventMenu_Update(GOBJ *gobj) {
         } else if ((menuData->isPaused == 1) && (stc_event_vars.hide_menu == 0)) {
             // run menu logic if the menu is shown
             // Get the current menu
-            EventMenu *currMenu = menuData->currMenu;
+            currMenu = menuData->currMenu;
 
             if (currMenu->state == EMSTATE_FOCUS) {
                 // menu think
@@ -2686,7 +2664,7 @@ void EventUpdate() {
 
 void TM_ConsoleThink(GOBJ *gobj) {
     // init variables
-    int *data = gobj->userdata;
+    DevText **data = gobj->userdata;
     DevText *text = data[0];
 
     // check to toggle console
@@ -2710,7 +2688,7 @@ void TM_ConsoleThink(GOBJ *gobj) {
 void TM_CreateConsole() {
     // init dev text
     GOBJ *gobj = GObj_Create(0, 0, 0);
-    int *data = calloc(32);
+    DevText **data = calloc(32);
     GObj_AddUserData(gobj, 4, HSD_Free, data);
     GObj_AddProc(gobj, TM_ConsoleThink, 0);
 
@@ -2718,8 +2696,8 @@ void TM_CreateConsole() {
     DevelopText_Activate(0, text);
     text->show_cursor = 0;
     data[0] = text;
-    GXColor color = {21, 20, 59, 135};
-    DevelopText_StoreBGColor(text, &color);
+    u8 color[] = {21, 20, 59, 135};
+    DevelopText_StoreBGColor(text, color);
     DevelopText_StoreTextScale(text, 10, 12);
     stc_event_vars.db_console_text = text;
 
@@ -2868,7 +2846,7 @@ int Savestate_Save(Savestate *savestate) {
             // get fighter gobjs
             BackupQueue queue[2];
             for (int j = 0; j < 2; j++) {
-                GOBJ *fighter = 0;
+                fighter = 0;
                 FighterData *fighter_data = 0;
 
                 // get fighter gobj and data if they exist
@@ -2911,75 +2889,59 @@ int Savestate_Save(Savestate *savestate) {
                         ft_data->stateSpeed = fighter_data->stateSpeed;
                         ft_data->stateBlend = fighter_data->stateBlend;
                         memcpy(&ft_data->phys, &fighter_data->phys, sizeof(fighter_data->phys)); // copy physics
-                        memcpy(&ft_data->color, &fighter_data->color, sizeof(fighter_data->color));
-                        // copy color overlay
+                        memcpy(&ft_data->color, &fighter_data->color, sizeof(fighter_data->color)); // copy color overlay
                         memcpy(&ft_data->input, &fighter_data->input, sizeof(fighter_data->input)); // copy inputs
-                        memcpy(&ft_data->coll_data, &fighter_data->coll_data, sizeof(fighter_data->coll_data));
-                        // copy collision
+                        memcpy(&ft_data->coll_data, &fighter_data->coll_data, sizeof(fighter_data->coll_data)); // copy collision
                         memcpy(&ft_data->cameraBox, fighter_data->cameraBox, sizeof(CameraBox)); // copy camerabox
                         memcpy(&ft_data->hitbox, &fighter_data->hitbox, sizeof(fighter_data->hitbox)); // copy hitbox
-                        memcpy(&ft_data->throw_hitbox, &fighter_data->throw_hitbox,
-                               sizeof(fighter_data->throw_hitbox)); // copy hitbox
-                        memcpy(&ft_data->unk_hitbox, &fighter_data->unk_hitbox,
-                               sizeof(fighter_data->unk_hitbox)); // copy hitbox
+                        memcpy(&ft_data->throw_hitbox, &fighter_data->throw_hitbox, sizeof(fighter_data->throw_hitbox)); // copy hitbox
+                        memcpy(&ft_data->unk_hitbox, &fighter_data->unk_hitbox, sizeof(fighter_data->unk_hitbox)); // copy hitbox
                         memcpy(&ft_data->flags, &fighter_data->flags, sizeof(fighter_data->flags)); // copy flags
-                        memcpy(&ft_data->fighter_var, &fighter_data->fighter_var,
-                               sizeof(fighter_data->fighter_var)); // copy var
-                        memcpy(&ft_data->state_var, &fighter_data->state_var,
-                               sizeof(fighter_data->state_var)); // copy var
-                        memcpy(&ft_data->ftcmd_var, &fighter_data->ftcmd_var,
-                               sizeof(fighter_data->ftcmd_var)); // copy var
+                        memcpy(&ft_data->fighter_var, &fighter_data->fighter_var, sizeof(fighter_data->fighter_var)); // copy var
+                        memcpy(&ft_data->state_var, &fighter_data->state_var, sizeof(fighter_data->state_var)); // copy var
+                        memcpy(&ft_data->ftcmd_var, &fighter_data->ftcmd_var, sizeof(fighter_data->ftcmd_var)); // copy var
                         memcpy(&ft_data->jump, &fighter_data->jump, sizeof(fighter_data->jump)); // copy var
                         memcpy(&ft_data->smash, &fighter_data->smash, sizeof(fighter_data->smash)); // copy var
-                        memcpy(&ft_data->hurtstatus, &fighter_data->hurtstatus,
-                               sizeof(fighter_data->hurtstatus)); // copy var
+                        memcpy(&ft_data->hurtstatus, &fighter_data->hurtstatus, sizeof(fighter_data->hurtstatus)); // copy var
                         memcpy(&ft_data->shield, &fighter_data->shield, sizeof(fighter_data->shield)); // copy hitbox
-                        memcpy(&ft_data->shield_bubble, &fighter_data->shield_bubble,
-                               sizeof(fighter_data->shield_bubble)); // copy hitbox
-                        memcpy(&ft_data->reflect_bubble, &fighter_data->reflect_bubble,
-                               sizeof(fighter_data->reflect_bubble)); // copy hitbox
-                        memcpy(&ft_data->absorb_bubble, &fighter_data->absorb_bubble,
-                               sizeof(fighter_data->absorb_bubble)); // copy hitbox
-                        memcpy(&ft_data->reflect_hit, &fighter_data->reflect_hit,
-                               sizeof(fighter_data->reflect_hit)); // copy hitbox
-                        memcpy(&ft_data->absorb_hit, &fighter_data->absorb_hit,
-                               sizeof(fighter_data->absorb_hit)); // copy hitbox
+                        memcpy(&ft_data->shield_bubble, &fighter_data->shield_bubble, sizeof(fighter_data->shield_bubble)); // copy hitbox
+                        memcpy(&ft_data->reflect_bubble, &fighter_data->reflect_bubble, sizeof(fighter_data->reflect_bubble)); // copy hitbox
+                        memcpy(&ft_data->absorb_bubble, &fighter_data->absorb_bubble, sizeof(fighter_data->absorb_bubble)); // copy hitbox
+                        memcpy(&ft_data->reflect_hit, &fighter_data->reflect_hit, sizeof(fighter_data->reflect_hit)); // copy hitbox
+                        memcpy(&ft_data->absorb_hit, &fighter_data->absorb_hit, sizeof(fighter_data->absorb_hit)); // copy hitbox
 
                         // copy dmg
                         memcpy(&ft_data->dmg, &fighter_data->dmg, sizeof(fighter_data->dmg));
-                        ft_data->dmg.source = GOBJToID(ft_data->dmg.source);
+                        ft_data->dmg.source = GOBJToID(fighter_data->dmg.source);
 
                         // copy grab
                         memcpy(&ft_data->grab, &fighter_data->grab, sizeof(fighter_data->grab));
-                        ft_data->grab.grab_attacker = GOBJToID(ft_data->grab.grab_attacker);
-                        ft_data->grab.grab_victim = GOBJToID(ft_data->grab.grab_victim);
+                        ft_data->grab.grab_attacker = GOBJToID(fighter_data->grab.grab_attacker);
+                        ft_data->grab.grab_victim = GOBJToID(fighter_data->grab.grab_victim);
 
                         // copy callbacks
                         memcpy(&ft_data->cb, &fighter_data->cb, sizeof(fighter_data->cb)); // copy hitbox
 
                         // convert hitbox pointers
                         for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++) {
-                            ft_data->hitbox[k].bone = BoneToID(fighter_data, ft_data->hitbox[k].bone);
+                            ft_data->hitbox[k].bone = BoneToID(fighter_data, fighter_data->hitbox[k].bone);
                             // pointers to hitbox victims
                             for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) {
-                                ft_data->hitbox[k].victims[l].victim_data = FtDataToID(
-                                    ft_data->hitbox[k].victims[l].victim_data);
+                                ft_data->hitbox[k].victims[l].victim_data = FtDataToID(fighter_data->hitbox[k].victims[l].victim_data);
                             }
                         }
                         for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
-                            ft_data->throw_hitbox[k].bone = BoneToID(fighter_data, ft_data->throw_hitbox[k].bone);
+                            ft_data->throw_hitbox[k].bone = BoneToID(fighter_data, fighter_data->throw_hitbox[k].bone);
                             // pointers to hitbox victims
                             for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) {
-                                ft_data->throw_hitbox[k].victims[l].victim_data = FtDataToID(
-                                    ft_data->throw_hitbox[k].victims[l].victim_data);
+                                ft_data->throw_hitbox[k].victims[l].victim_data = FtDataToID(fighter_data->throw_hitbox[k].victims[l].victim_data);
                             }
                         }
 
-                        ft_data->unk_hitbox.bone = BoneToID(fighter_data, ft_data->unk_hitbox.bone);
+                        ft_data->unk_hitbox.bone = BoneToID(fighter_data, fighter_data->unk_hitbox.bone);
                         // pointers to hitbox victims
                         for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) {
-                            ft_data->unk_hitbox.victims[k].victim_data = FtDataToID(
-                                ft_data->unk_hitbox.victims[k].victim_data);
+                            ft_data->unk_hitbox.victims[k].victim_data = FtDataToID(fighter_data->unk_hitbox.victims[k].victim_data);
                         }
 
                         // copy XRotN rotation
@@ -3093,7 +3055,6 @@ int Savestate_Load(Savestate *savestate) {
 
                     // restore coll data
                     CollData *thiscoll = &fighter_data->coll_data;
-                    CollData *savedcoll = &ft_data->coll_data;
                     GOBJ *gobj = thiscoll->gobj; // 0x0
                     JOBJ *joint_1 = thiscoll->joint_1; // 0x108
                     JOBJ *joint_2 = thiscoll->joint_2; // 0x10c
@@ -3115,43 +3076,37 @@ int Savestate_Load(Savestate *savestate) {
 
                     // restore hitboxes
                     memcpy(&fighter_data->hitbox, &ft_data->hitbox, sizeof(fighter_data->hitbox)); // copy hitbox
-                    memcpy(&fighter_data->throw_hitbox, &ft_data->throw_hitbox,
-                           sizeof(fighter_data->throw_hitbox)); // copy hitbox
-                    memcpy(&fighter_data->unk_hitbox, &ft_data->unk_hitbox, sizeof(fighter_data->unk_hitbox));
-                    // copy hitbox
+                    memcpy(&fighter_data->throw_hitbox, &ft_data->throw_hitbox, sizeof(fighter_data->throw_hitbox)); // copy hitbox
+                    memcpy(&fighter_data->unk_hitbox, &ft_data->unk_hitbox, sizeof(fighter_data->unk_hitbox)); // copy hitbox
 
                     // copy grab
                     memcpy(&fighter_data->grab, &ft_data->grab, sizeof(fighter_data->grab));
-                    fighter_data->grab.grab_attacker = IDToGOBJ(fighter_data->grab.grab_attacker);
-                    fighter_data->grab.grab_victim = IDToGOBJ(fighter_data->grab.grab_victim);
+                    fighter_data->grab.grab_attacker = IDToGOBJ(ft_data->grab.grab_attacker);
+                    fighter_data->grab.grab_victim = IDToGOBJ(ft_data->grab.grab_victim);
 
                     // convert pointers
                     for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++) {
                         fighter_data->hitbox[k].bone = IDToBone(fighter_data, ft_data->hitbox[k].bone);
                         // pointers to hitbox victims
                         for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) {
-                            fighter_data->hitbox[k].victims[l].victim_data = IDToFtData(
-                                ft_data->hitbox[k].victims[l].victim_data);
+                            fighter_data->hitbox[k].victims[l].victim_data = IDToFtData(ft_data->hitbox[k].victims[l].victim_data);
                         }
                     }
                     for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
                         fighter_data->throw_hitbox[k].bone = IDToBone(fighter_data, ft_data->throw_hitbox[k].bone);
                         // pointers to hitbox victims
                         for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) {
-                            fighter_data->throw_hitbox[k].victims[l].victim_data = IDToFtData(
-                                ft_data->throw_hitbox[k].victims[l].victim_data);
+                            fighter_data->throw_hitbox[k].victims[l].victim_data = IDToFtData(ft_data->throw_hitbox[k].victims[l].victim_data);
                         }
                     }
                     fighter_data->unk_hitbox.bone = IDToBone(fighter_data, ft_data->unk_hitbox.bone);
                     // pointers to hitbox victims
                     for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) {
-                        fighter_data->unk_hitbox.victims[k].victim_data = IDToFtData(
-                            ft_data->unk_hitbox.victims[k].victim_data);
+                        fighter_data->unk_hitbox.victims[k].victim_data = IDToFtData(ft_data->unk_hitbox.victims[k].victim_data);
                     }
 
                     // restore fighter variables
-                    memcpy(&fighter_data->fighter_var, &ft_data->fighter_var,
-                           sizeof(fighter_data->fighter_var)); // copy hitbox
+                    memcpy(&fighter_data->fighter_var, &ft_data->fighter_var, sizeof(fighter_data->fighter_var)); // copy hitbox
 
                     // zero pointer to cached animations to force anim load (fixes fall crash)
                     fighter_data->anim_curr_ARAM = 0;
@@ -3163,8 +3118,7 @@ int Savestate_Load(Savestate *savestate) {
                         anim_source = fighter_data->grab.grab_attacker;
                     }
                     Fighter_SetAllHurtboxesNotUpdated(fighter);
-                    ActionStateChange(ft_data->stateFrame, ft_data->stateSpeed, -1, fighter, ft_data->state, 0,
-                                      anim_source);
+                    ActionStateChange(ft_data->stateFrame, ft_data->stateSpeed, -1, fighter, ft_data->state, 0, (int)anim_source);
                     fighter_data->stateBlend = 0;
 
                     // restore XRotN rotation
@@ -3174,16 +3128,14 @@ int Savestate_Load(Savestate *savestate) {
                     }
 
                     // restore state variables
-                    memcpy(&fighter_data->state_var, &ft_data->state_var, sizeof(fighter_data->state_var));
-                    // copy hitbox
+                    memcpy(&fighter_data->state_var, &ft_data->state_var, sizeof(fighter_data->state_var)); // copy hitbox
 
                     // restore ftcmd variables
-                    memcpy(&fighter_data->ftcmd_var, &ft_data->ftcmd_var, sizeof(fighter_data->ftcmd_var));
-                    // copy hitbox
+                    memcpy(&fighter_data->ftcmd_var, &ft_data->ftcmd_var, sizeof(fighter_data->ftcmd_var)); // copy hitbox
 
                     // restore damage variables
                     memcpy(&fighter_data->dmg, &ft_data->dmg, sizeof(fighter_data->dmg)); // copy hitbox
-                    fighter_data->dmg.source = IDToGOBJ(fighter_data->dmg.source);
+                    fighter_data->dmg.source = IDToGOBJ(ft_data->dmg.source);
 
                     // restore jump variables
                     memcpy(&fighter_data->jump, &ft_data->jump, sizeof(fighter_data->jump)); // copy hitbox
@@ -3192,8 +3144,7 @@ int Savestate_Load(Savestate *savestate) {
                     memcpy(&fighter_data->flags, &ft_data->flags, sizeof(fighter_data->flags)); // copy hitbox
 
                     // restore hurtstatus variables
-                    memcpy(&fighter_data->hurtstatus, &ft_data->hurtstatus, sizeof(fighter_data->hurtstatus));
-                    // copy hitbox
+                    memcpy(&fighter_data->hurtstatus, &ft_data->hurtstatus, sizeof(fighter_data->hurtstatus)); // copy hitbox
 
                     // update jobj position
                     JOBJ *fighter_jobj = fighter->hsd_object;
@@ -3231,16 +3182,11 @@ int Savestate_Load(Savestate *savestate) {
 
                     // restore shield/reflect/absorb variables
                     memcpy(&fighter_data->shield, &ft_data->shield, sizeof(fighter_data->shield)); // copy hitbox
-                    memcpy(&fighter_data->shield_bubble, &ft_data->shield_bubble,
-                           sizeof(fighter_data->shield_bubble)); // copy hitbox
-                    memcpy(&fighter_data->reflect_bubble, &ft_data->reflect_bubble,
-                           sizeof(fighter_data->reflect_bubble)); // copy hitbox
-                    memcpy(&fighter_data->absorb_bubble, &ft_data->absorb_bubble,
-                           sizeof(fighter_data->absorb_bubble)); // copy hitbox
-                    memcpy(&fighter_data->reflect_hit, &ft_data->reflect_hit,
-                           sizeof(fighter_data->reflect_hit)); // copy hitbox
-                    memcpy(&fighter_data->absorb_hit, &ft_data->absorb_hit, sizeof(fighter_data->absorb_hit));
-                    // copy hitbox
+                    memcpy(&fighter_data->shield_bubble, &ft_data->shield_bubble, sizeof(fighter_data->shield_bubble)); // copy hitbox
+                    memcpy(&fighter_data->reflect_bubble, &ft_data->reflect_bubble, sizeof(fighter_data->reflect_bubble)); // copy hitbox
+                    memcpy(&fighter_data->absorb_bubble, &ft_data->absorb_bubble, sizeof(fighter_data->absorb_bubble)); // copy hitbox
+                    memcpy(&fighter_data->reflect_hit, &ft_data->reflect_hit, sizeof(fighter_data->reflect_hit)); // copy hitbox
+                    memcpy(&fighter_data->absorb_hit, &ft_data->absorb_hit, sizeof(fighter_data->absorb_hit)); // copy hitbox
 
                     // restore callback functions
                     memcpy(&fighter_data->cb, &ft_data->cb, sizeof(fighter_data->cb)); // copy hitbox
@@ -3318,8 +3264,6 @@ int Savestate_Load(Savestate *savestate) {
                 }
             }
 
-            sizeof(FtStateData);
-
             // check to recreate HUD
             MatchHUD *hud = &stc_matchhud[i];
 
@@ -3389,7 +3333,7 @@ int Savestate_Load(Savestate *savestate) {
                 *ptcls = ptcl->next;
 
                 // free alloc, 8039ca54
-                HSD_ObjFree(0x804d0f60, ptcl);
+                HSD_ObjFree((HSD_ObjAllocData *)0x804d0f60, ptcl);
 
                 // decrement ptcl total
                 u16 ptclnum = *stc_ptclnum;
@@ -3465,7 +3409,7 @@ int GOBJToID(GOBJ *gobj) {
         return -1;
     }
 
-    // ensure its a fighter
+    // ensure it's a fighter
     if (gobj->entity_class != 4) {
         return -1;
     }
@@ -3484,7 +3428,7 @@ int FtDataToID(FighterData *fighter_data) {
         return -1;
     }
 
-    // ensure its a fighter
+    // ensure it's a fighter
     if (fighter_data->fighter == 0) {
         return -1;
     }
@@ -3651,7 +3595,7 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     va_start(args, format);
     vsprintf(buffer, format, args);
     va_end(args);
-    char *msg = &buffer;
+    char *msg = buffer;
 
     // count newlines
     int line_num = 1;
@@ -3678,7 +3622,6 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev;
 
     // copy each line to an individual char array
-    char *msg_cursor = &msg;
     for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
@@ -3713,7 +3656,7 @@ void Message_Manager(GOBJ *mngr_gobj) {
 
     // Iterate through each queue
     for (int i = 0; i < MSGQUEUE_NUM; i++) {
-        GOBJ **msg_queue = &mgr_data->msg_queue[i];
+        GOBJ **msg_queue = mgr_data->msg_queue[i];
 
         // anim update (time based logic)
         // iterate through backwards (because deletions)
@@ -3723,8 +3666,6 @@ void Message_Manager(GOBJ *mngr_gobj) {
             // if message exists
             if (this_msg_gobj != 0) {
                 MsgData *this_msg_data = this_msg_gobj->userdata;
-                Text *this_msg_text = this_msg_data->text;
-                JOBJ *this_msg_jobj = this_msg_gobj->hsd_object;
 
                 // check if the message moved this frame
                 if (this_msg_data->orig_index != j) {
@@ -3739,8 +3680,15 @@ void Message_Manager(GOBJ *mngr_gobj) {
                 }
 
                 switch (this_msg_data->state) {
-                    case (MSGSTATE_WAIT):
-                    case (MSGSTATE_SHIFT): {
+                    case (MSGSTATE_DELETE): {
+                        // if timer is ended, remove the message
+                        if ((this_msg_data->anim_timer <= 0)) {
+                            Message_Destroy(msg_queue, j);
+                        }
+
+                        break;
+                    }
+                    default: {
                         // increment alive time
                         this_msg_data->alive_timer++;
 
@@ -3753,15 +3701,6 @@ void Message_Manager(GOBJ *mngr_gobj) {
                                 this_msg_data->state = MSGSTATE_DELETE;
                                 this_msg_data->anim_timer = MSGTIMER_DELETE;
                             }
-                        }
-
-                        break;
-                    }
-
-                    case (MSGSTATE_DELETE): {
-                        // if timer is ended, remove the message
-                        if ((this_msg_data->anim_timer <= 0)) {
-                            Message_Destroy(msg_queue, j);
                         }
 
                         break;
@@ -3784,20 +3723,35 @@ void Message_Manager(GOBJ *mngr_gobj) {
                 Vec3 base_pos;
                 Vec3 this_msg_pos;
                 float pos_delta = stc_msg_queue_offsets[i];
-                if (i < 6) {
+                if (i < MSGQUEUE_GENERAL) {
                     Vec3 *hud_pos = Match_GetPlayerHUDPos(i);
 
                     base_pos.X = hud_pos->X;
                     base_pos.Y = hud_pos->Y + MSG_HUDYOFFSET;
                     base_pos.Z = hud_pos->Z;
-                } else if (i == MSGQUEUE_GENERAL) {
+                } else {
                     base_pos = stc_msg_queue_general_pos;
                 }
                 this_msg_pos.X = base_pos.X; // Get this messages position
 
                 switch (this_msg_data->state) {
-                    case (MSGSTATE_WAIT):
-                    case (MSGSTATE_SHIFT): {
+                    case (MSGSTATE_DELETE): {
+                        // get time
+                        float t = ((this_msg_data->anim_timer) / (float) MSGTIMER_DELETE);
+
+                        Vec3 *scale = &this_msg_jobj->scale;
+                        Vec3 *pos = &this_msg_jobj->trans;
+
+                        // BG scale
+                        scale->Y = BezierBlend(t);
+                        // text scale
+                        this_msg_text->scale.Y = (scale->Y * 0.01) * MSGTEXT_BASESCALE;
+                        // text position
+                        this_msg_text->trans.Y = (pos->Y * -1) + (MSGTEXT_BASEY * (scale->Y / 4.0));
+
+                        break;
+                    }
+                    default: {
                         // get time
                         float t = (((float) MSGTIMER_SHIFT - this_msg_data->anim_timer) / MSGTIMER_SHIFT);
 
@@ -3822,25 +3776,9 @@ void Message_Manager(GOBJ *mngr_gobj) {
 
                         // adjust bar
                         JOBJ *bar;
-                        JOBJ_GetChild(this_msg_jobj, &bar, 4, -1);
+                        JOBJ_GetChild(this_msg_jobj, (int)&bar, 4, -1);
                         bar->trans.X = (float) (this_msg_data->lifetime - this_msg_data->alive_timer) / (float)
                                        this_msg_data->lifetime;
-
-                        break;
-                    }
-                    case (MSGSTATE_DELETE): {
-                        // get time
-                        float t = ((this_msg_data->anim_timer) / (float) MSGTIMER_DELETE);
-
-                        Vec3 *scale = &this_msg_jobj->scale;
-                        Vec3 *pos = &this_msg_jobj->trans;
-
-                        // BG scale
-                        scale->Y = BezierBlend(t);
-                        // text scale
-                        this_msg_text->scale.Y = (scale->Y * 0.01) * MSGTEXT_BASESCALE;
-                        // text position
-                        this_msg_text->trans.Y = (pos->Y * -1) + (MSGTEXT_BASEY * (scale->Y / 4.0));
 
                         break;
                     }
@@ -3886,7 +3824,7 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num) {
 void Message_Add(GOBJ *msg_gobj, int queue_num) {
     MsgData *msg_data = msg_gobj->userdata;
     MsgMngrData *mgr_data = stc_msgmgr->userdata;
-    GOBJ **msg_queue = &mgr_data->msg_queue[queue_num];
+    GOBJ **msg_queue = mgr_data->msg_queue[queue_num];
 
     // ensure this queue exists
     if (queue_num >= MSGQUEUE_NUM) {
@@ -3968,7 +3906,7 @@ void Tip_Think(GOBJ *gobj) {
         // update text position
         JOBJ *tip_jobj;
         Vec3 tip_pos;
-        JOBJ_GetChild(tip_gobj->hsd_object, &tip_jobj, TIP_TXTJOINT, -1);
+        JOBJ_GetChild(tip_gobj->hsd_object, (int)&tip_jobj, TIP_TXTJOINT, -1);
         JOBJ_GetWorldPosition(tip_jobj, 0, &tip_pos);
         Text *tip_text = stc_tipmgr.text;
         tip_text->trans.X = tip_pos.X + (0 * (tip_jobj->scale.X / 4.0));
@@ -4012,6 +3950,7 @@ void Tip_Think(GOBJ *gobj) {
                 }
                 break;
             }
+            default:
         }
     }
 
@@ -4042,7 +3981,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     GOBJ *tip_gobj = GObj_Create(0, 0, 0);
     stc_tipmgr.gobj = tip_gobj;
     GObj_AddGXLink(tip_gobj, GXLink_Common, MSG_GXLINK, 80);
-    JOBJ *tip_jobj = JOBJ_LoadJoint(stc_event_vars.menu_assets->tip_jobj);
+    JOBJ *tip_jobj = JOBJ_LoadJoint(stc_event_vars.menu_assets->tip_jobj->desc);
     GObj_AddObject(tip_gobj, R13_U8(-0x3E55), tip_jobj);
 
     // account for widescreen
@@ -4080,7 +4019,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     va_start(args, fmt);
     vsprintf(buffer, fmt, args);
     va_end(args);
-    char *msg = &buffer;
+    char *msg = buffer;
 
     // count newlines
     int line_num = 1;
@@ -4107,7 +4046,6 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     line_length_arr[line_num - 1] = msg_cursor_curr - msg_cursor_prev;
 
     // copy each line to an individual char array
-    char *msg_cursor = &msg;
     for (int i = 0; i < line_num; i++) {
         // check if over char max
         u8 line_length = line_length_arr[i];
@@ -4160,7 +4098,7 @@ GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu) {
     }
 
     // Create a cobj for the event menu
-    COBJDesc ***dmgScnMdls = File_GetSymbol(ACCESS_PTR(0x804d6d5c), 0x803f94d0);
+    COBJDesc ***dmgScnMdls = File_GetSymbol(ACCESS_PTR(0x804d6d5c), (char *)0x803f94d0);
     COBJDesc *cam_desc = dmgScnMdls[1][0];
     COBJ *cam_cobj = COBJ_LoadDesc(cam_desc);
     GOBJ *cam_gobj = GObj_Create(19, 20, 0);

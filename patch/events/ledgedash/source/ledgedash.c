@@ -1,5 +1,4 @@
 #include "ledgedash.h"
-static char nullString[] = " ";
 
 static GXColor tmgbar_black = {40, 40, 40, 255};
 static GXColor tmgbar_grey = {80, 80, 80, 255};
@@ -97,7 +96,7 @@ static EventMenu LdshMenu_Main = {
     .scroll = 0, // runtime variable used for how far down in the menu to start
     .state = 0, // bool used to know if this menu is focused, used at runtime
     .cursor = 0, // index of the option currently selected, used at runtime
-    .options = &LdshOptions_Main, // pointer to all of this menu's options
+    .options = LdshOptions_Main, // pointer to all of this menu's options
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
@@ -109,8 +108,8 @@ EventMenu **menu_start = &Event_Menu;
 void Ledgedash_HUDInit(LedgedashData *event_data) {
     // create hud cobj
     GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
-    ArchiveInfo **ifall_archive = 0x804d6d5c;
-    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, 0x803f94d0);
+    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
+    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
     COBJDesc *cam_desc = dmgScnMdls[1][0];
     COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
     // init camera
@@ -151,7 +150,7 @@ void Ledgedash_HUDInit(LedgedashData *event_data) {
         // Get position
         Vec3 text_pos;
         JOBJ *text_jobj;
-        JOBJ_GetChild(hud_jobj, &text_jobj, 2 + i, -1);
+        JOBJ_GetChild(hud_jobj, (int)&text_jobj, 2 + i, -1);
         JOBJ_GetWorldPosition(text_jobj, 0, &text_pos);
 
         // adjust scale
@@ -171,7 +170,7 @@ void Ledgedash_HUDInit(LedgedashData *event_data) {
 
     // reset all bar colors
     JOBJ *timingbar_jobj;
-    JOBJ_GetChild(hud_jobj, &timingbar_jobj, LCLJOBJ_BAR, -1); // get timing bar jobj
+    JOBJ_GetChild(hud_jobj, (int)&timingbar_jobj, LCLJOBJ_BAR, -1); // get timing bar jobj
     DOBJ *d = timingbar_jobj->dobj;
     int count = 0;
     while (d != 0) {
@@ -294,7 +293,7 @@ void Fighter_PlaceOnLedge(LedgedashData *event_data, GOBJ *hmn, int line_index, 
         Fighter_EnterRebirth(hmn);
 
         // place player on this ledge
-        FtCliffCatch *ft_state = &hmn_data->state_var;
+        FtCliffCatch *ft_state = (FtCliffCatch *)&hmn_data->state_var;
         hmn_data->facing_direction = ledge_dir;
         ft_state->ledge_index = line_index; // store line index
         Fighter_EnterCliffWait(hmn);
@@ -370,7 +369,7 @@ void Fighter_PlaceOnLedge(LedgedashData *event_data, GOBJ *hmn, int line_index, 
             *ptcls = ptcl->next;
 
             // free alloc, 8039ca54
-            HSD_ObjFree(0x804d0f60, ptcl);
+            HSD_ObjFree((HSD_ObjAllocData *)0x804d0f60, ptcl);
 
             // decrement ptcl total
             u16 ptclnum = *stc_ptclnum;
@@ -402,7 +401,6 @@ void Fighter_PlaceOnLedge(LedgedashData *event_data, GOBJ *hmn, int line_index, 
 // Fighter fuctions
 void Ledgedash_FtInit(LedgedashData *event_data) {
     GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
 
     // create camera box
     CameraBox *cam = CameraBox_Alloc();
@@ -441,8 +439,7 @@ void Event_Init(GOBJ *gobj) {
     event_data->assets = File_GetSymbol(event_vars->event_archive, "ldshData");
 
     // standardize camera
-    Stage *stage = stc_stage;
-    float *unk_cam = 0x803bcca0;
+    float *unk_cam = (float *)0x803bcca0;
     stc_stage->fov_r = 0; // no camera rotation
     stc_stage->x28 = 1; // pan value?
     stc_stage->x2c = 1; // pan value?
@@ -622,7 +619,7 @@ void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data) {
 
             // update bar colors
             JOBJ *timingbar_jobj;
-            JOBJ_GetChild(hud_jobj, &timingbar_jobj, LCLJOBJ_BAR, -1); // get timing bar jobj
+            JOBJ_GetChild(hud_jobj, (int)&timingbar_jobj, LCLJOBJ_BAR, -1); // get timing bar jobj
             DOBJ *d = timingbar_jobj->dobj;
             int count = 0;
             while (d != 0) {
@@ -753,7 +750,6 @@ void Ledgedash_HitLogThink(LedgedashData *event_data, GOBJ *hmn) {
 
 void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn) {
     FighterData *hmn_data = hmn->userdata;
-    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
 
     if ((LdshOptions_Main[1].option_val == 0) && (event_data->ledge_line != -1)) {
         // check if enabled and ledge exists
@@ -799,9 +795,8 @@ void Ledgedash_ChangeLedgeThink(LedgedashData *event_data, GOBJ *hmn) {
         // get current ledge position
         CollVert *collvert = *stc_collvert;
         CollLine *collline = *stc_collline;
-        CollVert *this_vert;
         CollLine *this_line = &collline[event_data->ledge_line];
-        float ledge_pos;
+        float ledge_pos = 0;
         if (event_data->ledge_dir == -1) {
             ledge_pos = collvert[this_line->info->vert_next].pos_curr.X;
         } else if (event_data->ledge_dir == 1) {
@@ -834,10 +829,9 @@ void Event_Think(GOBJ *event) {
     // get fighter data
     GOBJ *hmn = Fighter_GetGObj(0);
     FighterData *hmn_data = hmn->userdata;
-    HSD_Pad *pad = PadGet(hmn_data->player_controller_number, PADGET_ENGINE);
 
     // no ledgefall
-    FtCliffCatch *ft_state = &hmn_data->state_var;
+    FtCliffCatch *ft_state = (FtCliffCatch *)&hmn_data->state_var;
     if (hmn_data->state == ASID_CLIFFWAIT) {
         ft_state->fall_timer = 2;
     }
@@ -851,7 +845,7 @@ void Event_Think(GOBJ *event) {
 }
 
 void Event_Exit() {
-    Match *match = MATCH;
+    Match *match = (Match *)MATCH;
 
     // end game
     match->state = 3;
@@ -860,7 +854,7 @@ void Event_Exit() {
     Match_EndVS();
 
     // unfreeze
-    HSD_Update *update = HSD_UPDATE;
+    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
     update->pause_develop = 0;
     return;
 }
@@ -924,7 +918,7 @@ void Ledgedash_HitLogGX(GOBJ *gobj, int pass) {
         LdshHitboxData *this_ldsh_hit = &hitlog_data->hitlog[i];
 
         // determine color
-        GXColor *diffuse, *ambient;
+        GXColor *diffuse;
         if (this_ldsh_hit->kind == 0) {
             diffuse = &hit_diffuse;
         } else if (this_ldsh_hit->kind == 8) {
@@ -935,8 +929,7 @@ void Ledgedash_HitLogGX(GOBJ *gobj, int pass) {
             diffuse = &hit_diffuse;
         }
 
-        Develop_DrawSphere(this_ldsh_hit->size, &this_ldsh_hit->pos_curr, &this_ldsh_hit->pos_prev, diffuse,
-                           &hitlog_ambient);
+        Develop_DrawSphere(this_ldsh_hit->size, &this_ldsh_hit->pos_curr, (Vec2 *)&this_ldsh_hit->pos_prev, diffuse, &hitlog_ambient);
     }
 
     return;
@@ -945,8 +938,6 @@ void Ledgedash_HitLogGX(GOBJ *gobj, int pass) {
 int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
     // get line and vert pointers
     CollLine *collline = *stc_collline;
-    CollVert *collvert = *stc_collvert;
-    CollDataStage *coll_data = *stc_colldata;
 
     // get initial closest
     float xpos_closest;
@@ -962,10 +953,7 @@ int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
     }
 
     // look for the closest ledge
-    CollLine *line_closest = 0;
     int index_closest = -1;
-    int group_index = 0; // first ground link
-    int group_num = coll_data->group_num; // ground link num
     CollGroup *this_group = *stc_firstcollgroup;
     // loop through ground links
     while (this_group != 0) {
@@ -976,7 +964,7 @@ int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
                 // first pass, use floors
                 line_index = this_group->desc->floor_start; // first ground link
                 line_num = line_index + this_group->desc->floor_num; // ground link num
-            } else if (i == 1) {
+            } else {
                 // second pass, use dynamics
                 line_index = this_group->desc->dyn_start; // first ground link
                 line_num = line_index + this_group->desc->dyn_num; // ground link num
@@ -1008,20 +996,19 @@ int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
                             if (j == 0) {
                                 // left ledge
                                 dir_mult = -1;
-                            } else if (j == 1) {
+                            } else {
                                 // right ledge
                                 dir_mult = 1;
                             }
                             int ray_index;
                             int ray_kind;
-                            Vec2 ray_angle;
+                            Vec3 ray_angle;
                             Vec3 ray_pos;
                             float from_x = ledge_pos.X + (2 * dir_mult);
                             float to_x = from_x;
                             float from_y = ledge_pos.Y + 5;
                             float to_y = from_y - 10;
-                            int is_ground = GrColl_RaycastGround(&ray_pos, &ray_index, &ray_kind, &ray_angle, -1, -1,
-                                                                 -1, 0, from_x, from_y, to_x, to_y, 0);
+                            int is_ground = GrColl_RaycastGround(&ray_pos, &ray_index, &ray_kind, &ray_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, from_x, from_y, to_x, to_y, 0);
                             if (is_ground == 0) {
                                 int is_closer = 0;
 
@@ -1050,24 +1037,22 @@ int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
                                     if (j == 0) {
                                         // left ledge
                                         CollLine *prev_line = &collline[this_lineinfo->line_prev];
-                                        // ??? i actually dont know why i cant access this directly
-                                        // if prev line is a right wall / if prev line doesnt exist
+                                        // ??? i actually don't know why i cant access this directly
+                                        // if prev line is a right wall / if prev line doesn't exist
                                         if ((this_lineinfo->line_prev == -1) || (prev_line->is_rwall == 1)) {
                                             // save info on this line
                                             xpos_closest = ledge_pos.X; // save left vert's X position
-                                            line_closest = this_line;
                                             index_closest = line_index;
                                             *ledge_dir = 1;
                                         }
                                     } else if (j == 1) {
                                         // right ledge
                                         CollLine *next_line = &collline[this_lineinfo->line_next];
-                                        // ??? i actually dont know why i cant access this directly
-                                        // if prev line is a right wall / if prev line doesnt exist
+                                        // ??? i actually don't know why i cant access this directly
+                                        // if prev line is a right wall / if prev line doesn't exist
                                         if ((this_lineinfo->line_prev == -1) || (next_line->is_lwall == 1)) {
                                             // save info on this line
                                             xpos_closest = ledge_pos.X; // save left vert's X position
-                                            line_closest = this_line;
                                             index_closest = line_index;
                                             *ledge_dir = -1;
                                         }

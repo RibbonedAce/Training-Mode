@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
@@ -25,9 +27,9 @@ typedef struct WavedashData WavedashData;
 typedef struct TargetData TargetData;
 
 struct WavedashAssets {
-    JOBJ *hud;
+    JOBJDesc *hud;
     void **hudmatanim; // pointer to array
-    JOBJ *target_jobj;
+    JOBJDesc *target_jobj;
     void **target_jointanim;
     void **target_matanim;
 };

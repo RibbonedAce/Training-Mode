@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
@@ -12,7 +14,7 @@ typedef struct LdshHitboxData LdshHitboxData;
 typedef struct LdshHitlogData LdshHitlogData;
 
 struct LedgedashAssets {
-    JOBJ *hud;
+    JOBJDesc *hud;
     void **hudmatanim; // pointer to array
 };
 

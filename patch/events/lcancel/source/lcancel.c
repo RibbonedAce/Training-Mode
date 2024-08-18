@@ -84,10 +84,6 @@ int Barrel_OnHurt(GOBJ *barrel_gobj) {
     LCancelData *event_data = event_vars->event_gobj->userdata;
 
     switch (LcOptions_Main[0].option_val) {
-        // off
-        case (0): {
-            break;
-        }
         // stationary
         case (1): {
             break;
@@ -100,6 +96,10 @@ int Barrel_OnHurt(GOBJ *barrel_gobj) {
             // spawn new barrel at a random position
             barrel_gobj = Barrel_Spawn(1);
             event_data->barrel_gobj = barrel_gobj;
+            break;
+        }
+        // off
+        default: {
             break;
         }
     }
@@ -120,24 +120,22 @@ int Barrel_OnDestroy(GOBJ *barrel_gobj) {
 }
 
 static void *item_callbacks[] = {
-    0x803f58e0,
-    0x80287458,
+    (void *)0x803f58e0,
+    (void *)0x80287458,
     Barrel_OnDestroy, // onDestroy
-    0x80287e68,
-    0x80287ea8,
-    0x80287ec8,
-    0x80288818,
+    (void *)0x80287e68,
+    (void *)0x80287ea8,
+    (void *)0x80287ec8,
+    (void *)0x80288818,
     Barrel_OnHurt, // onhurt
-    0x802889f8,
-    0x802888b8,
-    0x00000000,
-    0x00000000,
-    0x80288958,
-    0x80288c68,
-    0x803f5988,
+    (void *)0x802889f8,
+    (void *)0x802888b8,
+    (void *)0x00000000,
+    (void *)0x00000000,
+    (void *)0x80288958,
+    (void *)0x80288c68,
+    (void *)0x803f5988,
 };
-
-static char nullString[] = " ";
 
 static EventMenu LClMenu_Main = {
     .name = "L-Cancel Training", // the name of this menu
@@ -145,7 +143,7 @@ static EventMenu LClMenu_Main = {
     .scroll = 0, // runtime variable used for how far down in the menu to start
     .state = 0, // bool used to know if this menu is focused, used at runtime
     .cursor = 0, // index of the option currently selected, used at runtime
-    .options = &LcOptions_Main, // pointer to all of this menu's options
+    .options = LcOptions_Main, // pointer to all of this menu's options
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
@@ -157,8 +155,8 @@ EventMenu **menu_start = &Event_Menu;
 void LCancel_Init(LCancelData *event_data) {
     // create hud cobj
     GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
-    ArchiveInfo **ifall_archive = 0x804d6d5c;
-    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, 0x803f94d0);
+    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
+    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
     COBJDesc *cam_desc = dmgScnMdls[1][0];
     COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
     // init camera
@@ -199,7 +197,7 @@ void LCancel_Init(LCancelData *event_data) {
         // Get position
         Vec3 text_pos;
         JOBJ *text_jobj;
-        JOBJ_GetChild(hud_jobj, &text_jobj, 2 + i, -1);
+        JOBJ_GetChild(hud_jobj, (int)&text_jobj, 2 + i, -1);
         JOBJ_GetWorldPosition(text_jobj, 0, &text_pos);
 
         // adjust scale
@@ -219,7 +217,7 @@ void LCancel_Init(LCancelData *event_data) {
 
     // save initial arrow position
     JOBJ *arrow_jobj;
-    JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1);
+    JOBJ_GetChild(hud_jobj, (int)&arrow_jobj, LCLARROW_JOBJ, -1);
     event_data->hud.arrow_base_x = arrow_jobj->trans.X;
     event_data->hud.arrow_timer = 0;
     arrow_jobj->trans.X = 0;
@@ -231,13 +229,8 @@ void LCancel_Init(LCancelData *event_data) {
 // Init Function
 void Event_Init(GOBJ *gobj) {
     LCancelData *event_data = gobj->userdata;
-    EventDesc *event_desc = event_data->event_desc;
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-    //GOBJ *cpu = Fighter_GetGObj(1);
-    //FighterData *cpu_data = cpu->userdata;
 
-    // theres got to be a better way to do this...
+    // there's got to be a better way to do this...
     event_vars = *event_vars_ptr;
 
     // get l-cancel assets
@@ -245,9 +238,6 @@ void Event_Init(GOBJ *gobj) {
 
     // create HUD
     LCancel_Init(event_data);
-
-    // set CPU AI to no_act 15
-    //cpu_data->cpu.ai = 0;
 
     return;
 }
@@ -404,20 +394,17 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
     // log fastfall frame
     // if im in a fastfall-able state
-    int state = hmn_data->state;
-    /*if ((state == ASID_JUMPF) || (state == ASID_JUMPB) || (state == ASID_JUMPAERIALF) || (state == ASID_JUMPAERIALB) || (state == ASID_FALL) || (state == ASID_FALLAERIAL) || ((state >= ASID_ATTACKAIRN) && (state <= ASID_ATTACKAIRLW))*/ {
-        if (hmn_data->phys.self_vel.Y < 0) {
-            // can i fastfall?
-            // did i fastfall yet?
-            if (hmn_data->flags.is_fastfall) {
-                event_data->is_fastfall = 1; // set as fastfall this session
-            } else {
-                event_data->fastfall_frame++; // increment frames
-            }
+    if (hmn_data->phys.self_vel.Y < 0) {
+        // can i fastfall?
+        // did i fastfall yet?
+        if (hmn_data->flags.is_fastfall) {
+            event_data->is_fastfall = 1; // set as fastfall this session
         } else {
-            // cant fastfall, reset frames
-            event_data->fastfall_frame = 0;
+            event_data->fastfall_frame++; // increment frames
         }
+    } else {
+        // cant fastfall, reset frames
+        event_data->fastfall_frame = 0;
     }
 
     // if aerial landing
@@ -454,7 +441,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
         // update arrow
         JOBJ *arrow_jobj;
-        JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1);
+        JOBJ_GetChild(hud_jobj, (int)&arrow_jobj, LCLARROW_JOBJ, -1);
         event_data->hud.arrow_prevpos = arrow_jobj->trans.X;
         event_data->hud.arrow_nextpos = event_data->hud.arrow_base_x - (frame_box_id * LCLARROW_OFFSET);
         JOBJ_ClearFlags(arrow_jobj, JOBJ_HIDDEN);
@@ -502,7 +489,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
         // update position
         JOBJ *arrow_jobj;
-        JOBJ_GetChild(hud_jobj, &arrow_jobj, LCLARROW_JOBJ, -1); // get timing bar jobj
+        JOBJ_GetChild(hud_jobj, (int)&arrow_jobj, LCLARROW_JOBJ, -1); // get timing bar jobj
         arrow_jobj->trans.X = xpos;
         JOBJ_SetMtxDirtySub(arrow_jobj);
     }
@@ -520,9 +507,6 @@ void Event_Think(GOBJ *event) {
     // get fighter data
     GOBJ *hmn = Fighter_GetGObj(0);
     FighterData *hmn_data = hmn->userdata;
-    //GOBJ *cpu = Fighter_GetGObj(1);
-    //FighterData *cpu_data = cpu->userdata;
-    HSD_Pad *pad = PadGet(hmn_data->player_controller_number, PADGET_ENGINE);
 
     LCancel_Think(event_data, hmn_data);
     Barrel_Think(event_data);
@@ -531,7 +515,7 @@ void Event_Think(GOBJ *event) {
 }
 
 void Event_Exit() {
-    Match *match = MATCH;
+    Match *match = (Match *)MATCH;
 
     // end game
     match->state = 3;
@@ -540,7 +524,7 @@ void Event_Exit() {
     Match_EndVS();
 
     // unfreeze
-    HSD_Update *update = HSD_UPDATE;
+    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
     update->pause_develop = 0;
     return;
 }
@@ -569,16 +553,6 @@ void Barrel_Think(LCancelData *event_data) {
     GOBJ *barrel_gobj = event_data->barrel_gobj;
 
     switch (LcOptions_Main[0].option_val) {
-        // off
-        case (0): {
-            // if spawned, remove
-            if (barrel_gobj != 0) {
-                Item_Destroy(barrel_gobj);
-                event_data->barrel_gobj = 0;
-            }
-
-            break;
-        }
         // stationary
         case (1): {
             // if not spawned, spawn
@@ -596,8 +570,6 @@ void Barrel_Think(LCancelData *event_data) {
             GOBJ *hmn = Fighter_GetGObj(0);
             FighterData *hmn_data = hmn->userdata;
             if (hmn_data->input.down & PAD_BUTTON_DPAD_DOWN) {
-                // ensure player is grounded
-                int isGround = 0;
                 if (hmn_data->phys.air_state == 0) {
                     // check for ground in front of player
                     Vec3 coll_pos;
@@ -608,8 +580,7 @@ void Barrel_Think(LCancelData *event_data) {
                     float toX = fromX;
                     float fromY = (hmn_data->phys.pos.Y + 5);
                     float toY = fromY - 10;
-                    isGround = GrColl_RaycastGround(&coll_pos, &line_index, &line_kind, &line_unk, -1, -1, -1, 0, fromX,
-                                                    fromY, toX, toY, 0);
+                    int isGround = GrColl_RaycastGround(&coll_pos, &line_index, &line_kind, &line_unk, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, fromX, fromY, toX, toY, 0); // ensure player is grounded
                     if (isGround == 1) {
                         // update last pos
                         event_data->barrel_lastpos = coll_pos;
@@ -648,6 +619,16 @@ void Barrel_Think(LCancelData *event_data) {
 
             break;
         }
+        // off
+        default: {
+            // if spawned, remove
+            if (barrel_gobj != 0) {
+                Item_Destroy(barrel_gobj);
+                event_data->barrel_gobj = 0;
+            }
+
+            break;
+        }
     }
 
     return;
@@ -668,8 +649,7 @@ void Barrel_Rand_Pos(Vec3 pos, Vec3 *barrel_lastpos) {
         float to_x = from_x;
         float from_y = Stage_GetCameraBottom() + (HSD_Randi(Stage_GetCameraTop() - Stage_GetCameraBottom())) + HSD_Randf();
         float to_y = from_y - 1000;
-        int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
-                                             from_y, to_x, to_y, 0);
+        int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, from_x, from_y, to_x, to_y, 0);
         raycast_num++;
         if (is_ground == 0) {
             continue;
@@ -686,15 +666,13 @@ void Barrel_Rand_Pos(Vec3 pos, Vec3 *barrel_lastpos) {
         float near_fromX = pos.X + 8;
         float near_fromY = pos.Y + 4;
         to_y = near_fromY - 4;
-        is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
-                                         near_fromX, near_fromY, near_fromX, to_y, 0);
+        is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, near_fromX, near_fromY, near_fromX, to_y, 0);
         raycast_num++;
         if (is_ground == 0) {
             continue;
         }
         near_fromX = pos.X - 8;
-        is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
-                                         near_fromX, near_fromY, near_fromX, to_y, 0);
+        is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, near_fromX, near_fromY, near_fromX, to_y, 0);
         raycast_num++;
         if (is_ground == 0) {
             continue;
@@ -718,8 +696,13 @@ GOBJ *Barrel_Spawn(int pos_kind) {
     pos.Z = 0;
 
     switch (pos_kind) {
+        // random pos
+        case (1): {
+            Barrel_Rand_Pos(pos, barrel_lastpos);
+            break;
+        }
         // center stage
-        case (0): {
+        default: {
             // get position
             int line_index;
             int line_kind;
@@ -728,16 +711,10 @@ GOBJ *Barrel_Spawn(int pos_kind) {
             float to_x = from_x;
             float from_y = 6;
             float to_y = from_y - 1000;
-            int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
-                                                 from_y, to_x, to_y, 0);
+            int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, from_x, from_y, to_x, to_y, 0);
             if (is_ground == 0) {
                 Barrel_Rand_Pos(pos, barrel_lastpos);
             }
-            break;
-        }
-        // random pos
-        case (1): {
-            Barrel_Rand_Pos(pos, barrel_lastpos);
             break;
         }
     }

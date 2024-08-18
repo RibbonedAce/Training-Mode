@@ -26,8 +26,6 @@ static ImportData import_data;
 
 // OnLoad
 void OnCSSLoad(ArchiveInfo *archive) {
-    EventVars *event_vars = *event_vars_ptr;
-
     // get assets from this file
     stc_import_assets = File_GetSymbol(archive, "importData");
 
@@ -167,12 +165,12 @@ GOBJ *Menu_Create() {
     GObj_AddObject(menu_gobj, R13_U8(-0x3E55), menu_jobj);
 
     // save jobj pointers
-    JOBJ_GetChild(menu_jobj, &import_data.memcard_jobj[0], 2, -1);
-    JOBJ_GetChild(menu_jobj, &import_data.memcard_jobj[1], 4, -1);
-    JOBJ_GetChild(menu_jobj, &import_data.screenshot_jobj, 6, -1);
-    JOBJ_GetChild(menu_jobj, &import_data.scroll_jobj, 7, -1);
-    JOBJ_GetChild(menu_jobj, &import_data.scroll_top, 9, -1);
-    JOBJ_GetChild(menu_jobj, &import_data.scroll_bot, 10, -1);
+    JOBJ_GetChild(menu_jobj, (int)&import_data.memcard_jobj[0], 2, -1);
+    JOBJ_GetChild(menu_jobj, (int)&import_data.memcard_jobj[1], 4, -1);
+    JOBJ_GetChild(menu_jobj, (int)&import_data.screenshot_jobj, 6, -1);
+    JOBJ_GetChild(menu_jobj, (int)&import_data.scroll_jobj, 7, -1);
+    JOBJ_GetChild(menu_jobj, (int)&import_data.scroll_top, 9, -1);
+    JOBJ_GetChild(menu_jobj, (int)&import_data.scroll_bot, 10, -1);
 
     // hide all
     JOBJ_SetFlagsAll(import_data.memcard_jobj[0], JOBJ_HIDDEN);
@@ -274,6 +272,7 @@ void Menu_Destroy(GOBJ *menu_gobj) {
             Menu_SelFile_Exit(menu_gobj);
             break;
         }
+        default:
     }
 
     // destroy text
@@ -304,7 +303,6 @@ void Memcard_Wait() {
 int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
     int result = 0;
     int files_on_page;
-    int cursor = import_data.cursor; // start at cursor
     int page_total = import_data.file_num / IMPORT_FILESPERPAGE;
 
     // ensure page exists
@@ -376,8 +374,7 @@ int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
                         for (int i = 0; i < files_on_page; i++) {
                             // get file info
                             int this_file_index = (page * IMPORT_FILESPERPAGE) + i;
-                            char *file_name = import_data.file_info[this_file_index].file_name;
-                            int file_size = import_data.file_info[this_file_index].file_size;
+                            char **file_name = import_data.file_info[this_file_index].file_name;
                             int file_no = import_data.file_info[this_file_index].file_no;
 
                             // get comment from card
@@ -387,10 +384,9 @@ int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
                             // get status
                             if (CARDGetStatus(slot, file_no, &card_stat) == CARD_RESULT_READY) {
                                 // open card (get file info)
-                                if (CARDOpen(slot, file_name, &card_file_info) == CARD_RESULT_READY) {
+                                if (CARDOpen(slot, (char *)file_name, &card_file_info) == CARD_RESULT_READY) {
                                     // try to get header
-                                    if (CARDRead(&card_file_info, buffer, CARD_READ_SIZE, 0x1E00) ==
-                                        CARD_RESULT_READY) {
+                                    if (CARDRead(&card_file_info, buffer, CARD_READ_SIZE, 0x1E00) == CARD_RESULT_READY) {
                                         // deobfuscate stupid melee bullshit
                                         Memcard_Deobfuscate(buffer, CARD_READ_SIZE);
                                         ExportHeader *header = buffer + 0x90;
@@ -484,8 +480,6 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
     // search card for save files
     import_data.file_num = 0;
     int slot = import_data.memcard_slot;
-    char *filename[32];
-    int file_size;
     s32 memSize, sectorSize;
     if (CARDProbeEx(slot, &memSize, &sectorSize) == CARD_RESULT_READY) {
         // mount card
@@ -511,13 +505,10 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
                                 if (strncmp(os_info->gameName, card_stat.gameName, sizeof(os_info->gameName)) == 0) {
                                     // check file name
                                     if (strncmp("TMREC", card_stat.fileName, 5) == 0) {
-                                        OSReport("found recording file %s with size %d\n", card_stat.fileName, card_stat
-                                                 .length);
-                                        import_data.file_info[import_data.file_num].file_size = card_stat.length;
-                                        // save file size
+                                        OSReport("found recording file %s with size %d\n", card_stat.fileName, card_stat.length);
+                                        import_data.file_info[import_data.file_num].file_size = card_stat.length; // save file size
                                         import_data.file_info[import_data.file_num].file_no = i; // save file no
-                                        memcpy(import_data.file_info[import_data.file_num].file_name,
-                                               card_stat.fileName, sizeof(card_stat.fileName)); // save file name
+                                        memcpy(import_data.file_info[import_data.file_num].file_name, card_stat.fileName, sizeof(card_stat.fileName)); // save file name
                                         import_data.file_num++; // increment file amount
                                     }
                                 }
@@ -677,7 +668,7 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
         // checking inprogress again in case the code above set it to 0 this tick
         (import_data.snap.loaded_num < import_data.files_on_page)) {
         // find nearest unloaded file
-        int file_to_load;
+        int file_to_load = 0;
         int cursor = import_data.cursor;
 
         if (import_data.snap.is_loaded[cursor] == 0) {
@@ -716,7 +707,7 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
         int this_file_index = (import_data.page * IMPORT_FILESPERPAGE) + file_to_load;
         // page file index -> TMREC file index
         int file_size = import_data.file_info[this_file_index].file_size;
-        char *file_name = import_data.file_info[this_file_index].file_name;
+        char **file_name = import_data.file_info[this_file_index].file_name;
 
         // load next
         static MemcardSave stc_memcard_save;
@@ -726,8 +717,7 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
         stc_memcard_save.x4 = 3;
         stc_memcard_save.size = file_size;
         stc_memcard_save.xc = -1;
-        Memcard_LoadSnapshot(import_data.memcard_slot, file_name, &stc_memcard_save, &stc_memcard_info->file_name, 0, 0,
-                             0);
+        Memcard_LoadSnapshot(import_data.memcard_slot, (char *)file_name, &stc_memcard_save, stc_memcard_info->file_name, 0, 0, 0);
 
         import_data.snap.load_inprogress = 1;
         import_data.snap.file_loading = file_to_load;
@@ -846,17 +836,14 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
         Text_SetColor(import_data.filename_text, cursor, &text_gold);
 
         // update file info text from header data
-        int this_file_index = (import_data.page * IMPORT_FILESPERPAGE) + cursor;
         ExportHeader *header = &import_data.header[cursor];
 
         // update file info text
         Text_SetText(import_data.fileinfo_text, 0, "Stage: %s", stage_names[header->metadata.stage_internal]);
         Text_SetText(import_data.fileinfo_text, 1, "HMN: %s", Fighter_GetName(header->metadata.hmn));
         Text_SetText(import_data.fileinfo_text, 2, "CPU: %s", Fighter_GetName(header->metadata.cpu));
-        Text_SetText(import_data.fileinfo_text, 3, "Date: %d/%d/%d", header->metadata.month, header->metadata.day,
-                     header->metadata.year);
-        Text_SetText(import_data.fileinfo_text, 4, "Time: %d:%02d:%02d", header->metadata.hour, header->metadata.minute,
-                     header->metadata.second);
+        Text_SetText(import_data.fileinfo_text, 3, "Date: %d/%d/%d", header->metadata.month, header->metadata.day, header->metadata.year);
+        Text_SetText(import_data.fileinfo_text, 4, "Time: %d:%02d:%02d", header->metadata.hour, header->metadata.minute, header->metadata.second);
 
         // async load snapshots
         Menu_SelFile_LoadAsyncThink(menu_gobj);
@@ -894,12 +881,12 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
             int vers = import_data.header[cursor].metadata.version; // get version number
 
             // check if version is compatible with this release
-            if (vers == REC_VERS) {
-                kind = CFRM_LOAD;
-            } else if (vers > REC_VERS) {
+            if (vers > REC_VERS) {
                 kind = CFRM_NEW;
             } else if (vers < REC_VERS) {
                 kind = CFRM_OLD;
+            } else {
+                kind = CFRM_LOAD;
             }
 
             // open confirm dialog
@@ -921,7 +908,7 @@ void Menu_Think(GOBJ *menu_gobj) {
             Menu_SelFile_Think(menu_gobj);
             break;
         }
-        case (IMP_CONFIRM): {
+        default: {
             Menu_Confirm_Think(menu_gobj);
             break;
         }
@@ -950,22 +937,11 @@ void Menu_SelFile_DeleteUnsupported(GOBJ *menu_gobj) {
                 // loop through all detected TMREC files
                 for (int i = 0; i < import_data.file_num; i++) {
                     // get file info
-                    char *file_name = import_data.file_info[i].file_name;
-                    int file_size = import_data.file_info[i].file_size;
+                    char **file_name = import_data.file_info[i].file_name;
                     CARDFileInfo card_file_info;
 
-                    /*
-                    so at this point, i have filenames for every TMREC file
-                    present on the memcard. all i have to do is:
-                    - cardopen each file
-                    - cardread the header
-                    - deobfuscate
-                    - check version
-                    - delete file using filename if its a bad file
-                    */
-
                     // open card (get file info)
-                    if (CARDOpen(slot, file_name, &card_file_info) == CARD_RESULT_READY) {
+                    if (CARDOpen(slot, (char *)file_name, &card_file_info) == CARD_RESULT_READY) {
                         // read header
                         if (CARDRead(&card_file_info, buffer, CARD_READ_SIZE, 0x1E00) == CARD_RESULT_READY) {
                             // deobfuscate stupid melee bullshit
@@ -977,7 +953,7 @@ void Menu_SelFile_DeleteUnsupported(GOBJ *menu_gobj) {
                             if (header->metadata.version < 1) {
                                 // delete this file
                                 stc_memcard_work->is_done = 0;
-                                if (CARDDeleteAsync(slot, file_name, Memcard_RemovedCallback) == CARD_RESULT_READY) {
+                                if (CARDDeleteAsync(slot, (char *)file_name, Memcard_RemovedCallback) == CARD_RESULT_READY) {
                                     Memcard_Wait();
                                 }
                             }
@@ -1017,15 +993,14 @@ int Menu_SelFile_DeleteFile(GOBJ *menu_gobj, int file_index) {
                 Memcard_Wait();
 
                 // get file info
-                char *file_name = import_data.file_info[file_index].file_name;
-                int file_size = import_data.file_info[file_index].file_size;
+                char **file_name = import_data.file_info[file_index].file_name;
                 CARDFileInfo card_file_info;
 
                 // open card (get file info)
-                if (CARDOpen(slot, file_name, &card_file_info) == CARD_RESULT_READY) {
+                if (CARDOpen(slot, (char *)file_name, &card_file_info) == CARD_RESULT_READY) {
                     // delete this file
                     stc_memcard_work->is_done = 0;
-                    if (CARDDeleteAsync(slot, file_name, Memcard_RemovedCallback) == CARD_RESULT_READY) {
+                    if (CARDDeleteAsync(slot, (char *)file_name, Memcard_RemovedCallback) == CARD_RESULT_READY) {
                         Memcard_Wait();
                         result = 1;
                     }
@@ -1093,7 +1068,7 @@ void Menu_Confirm_Init(GOBJ *menu_gobj, int kind) {
             Text_AddSubtext(text, 65, 20, "No");
             break;
         }
-        case (CFRM_ERR): {
+        default: {
             Text_AddSubtext(text, 0, -70, "Corrupted recording(s) detected.");
             Text_AddSubtext(text, 0, -35, "Would you like to delete them?");
             Text_AddSubtext(text, -65, 40, "Yes");
@@ -1292,7 +1267,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             }
             break;
         }
-        case (CFRM_ERR): {
+        default: {
             // cursor movement
             if (down & (HSD_BUTTON_RIGHT | HSD_BUTTON_DPAD_RIGHT)) {
                 // check for cursor right

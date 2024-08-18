@@ -1899,7 +1899,7 @@ struct FighterData
     FighterBone *bones;                                        // 0x5E8
     int bone_num;                                              // 0x5EC
     int bone_arr;                                              // 0x5F0
-    u16 dobj_toggle[12];                                       // 0x5f4
+    u16 dobj_toggle[12];                                       // 0x5F4
     Effect *gfx;                                               // 0x60C
     int unknown610;                                            // 0x610
     int unknown614;                                            // 0x614

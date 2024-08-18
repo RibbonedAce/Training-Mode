@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../../MexTK/mex.h"
 
 #define TM_VERSSHORT "TM v3.0-a8"
@@ -83,8 +84,8 @@
 #define MENUHIGHLIGHT_Y 10.8 //10.3
 #define MENUHIGHLIGHT_Z 0.01
 #define MENUHIGHLIGHT_YOFFSET ROWBOX_YOFFSET
-#define MENUHIGHLIGHT_COLOR { \
-    255, 211, 0, 255          \
+#define MENUHIGHLIGHT_COLOR (GXColor) { \
+    255, 211, 0, 255                    \
 }
 
 // menu scroll
@@ -96,8 +97,8 @@
 #define MENUSCROLL_PEROPTION 1
 #define MENUSCROLL_MINLENGTH -1
 #define MENUSCROLL_MAXLENGTH -10
-#define MENUSCROLL_COLOR { \
-    255, 211, 0, 255       \
+#define MENUSCROLL_COLOR (GXColor){ \
+    255, 211, 0, 255                \
 }
 
 // row jobj
@@ -199,6 +200,8 @@ typedef struct EventPage EventPage;
 typedef struct EventOption EventOption;
 typedef struct EventMenu EventMenu;
 typedef struct MenuData MenuData;
+typedef struct FtStateHit FtStateHit;
+typedef struct FtStateHitVictim FtStateHitVictim;
 typedef struct FtStateData FtStateData;
 typedef struct FtState FtState;
 typedef struct Savestate Savestate;
@@ -327,6 +330,54 @@ struct MenuData {
     void *(*custom_gobj_destroy)(GOBJ *custom_gobj); // on destroy function
 };
 
+struct FtStateHitVictim {
+    int victim_data;   // the gobj that was hit
+    int unk;           // not sure, is set to 0 when hitting them
+};
+
+struct FtStateHit {
+    int active;                   // 0x0
+    int x4;                       // 0x4
+    int dmg;                      // 0x8
+    float dmg_f;                  // 0xc
+    Vec3 offset;                  // 0x10
+    float size;                   // 0x1c
+    int angle;                    // 0x20
+    int kb_growth;                // 0x24
+    int wdsk;                     // 0x28
+    int kb;                       // 0x2c
+    int attribute;                // 0x30
+    int shield_dmg;               // 0x34
+    int hitsound_severity;        // 0x38. hurtbox interaction. 0 = none, 1 = grounded, 2 = aerial, 3 = both
+    int hitsound_kind;            // 0x3c
+    char x40;                     // 0x40
+    char x41;                     // 0x41
+    unsigned char x421 : 1;       // 0x42 0x80
+    unsigned char x422 : 1;       // 0x42 0x40
+    unsigned char x423 : 1;       // 0x42 0x20
+    unsigned char x424 : 1;       // 0x42 0x10
+    unsigned char no_hurt : 1;    // 0x42 0x08      ignore hurtbox
+    unsigned char no_reflect : 1; // 0x42 0x04      ignore reflect?
+    unsigned char x427 : 1;       // 0x42 0x02
+    unsigned char x428 : 1;       // 0x42 0x01
+    unsigned char x431 : 1;       // 0x43 0x80
+    unsigned char x432 : 1;       // 0x43 0x40
+    unsigned char hit_all : 1;    // 0x43 0x20
+    unsigned char x434 : 1;       // 0x43 0x10
+    unsigned char x435 : 1;       // 0x43 0x08
+    unsigned char x436 : 1;       // 0x43 0x04
+    unsigned char x437 : 1;       // 0x43 0x02
+    unsigned char x438 : 1;       // 0x43 0x01
+    int x44;                      // 0x44
+    int bone;                     // 0x48
+    Vec3 pos;                     // 0x4c
+    Vec3 pos_prev;                // 0x58
+    Vec3 pos_coll;                // 0x64   position of hurt collision
+    float coll_distance;          // 0x70   Distance From Collding FtHurt (Used for phantom hit collision calculation)
+    FtStateHitVictim victims[24]; // 0x74
+    int x134;                     // 0x134, flags of some sort
+};
+
 struct FtStateData {
     int is_exist;
     int state;
@@ -413,9 +464,9 @@ struct FtStateData {
     } input; //
     CollData coll_data;
     CameraBox cameraBox;
-    ftHit hitbox[4];
-    ftHit throw_hitbox[2];
-    ftHit unk_hitbox;
+    FtStateHit hitbox[4];
+    FtStateHit throw_hitbox[2];
+    FtStateHit unk_hitbox;
 
     struct {
         unsigned char throw_1: 1; // 0x80 - x2210
@@ -623,7 +674,7 @@ struct FtStateData {
         Vec3 collpos; // 0x1854
         int dealt; // 0x1860
         int x1864; // 0x1864
-        GOBJ *source; // 0x1868
+        int source; // 0x1868
         int x186c; // 0x186c
         int x1870; // 0x1870
         int x1874; // 0x1874
@@ -693,8 +744,8 @@ struct FtStateData {
         float grab_timer; // 0x1a4c
         int x1a50; // 0x1a50
         int x1a54; // 0x1a54
-        GOBJ *grab_attacker; // 0x1a58
-        GOBJ *grab_victim; // 0x1a5c
+        int grab_attacker; // 0x1a58
+        int grab_victim; // 0x1a5c
         int x1a60; // 0x1a60
         int x1a64; // 0x1a64
         u16 x1a68; // 0x1a68
@@ -911,7 +962,7 @@ enum MsgColors {
     MSGCOLOR_YELLOW
 };
 
-static EventVars **event_vars_ptr = 0x803d7054; // R13 + (-0x4730)
+static EventVars **event_vars_ptr = (EventVars **)0x803d7054; // R13 + (-0x4730)
 static float stc_msg_queue_offsets[] = {5.15, 5.15, 5.15, 5.15, 5.15, 5.15, -5.15};
 // Y offsets for each message in the queue
 static Vec3 stc_msg_queue_general_pos = {-21, 18.5, 0};
@@ -919,8 +970,6 @@ static GXColor stc_msg_colors[] = {
     {255, 255, 255, 255}, {141, 255, 110, 255}, {255, 162, 186, 255}, {255, 240, 0, 255},
 };
 
-static EventDesc *static_eventInfo;
-static MenuData *static_menuData;
 static EventVars stc_event_vars;
 static int *eventDataBackup;
 static EventVars *event_vars;

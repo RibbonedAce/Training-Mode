@@ -1,7 +1,5 @@
 #include "wavedash.h"
 
-static char nullString[] = " ";
-
 // Main Menu
 static char **WdOptions_Target[] = {"Off", "On"};
 static char **WdOptions_HUD[] = {"On", "Off"};
@@ -68,7 +66,7 @@ static EventMenu WdMenu_Main = {
     .scroll = 0, // runtime variable used for how far down in the menu to start
     .state = 0, // bool used to know if this menu is focused, used at runtime
     .cursor = 0, // index of the option currently selected, used at runtime
-    .options = &WdOptions_Main, // pointer to all of this menu's options
+    .options = WdOptions_Main, // pointer to all of this menu's options
     .prev = 0, // pointer to previous menu, used at runtime
 };
 
@@ -80,8 +78,8 @@ EventMenu **menu_start = &Event_Menu;
 void Wavedash_Init(WavedashData *event_data) {
     // create hud cobj
     GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
-    ArchiveInfo **ifall_archive = 0x804d6d5c;
-    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, 0x803f94d0);
+    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
+    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
     COBJDesc *cam_desc = dmgScnMdls[1][0];
     COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
     // init camera
@@ -113,7 +111,7 @@ void Wavedash_Init(WavedashData *event_data) {
         // Get position
         Vec3 text_pos;
         JOBJ *text_jobj;
-        JOBJ_GetChild(hud_jobj, &text_jobj, WDJOBJ_TEXT + i, -1);
+        JOBJ_GetChild(hud_jobj, (int)&text_jobj, WDJOBJ_TEXT + i, -1);
         JOBJ_GetWorldPosition(text_jobj, 0, &text_pos);
 
         // adjust scale
@@ -155,8 +153,7 @@ void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
     } else if (dist > TRGTSCL_DISTMAX) {
         dist = TRGTSCL_DISTMAX;
     }
-    event_data->target.scale = (((dist - TRGTSCL_DISTMIN) / (TRGTSCL_DISTMAX - TRGTSCL_DISTMIN)) * (
-                                    TRGTSCL_SCALEMAX - TRGTSCL_SCALEMIN)) + TRGTSCL_SCALEMIN;
+    event_data->target.scale = (((dist - TRGTSCL_DISTMIN) / (TRGTSCL_DISTMAX - TRGTSCL_DISTMIN)) * (TRGTSCL_SCALEMAX - TRGTSCL_SCALEMIN)) + TRGTSCL_SCALEMIN;
 
     // get width of the target
     JOBJ *target = JOBJ_LoadJoint(event_data->assets->target_jobj); // create dummy
@@ -166,8 +163,8 @@ void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
 
     // get children
     JOBJ *left_jobj, *right_jobj;
-    JOBJ_GetChild(target, &left_jobj, TRGTJOBJ_LBOUND, -1);
-    JOBJ_GetChild(target, &right_jobj, TRGTJOBJ_RBOUND, -1);
+    JOBJ_GetChild(target, (int)&left_jobj, TRGTJOBJ_LBOUND, -1);
+    JOBJ_GetChild(target, (int)&right_jobj, TRGTJOBJ_RBOUND, -1);
     // get offsets
     JOBJ_GetWorldPosition(left_jobj, 0, &event_data->target.left_offset);
     JOBJ_GetWorldPosition(right_jobj, 0, &event_data->target.right_offset);
@@ -181,13 +178,12 @@ void Target_Init(WavedashData *event_data, FighterData *hmn_data) {
 // Init Function
 void Event_Init(GOBJ *gobj) {
     WavedashData *event_data = gobj->userdata;
-    EventDesc *event_desc = event_data->event_desc;
     GOBJ *hmn = Fighter_GetGObj(0);
     FighterData *hmn_data = hmn->userdata;
     //GOBJ *cpu = Fighter_GetGObj(1);
     //FighterData *cpu_data = cpu->userdata;
 
-    // theres got to be a better way to do this...
+    // there's got to be a better way to do this...
     event_vars = *event_vars_ptr;
 
     // get l-cancel assets
@@ -222,16 +218,6 @@ void Target_Manager(WavedashData *event_data, FighterData *hmn_data) {
     GOBJ *target_gobj = event_data->target.gobj;
 
     switch (WdOptions_Main[0].option_val) {
-        // off
-        case (0): {
-            // if spawned, remove
-            if (target_gobj != 0) {
-                Target_ChangeState(target_gobj, TRGSTATE_DESPAWN);
-                event_data->target.gobj = 0;
-            }
-
-            break;
-        }
         // on
         case (1): {
             // if not spawned, spawn
@@ -261,13 +247,23 @@ void Target_Manager(WavedashData *event_data, FighterData *hmn_data) {
 
             break;
         }
+        // off
+        default: {
+            // if spawned, remove
+            if (target_gobj != 0) {
+                Target_ChangeState(target_gobj, TRGSTATE_DESPAWN);
+                event_data->target.gobj = 0;
+            }
+
+            break;
+        }
     }
 
     return;
 }
 
 // Tips
-Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
+void Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
     // only if enabled
     if (WdOptions_Main[2].option_val == 0) {
         // shield after wavedash
@@ -285,7 +281,7 @@ Tips_Think(WavedashData *event_data, FighterData *hmn_data) {
                         "Tip:\nDon't hold the trigger! Quickly \npress and release to prevent \nshielding after wavedashing.");
                     event_data->tip.shield_num = 0;
                 }
-                }
+            }
         }
     }
 
@@ -405,14 +401,13 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
                 // restore position
                 int ray_index;
                 int ray_kind;
-                Vec2 ray_angle;
+                Vec3 ray_angle;
                 Vec3 ray_pos;
                 float from_x = event_data->restore.pos.X;
                 float to_x = from_x;
                 float from_y = event_data->restore.pos.Y + 3;
                 float to_y = from_y - 6;
-                int is_ground = GrColl_RaycastGround(&ray_pos, &ray_index, &ray_kind, &ray_angle, -1, -1, -1, 0, from_x,
-                                                     from_y, to_x, to_y, 0);
+                int is_ground = GrColl_RaycastGround(&ray_pos, &ray_index, &ray_kind, &ray_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, from_x, from_y, to_x, to_y, 0);
                 if ((is_ground == 1) && (ray_index == event_data->restore.line_index)) {
                     // do this for every subfighter (thanks for complicated code ice climbers)
                     for (int i = 0; i < 2; i++) {
@@ -445,10 +440,8 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
 
                                 // update camera box
                                 Fighter_UpdateCameraBox(this_fighter);
-                                this_fighter_data->cameraBox->boundleft_curr = this_fighter_data->cameraBox->
-                                        boundleft_proj;
-                                this_fighter_data->cameraBox->boundright_curr = this_fighter_data->cameraBox->
-                                        boundright_proj;
+                                this_fighter_data->cameraBox->boundleft_curr = this_fighter_data->cameraBox->boundleft_proj;
+                                this_fighter_data->cameraBox->boundright_curr = this_fighter_data->cameraBox->boundright_proj;
 
                                 // init CPU logic (for nana's popo position history...)
                                 int cpu_kind = Fighter_GetCPUKind(this_fighter_data->ply);
@@ -478,7 +471,7 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
 
                 // update bar frame colors
                 JOBJ *arrow_jobj;
-                JOBJ_GetChild(hud_jobj, &arrow_jobj, WDJOBJ_ARROW, -1); // get timing bar jobj
+                JOBJ_GetChild(hud_jobj, (int)&arrow_jobj, WDJOBJ_ARROW, -1); // get timing bar jobj
                 // get in terms of bar timeframe
                 int jump_frame = ((WDFRAMES - 1) / 2) - (int) hmn_data->attr.jump_startup_time;
                 int input_frame = jump_frame + event_data->airdodge_frame - 1;
@@ -500,10 +493,10 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
                 if (input_frame < ((WDFRAMES - 1) / 2)) {
                     // is early
                     Text_SetText(event_data->hud.text_timing, 0, "%df Early", ((WDFRAMES - 1) / 2) - input_frame);
-                } else if (input_frame == ((WDFRAMES - 1) / 2)) {
-                    Text_SetText(event_data->hud.text_timing, 0, "Perfect");
                 } else if (input_frame > ((WDFRAMES - 1) / 2)) {
                     Text_SetText(event_data->hud.text_timing, 0, "%df Late", input_frame - ((WDFRAMES - 1) / 2));
+                } else {
+                    Text_SetText(event_data->hud.text_timing, 0, "Perfect");
                 }
 
                 // update airdodge angle
@@ -545,7 +538,7 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
 
         // update position
         JOBJ *arrow_jobj;
-        JOBJ_GetChild(hud_jobj, &arrow_jobj, WDJOBJ_ARROW, -1); // get timing bar jobj
+        JOBJ_GetChild(hud_jobj, (int)&arrow_jobj, WDJOBJ_ARROW, -1); // get timing bar jobj
         arrow_jobj->trans.X = xpos;
         JOBJ_SetMtxDirtySub(arrow_jobj);
     }
@@ -568,7 +561,7 @@ void Event_Think(GOBJ *event) {
 }
 
 void Event_Exit() {
-    Match *match = MATCH;
+    Match *match = (Match *)MATCH;
 
     // end game
     match->state = 3;
@@ -577,7 +570,7 @@ void Event_Exit() {
     Match_EndVS();
 
     // unfreeze
-    HSD_Update *update = HSD_UPDATE;
+    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
     update->pause_develop = 0;
     return;
 }
@@ -656,7 +649,7 @@ GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data) {
 
         // adjust rotation based on line slope
         JOBJ *aura_jobj;
-        JOBJ_GetChild(target_jobj, &aura_jobj, TRGTJOBJ_AURA, -1);
+        JOBJ_GetChild(target_jobj, (int)&aura_jobj, TRGTJOBJ_AURA, -1);
         aura_jobj->rot.Z = -1 * atan2(ray_angle.X, ray_angle.Y);
 
         // create camera box
@@ -708,7 +701,7 @@ void Target_Think(GOBJ *target_gobj) {
     Vec3 slope;
     GrColl_GetLineSlope(target_data->line_index, &slope);
     JOBJ *aura_jobj;
-    JOBJ_GetChild(target_jobj, &aura_jobj, TRGTJOBJ_AURA, -1);
+    JOBJ_GetChild(target_jobj, (int)&aura_jobj, TRGTJOBJ_AURA, -1);
     aura_jobj->rot.Z = -1 * atan2(slope.X, slope.Y);
 
     // update camerabox position
@@ -767,6 +760,7 @@ void Target_Think(GOBJ *target_gobj) {
 
             break;
         }
+        default:
     }
 
     return;
@@ -803,8 +797,7 @@ float Target_GetWdashDistance(FighterData *hmn_data, float mag) {
     return distance;
 }
 
-int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offset, int *ret_line, Vec3 *ret_pos,
-                     Vec3 *ret_slope) {
+int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offset, int *ret_line, Vec3 *ret_pos, Vec3 *ret_slope) {
     int status = 0;
 
     // init

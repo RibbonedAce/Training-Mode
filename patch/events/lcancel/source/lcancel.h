@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 
@@ -10,7 +12,7 @@ typedef struct LCancelAssets LCancelAssets;
 typedef struct LCancelData LCancelData;
 
 struct LCancelAssets {
-    JOBJ *hud;
+    JOBJDesc *hud;
     void **hudmatanim; // pointer to array
 };
 
