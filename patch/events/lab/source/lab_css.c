@@ -736,6 +736,12 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
     return;
 }
 
+void Menu_SelFile_Think_Exit(GOBJ *menu_gobj) {
+    SFX_PlayCommon(0);
+    Menu_SelFile_Exit(menu_gobj);
+    Menu_SelCard_Init(menu_gobj);
+}
+
 void Menu_SelFile_Think(GOBJ *menu_gobj) {
     // init
     int down = Pad_GetRapidHeld(*stc_css_hmnport);
@@ -743,14 +749,15 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
     // first ensure memcard is still inserted
     s32 memSize, sectorSize;
     if (CARDProbeEx(import_data.memcard_slot, &memSize, &sectorSize) != CARD_RESULT_READY) {
-        goto EXIT;
+        Menu_SelFile_Think_Exit(menu_gobj);
+        return;
     }
 
     if (import_data.file_num == 0) {
         // if no files exist
         // check for exit
         if (down & (HSD_BUTTON_B | HSD_BUTTON_A)) {
-            goto EXIT;
+            Menu_SelFile_Think_Exit(menu_gobj);
         }
     } else {
         // navigation think
@@ -770,7 +777,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                     // create dialog
                     Menu_Confirm_Init(menu_gobj, CFRM_ERR);
                     SFX_PlayCommon(3);
-                    goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
+                    return;
                 }
             } else if (import_data.cursor > 0) {
                 // if cursor can be advanced
@@ -790,7 +797,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                 // create dialog
                 Menu_Confirm_Init(menu_gobj, CFRM_ERR);
                 SFX_PlayCommon(3);
-                goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
+                return;
             }
         } else if (down & (HSD_BUTTON_DOWN | HSD_BUTTON_DPAD_DOWN)) {
             if (import_data.cursor == (IMPORT_FILESPERPAGE - 1)) {
@@ -807,7 +814,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                     // create dialog
                     Menu_Confirm_Init(menu_gobj, CFRM_ERR);
                     SFX_PlayCommon(3);
-                    goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
+                    return;
                 }
             } else if ((import_data.cursor < import_data.files_on_page - 1)) {
                 // if cursor can be advanced
@@ -827,7 +834,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                 // create dialog
                 Menu_Confirm_Init(menu_gobj, CFRM_ERR);
                 SFX_PlayCommon(3);
-                goto EXIT_FUNC; // gotos are weird but i couldnt think of another way
+                return;
             }
         }
 
@@ -876,10 +883,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
 
         if (down & HSD_BUTTON_B) {
             // check for exit
-        EXIT:
-            SFX_PlayCommon(0);
-            Menu_SelFile_Exit(menu_gobj);
-            Menu_SelCard_Init(menu_gobj);
+            Menu_SelFile_Think_Exit(menu_gobj);
         } else if (down & HSD_BUTTON_X) {
             // check to delete
             Menu_Confirm_Init(menu_gobj, CFRM_DEL);
@@ -903,8 +907,6 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
             SFX_PlayCommon(1);
         }
     }
-EXIT_FUNC:
-    return;
 }
 
 void Menu_Think(GOBJ *menu_gobj) {
@@ -1103,6 +1105,25 @@ void Menu_Confirm_Init(GOBJ *menu_gobj, int kind) {
     return;
 }
 
+void Menu_No_Delete_Corrupt(GOBJ *menu_gobj) {
+    Menu_Confirm_Exit(menu_gobj); // close dialog
+    Menu_SelFile_Exit(menu_gobj); // close select file
+    Menu_SelCard_Init(menu_gobj); // open select card
+    SFX_PlayCommon(0);
+}
+
+void Menu_Return_to_FileSel(GOBJ *menu_gobj) {
+    Menu_Confirm_Exit(menu_gobj);
+    SFX_PlayCommon(0);
+    import_data.menu_state = IMP_SELFILE;
+}
+
+void Menu_Confirm_Think_Exit(GOBJ *menu_gobj) {
+    Menu_Confirm_Exit(menu_gobj);
+    SFX_PlayCommon(0);
+    import_data.menu_state = IMP_SELFILE;
+}
+
 void Menu_Confirm_Think(GOBJ *menu_gobj) {
     // init
     int down = Pad_GetRapidHeld(*stc_css_hmnport);
@@ -1110,7 +1131,8 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
     // first ensure memcard is still inserted
     s32 memSize, sectorSize;
     if (CARDProbeEx(import_data.memcard_slot, &memSize, &sectorSize) != CARD_RESULT_READY) {
-        goto EXIT;
+        Menu_Confirm_Think_Exit(menu_gobj);
+        return;
     }
 
     switch (import_data.confirm.kind) {
@@ -1139,10 +1161,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
 
             if (down & HSD_BUTTON_B) {
                 // check for exit
-            EXIT:
-                Menu_Confirm_Exit(menu_gobj);
-                SFX_PlayCommon(0);
-                import_data.menu_state = IMP_SELFILE;
+                Menu_Confirm_Think_Exit(menu_gobj);
             } else if (down & HSD_BUTTON_A) {
                 // check for select
                 // check which option is selected
@@ -1202,7 +1221,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
 
                     SFX_PlayCommon(1);
                 } else {
-                    goto EXIT;
+                    Menu_Confirm_Think_Exit(menu_gobj);
                 }
             }
 
@@ -1251,10 +1270,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
 
             if (down & HSD_BUTTON_B) {
                 // check for back
-            RETURN_TO_FILESEL:
-                Menu_Confirm_Exit(menu_gobj);
-                SFX_PlayCommon(0);
-                import_data.menu_state = IMP_SELFILE;
+                Menu_Return_to_FileSel(menu_gobj);
             } else if (down & HSD_BUTTON_A) {
                 // check for confirm
                 if (cursor == 0) {
@@ -1271,7 +1287,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     Menu_SelFile_Exit(menu_gobj); // close select file
                     Menu_SelFile_Init(menu_gobj); // open select file
                 } else {
-                    goto RETURN_TO_FILESEL;
+                    Menu_Return_to_FileSel(menu_gobj);
                 }
             }
             break;
@@ -1301,12 +1317,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
 
             if (down & HSD_BUTTON_B) {
                 // check for back
-            NO_DELETE_CORRUPT:
-                Menu_Confirm_Exit(menu_gobj); // close dialog
-                Menu_SelFile_Exit(menu_gobj); // close select file
-                Menu_SelCard_Init(menu_gobj); // open select card
-                SFX_PlayCommon(0);
-                //import_data.menu_state = IMP_SELCARD;
+                Menu_No_Delete_Corrupt(menu_gobj);
             } else if (down & HSD_BUTTON_A) {
                 // check for confirm
                 if (cursor == 0) {
@@ -1322,7 +1333,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     Menu_SelFile_Exit(menu_gobj); // close select file
                     Menu_SelFile_Init(menu_gobj); // open select file
                 } else {
-                    goto NO_DELETE_CORRUPT;
+                    Menu_No_Delete_Corrupt(menu_gobj);
                 }
             }
             break;

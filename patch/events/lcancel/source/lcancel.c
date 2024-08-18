@@ -653,6 +653,62 @@ void Barrel_Think(LCancelData *event_data) {
     return;
 }
 
+void Barrel_Rand_Pos(Vec3 pos, Vec3 *barrel_lastpos) {
+    // setup time
+    int raycast_num = 0;
+    int raytime_start, raytime_end, raytime_time;
+    raytime_start = OSGetTick();
+
+    while (true) {
+        // get position
+        int line_index;
+        int line_kind;
+        Vec3 line_angle;
+        float from_x = Stage_GetCameraLeft() + (HSD_Randi(Stage_GetCameraRight() - Stage_GetCameraLeft())) + HSD_Randf();
+        float to_x = from_x;
+        float from_y = Stage_GetCameraBottom() + (HSD_Randi(Stage_GetCameraTop() - Stage_GetCameraBottom())) + HSD_Randf();
+        float to_y = from_y - 1000;
+        int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
+                                             from_y, to_x, to_y, 0);
+        raycast_num++;
+        if (is_ground == 0) {
+            continue;
+        }
+
+        // ensure it isnt too close to the previous
+        float distance = sqrtf(pow((pos.X - barrel_lastpos->X), 2) + pow((pos.Y - barrel_lastpos->Y), 2));
+        if (distance < 25) {
+            continue;
+        }
+
+        // ensure left and right have ground
+        Vec3 near_pos;
+        float near_fromX = pos.X + 8;
+        float near_fromY = pos.Y + 4;
+        to_y = near_fromY - 4;
+        is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
+                                         near_fromX, near_fromY, near_fromX, to_y, 0);
+        raycast_num++;
+        if (is_ground == 0) {
+            continue;
+        }
+        near_fromX = pos.X - 8;
+        is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
+                                         near_fromX, near_fromY, near_fromX, to_y, 0);
+        raycast_num++;
+        if (is_ground == 0) {
+            continue;
+        }
+
+        // output num and time
+        raytime_end = OSGetTick();
+        raytime_time = OSTicksToMilliseconds(raytime_end - raytime_start);
+        OSReport("lcl: %d ray in %dms\n", raycast_num, raytime_time);
+
+        break;
+    }
+}
+
 GOBJ *Barrel_Spawn(int pos_kind) {
     LCancelData *event_data = event_vars->event_gobj->userdata;
     Vec3 *barrel_lastpos = &event_data->barrel_lastpos;
@@ -660,6 +716,7 @@ GOBJ *Barrel_Spawn(int pos_kind) {
     // determine position to spawn
     Vec3 pos;
     pos.Z = 0;
+
     switch (pos_kind) {
         // center stage
         case (0): {
@@ -674,66 +731,14 @@ GOBJ *Barrel_Spawn(int pos_kind) {
             int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
                                                  from_y, to_x, to_y, 0);
             if (is_ground == 0) {
-                goto BARREL_RANDPOS;
+                Barrel_Rand_Pos(pos, barrel_lastpos);
             }
             break;
         }
         // random pos
         case (1): {
-            // setup time
-            int raycast_num = 0;
-            int raytime_start, raytime_end, raytime_time;
-            raytime_start = OSGetTick();
-        BARREL_RANDPOS: {
-                // get position
-                int line_index;
-                int line_kind;
-                Vec3 line_angle;
-                float from_x = Stage_GetCameraLeft() + (HSD_Randi(Stage_GetCameraRight() - Stage_GetCameraLeft())) +
-                               HSD_Randf();
-                float to_x = from_x;
-                float from_y = Stage_GetCameraBottom() + (HSD_Randi(Stage_GetCameraTop() - Stage_GetCameraBottom())) +
-                               HSD_Randf();
-                float to_y = from_y - 1000;
-                int is_ground = GrColl_RaycastGround(&pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0, from_x,
-                                                     from_y, to_x, to_y, 0);
-                raycast_num++;
-                if (is_ground == 0) {
-                    goto BARREL_RANDPOS;
-                }
-
-                // ensure it isnt too close to the previous
-                float distance = sqrtf(pow((pos.X - barrel_lastpos->X), 2) + pow((pos.Y - barrel_lastpos->Y), 2));
-                if (distance < 25) {
-                    goto BARREL_RANDPOS;
-                }
-
-                // ensure left and right have ground
-                Vec3 near_pos;
-                float near_fromX = pos.X + 8;
-                float near_fromY = pos.Y + 4;
-                to_y = near_fromY - 4;
-                is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
-                                                 near_fromX, near_fromY, near_fromX, to_y, 0);
-                raycast_num++;
-                if (is_ground == 0) {
-                    goto BARREL_RANDPOS;
-                }
-                near_fromX = pos.X - 8;
-                is_ground = GrColl_RaycastGround(&near_pos, &line_index, &line_kind, &line_angle, -1, -1, -1, 0,
-                                                 near_fromX, near_fromY, near_fromX, to_y, 0);
-                raycast_num++;
-                if (is_ground == 0) {
-                    goto BARREL_RANDPOS;
-                }
-
-                // output num and time
-                raytime_end = OSGetTick();
-                raytime_time = OSTicksToMilliseconds(raytime_end - raytime_start);
-                OSReport("lcl: %d ray in %dms\n", raycast_num, raytime_time);
-
-                break;
-            }
+            Barrel_Rand_Pos(pos, barrel_lastpos);
+            break;
         }
     }
 

@@ -2610,6 +2610,327 @@ int LCancel_CPUPerformAction(GOBJ *cpu, int action_id, GOBJ *hmn) {
     return action_done;
 }
 
+void Lab_CPUThink_Start(FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu) {
+    // clear held inputs
+    Fighter_ZeroCPUInputs(cpu_data);
+
+    // perform default behavior
+    int behavior = LabOptions_CPU[OPTCPU_BEHAVE].option_val;
+    switch (behavior) {
+        case (CPUBEHAVE_STAND): {
+            break;
+        }
+
+        case (CPUBEHAVE_SHIELD): {
+            // hold R
+            cpu_data->cpu.held = PAD_TRIGGER_R;
+            break;
+        }
+
+        case (CPUBEHAVE_CROUCH): {
+            // hold down
+            cpu_data->cpu.lstickY = -127;
+            break;
+        }
+
+        case (CPUBEHAVE_JUMP): {
+            // run jump command
+            LCancel_CPUPerformAction(cpu, 12, hmn);
+            break;
+        }
+    }
+}
+
+void Lab_CPUThink_Enter_Start(LCancelData *eventData, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu) {
+    // clear inputs
+
+    // go to start
+    eventData->cpu_state = CPUSTATE_START;
+    eventData->cpu_hitshield = 0;
+    eventData->cpu_hitnum = 0;
+    eventData->cpu_sincehit = 0;
+    eventData->cpu_hitshield = 0;
+    eventData->cpu_lasthit = -1;
+    eventData->cpu_lastshieldstun = -1;
+    eventData->cpu_hitkind = -1;
+    eventData->cpu_hitshieldnum = 0;
+    eventData->cpu_isactionable = 0;
+
+    Lab_CPUThink_Start(cpu_data, hmn, cpu);
+}
+
+void Lab_CPUThink_Recover(LCancelData *eventData, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu) {
+    if (cpu_data->phys.air_state == 0) {
+        // if onstage, go back to start
+        Lab_CPUThink_Enter_Start(eventData, cpu_data, hmn, cpu);
+    } else {
+        // recover with CPU AI
+        cpu_data->cpu.ai = 0;
+    }
+}
+
+void Lab_CPUThink_Counter(LCancelData *eventData, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu) {
+    // check if the CPU has been actionable yet
+    if (eventData->cpu_isactionable == 0) {
+        // check if actionable
+        if (CPUAction_CheckMultipleState(cpu, 0) == 0) {
+            return;
+        } else {
+            eventData->cpu_isactionable = 1; // set actionable flag to begin running code
+            eventData->cpu_groundstate = cpu_data->phys.air_state; // remember initial ground state
+        }
+    }
+
+    // if started in the air, didnt finish action, but now grounded, perform ground action
+    if ((eventData->cpu_groundstate == 1) && (cpu_data->phys.air_state == 0)) {
+        eventData->cpu_groundstate = 0;
+    }
+
+    // increment frames since actionable
+    eventData->cpu_sincehit++;
+
+    // ensure hit count and frame count criteria are met
+    int action_id;
+    if (eventData->cpu_hitkind == HITKIND_DAMAGE) {
+        if ((eventData->cpu_hitnum < LabOptions_CPU[OPTCPU_CTRHITS].option_val) || (
+                eventData->cpu_sincehit < LabOptions_CPU[OPTCPU_CTRFRAMES].option_val)) {
+            return;
+        }
+
+        // get counter action
+        if (cpu_data->phys.air_state == 0 || (eventData->cpu_groundstate == 0)) {
+            // if am grounded or started grounded
+            int grndCtr = LabOptions_CPU[OPTCPU_CTRGRND].option_val;
+            action_id = GrAcLookup[grndCtr];
+        } else if (cpu_data->phys.air_state == 1) {
+            // only if in the air at the time of hitstun ending
+            int airCtr = LabOptions_CPU[OPTCPU_CTRAIR].option_val;
+            action_id = AirAcLookup[airCtr];
+        }
+    } else if (eventData->cpu_hitkind == HITKIND_SHIELD) {
+        // if the shield wasnt hit enough times, return to start
+        if (eventData->cpu_hitshieldnum < LabOptions_CPU[OPTCPU_SHIELDHITS].option_val) {
+            eventData->cpu_state = CPUSTATE_START;
+            Lab_CPUThink_Start(cpu_data, hmn, cpu);
+            return;
+        }
+
+        // if this isnt the frame to counter, keep holding shield
+        if (eventData->cpu_sincehit < LabOptions_CPU[OPTCPU_CTRFRAMES].option_val) {
+            cpu_data->cpu.held = PAD_TRIGGER_R;
+            return;
+        }
+
+        // get action to perform
+        int shieldCtr = LabOptions_CPU[OPTCPU_CTRSHIELD].option_val;
+        action_id = ShieldAcLookup[shieldCtr];
+    } else {
+        // wasnt hit, fell or something idk. enter start again
+        Lab_CPUThink_Enter_Start(eventData, cpu_data, hmn, cpu);
+        return;
+    }
+
+    // if none, enter recover
+    if (action_id == 0) {
+        eventData->cpu_state = CPUSTATE_RECOVER;
+        Lab_CPUThink_Recover(eventData, cpu_data, hmn, cpu);
+        return;
+    }
+
+    // perform counter behavior
+    if (LCancel_CPUPerformAction(cpu, action_id, hmn) == 1) {
+        eventData->cpu_state = CPUSTATE_RECOVER;
+    }
+}
+
+void Lab_CPUThink_Tech(LCancelData *eventData, FighterData *hmn_data, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu) {
+    // if no more hitstun, go to counter
+    if (cpu_data->flags.hitstun == 0) {
+        // also reset stick timer (messes with airdodge wiggle)
+        cpu_data->input.lstick_x = 0;
+        cpu_data->input.timer_lstick_tilt_x = 254;
+        eventData->cpu_state = CPUSTATE_COUNTER;
+        Lab_CPUThink_Counter(eventData, cpu_data, hmn, cpu);
+        return;
+    }
+
+    // perform tech behavior
+    int tech_kind = LabOptions_CPU[OPTCPU_TECH].option_val;
+    s8 dir;
+    s8 stickX = 0;
+    s8 sincePress = 0;
+    s8 since2Press = -1;
+    s8 sinceXSmash = -1;
+
+    while (true) {
+        switch (tech_kind) {
+            case (CPUTECH_RANDOM): {
+                tech_kind = (HSD_Randi((sizeof(LabValues_Tech) / 4) - 1) + 1);
+                continue;
+            }
+            case (CPUTECH_NEUTRAL): {
+                break;
+            }
+            case (CPUTECH_AWAY): {
+                dir = Fighter_GetOpponentDir(cpu_data, hmn_data);
+                stickX = 127 * (dir * -1);
+                break;
+            }
+            case (CPUTECH_TOWARDS): {
+                dir = Fighter_GetOpponentDir(cpu_data, hmn_data);
+                stickX = 127 * (dir);
+                break;
+            }
+            case (CPUTECH_NONE): {
+                sincePress = -1;
+                break;
+            }
+        }
+
+        break;
+    }
+
+    // input tech
+    cpu_data->input.timer_LR = sincePress;
+    cpu_data->input.sinceRapidLR = since2Press;
+    cpu_data->cpu.lstickX = stickX;
+    cpu_data->input.timer_lstick_smash_x = sinceXSmash;
+}
+
+void Lab_CPUThink_TDI_Out(FighterData *cpu_data, float kb_angle) {
+    /*
+    NOTE: im using 94 degrees here because some moves like marth
+    uthrow use a 93 degree angle, and drawing the line at 90 would make
+    inward DI cause the opponent to DI in the direction marth is facing
+    and looks confusing
+    */
+
+    float orig_dir;
+    if ((kb_angle > (-94 * M_1DEGREE)) && (kb_angle <= (94 * M_1DEGREE))) {
+        orig_dir = -1;
+    } else {
+        orig_dir = 1;
+    }
+
+    // get optimal tdi
+    float tdi_angle = kb_angle + (orig_dir * M_PI / 2);
+
+    // convert to analog input
+    cpu_data->cpu.lstickX = cos(tdi_angle) * 127;
+    cpu_data->cpu.lstickY = sin(tdi_angle) * 127;
+}
+
+void Lab_CPUThink_TDI(LCancelData *eventData, FighterData *hmn_data, FighterData *cpu_data, int is_thrown, GOBJ *hmn, GOBJ *cpu) {
+    // if no more hitlag and not being thrown, enter tech state. this might never be hit, just being safe
+    if ((cpu_data->flags.hitlag == 0) && (is_thrown == 0)) {
+        eventData->cpu_state = CPUSTATE_TECH;
+        Lab_CPUThink_Tech(eventData, hmn_data, cpu_data, hmn, cpu);
+        return;
+    }
+
+    // if in shield, no need to TDI
+    if ((cpu_data->state >= ASID_GUARDON) && (cpu_data->state <= ASID_GUARDREFLECT)) {
+        return;
+    }
+
+    // get knockback value
+    float kb_angle;
+    if (is_thrown == 1) {
+        // if being thrown, get knockback info from attacker
+        FighterData *attacker_data = cpu_data->grab.grab_attacker->userdata;
+        kb_angle = ((float) attacker_data->throw_hitbox[0].angle * M_1DEGREE) * (attacker_data->
+                       facing_direction);
+    } else {
+        // not being thrown, get knockback angle normally
+        //kb_angle = Fighter_GetKnockbackAngle(cpu_data) * cpu_data->dmg.direction;
+        kb_angle = atan2(cpu_data->phys.kb_vel.Y, cpu_data->phys.kb_vel.X);
+    }
+
+    // perform TDI behavior
+    int tdi_kind = LabOptions_CPU[OPTCPU_TDI].option_val;
+
+    while (true) {
+        switch (tdi_kind) {
+            case (CPUTDI_RANDOM): {
+                tdi_kind = HSD_Randi(CPUTDI_NUM - 1) + 1;
+                continue;
+            }
+            case (CPUTDI_IN): {
+                /*
+                NOTE: im using 94 degrees here because some moves like marth
+                uthrow use this angle, and drawing the line at 90 would make
+                inward DI cause the opponent to DI in the direction marth is facing
+                and looks confusing
+                */
+
+                float orig_dir;
+                if ((kb_angle > (-94 * M_1DEGREE)) && (kb_angle <= (94 * M_1DEGREE))) {
+                    orig_dir = -1;
+                } else {
+                    orig_dir = 1;
+                }
+
+                // get optimal tdi
+                float tdi_angle = kb_angle + (orig_dir * -(M_PI / 2));
+
+                // convert to analog input
+                cpu_data->cpu.lstickX = cos(tdi_angle) * 127;
+                cpu_data->cpu.lstickY = sin(tdi_angle) * 127;
+
+                break;
+            }
+            case (CPUTDI_OUT): {
+                Lab_CPUThink_TDI_Out(cpu_data, kb_angle);
+                break;
+            }
+            case (CPUTDI_FLOORHUG): {
+                // floothug = full ASDI down + outward DI
+                cpu_data->cpu.cstickY = -127;
+                Lab_CPUThink_TDI_Out(cpu_data, kb_angle);
+                break;
+            }
+            case (CPUTDI_CUSTOM): {
+                int cpu_hitnum = eventData->cpu_hitnum;
+
+                // ensure we have a DI input for this hitnum
+                if (cpu_hitnum <= stc_tdi_val_num) {
+                    // get the stick values for this hit num
+                    cpu_hitnum--;
+
+                    s8 lstickX = stc_tdi_vals[cpu_hitnum][0][0];
+                    s8 lstickY = stc_tdi_vals[cpu_hitnum][0][1];
+                    s8 cstickX = stc_tdi_vals[cpu_hitnum][1][0];
+                    s8 cstickY = stc_tdi_vals[cpu_hitnum][1][1];
+
+                    cpu_data->cpu.lstickX = ((float) lstickX / 80) * 127.0;
+                    cpu_data->cpu.lstickY = ((float) lstickY / 80) * 127.0;
+                    cpu_data->cpu.cstickX = ((float) cstickX / 80) * 127.0;
+                    cpu_data->cpu.cstickY = ((float) cstickY / 80) * 127.0;
+
+                    // increment
+                }
+
+                break;
+            }
+            case (CPUTDI_NONE): {
+                Fighter_ZeroCPUInputs(cpu_data);
+                break;
+            }
+        }
+
+        break;
+    }
+
+    // this is kinda meh, maybe i can come up with something better later
+    // spoof last input as current input as to not trigger SDI
+    // also spoof input as held for more than the SDI window
+    cpu_data->input.lstick_x = ((float) cpu_data->cpu.lstickX * 0.0078125);
+    cpu_data->input.timer_lstick_tilt_x = 5;
+    cpu_data->input.lstick_y = ((float) cpu_data->cpu.lstickY * 0.0078125);
+    cpu_data->input.timer_lstick_tilt_y = 5;
+    return;
+}
+
 void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
     // get gobjs data
     LCancelData *eventData = event->userdata;
@@ -2637,14 +2958,17 @@ void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
         eventData->cpu_state = CPUSTATE_SDI;
         Fighter_ZeroCPUInputs(cpu_data);
     }
+
     // check if being held in a grab
     if (CPU_IsGrabbed(cpu) == 1) {
         eventData->cpu_state = CPUSTATE_GRABBED;
     }
+
     // check if being thrown
     if (is_thrown == 1) {
         eventData->cpu_state = CPUSTATE_TDI;
     }
+
     // check for shield hit
     if ((cpu_state == ASID_GUARDSETOFF) || ((cpu_data->kind == 0xE) && (cpu_state == 344))) {
         Fighter_ZeroCPUInputs(cpu_data);
@@ -2657,8 +2981,6 @@ void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
 
         eventData->cpu_hitkind = HITKIND_SHIELD;
         eventData->cpu_state = CPUSTATE_SDI;
-        // go to Shield state
-        //eventData->cpu_state = CPUSTATE_SHIELD;
     }
     // check for missed tech
     if ((cpu_state == ASID_DOWNBOUNDD) || (cpu_state == ASID_DOWNBOUNDU) || (cpu_state == ASID_DOWNWAITU) || (
@@ -2672,92 +2994,40 @@ void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
     }
     // check if dead
     if (cpu_data->flags.dead == 1) {
-        goto CPUSTATE_ENTERSTART;
+        Lab_CPUThink_Enter_Start(eventData, cpu_data, hmn, cpu);
+        return;
     }
 
     // run CPU state logic
     switch (eventData->cpu_state) {
         // Initial State, hasn't been hit yet
-        case (CPUSTATE_START):
-        CPULOGIC_START: {
-                // if in the air somehow, enter recovery
-                if (cpu_data->phys.air_state == 1) {
-                    eventData->cpu_state = CPUSTATE_RECOVER;
-                    goto CPULOGIC_RECOVER;
-                }
-
-                // clear held inputs
-                Fighter_ZeroCPUInputs(cpu_data);
-
-                // perform default behavior
-                int behavior = LabOptions_CPU[OPTCPU_BEHAVE].option_val;
-                switch (behavior) {
-                    case (CPUBEHAVE_STAND): {
-                        break;
-                    }
-
-                    case (CPUBEHAVE_SHIELD): {
-                        // hold R
-                        cpu_data->cpu.held = PAD_TRIGGER_R;
-                        break;
-                    }
-
-                    case (CPUBEHAVE_CROUCH): {
-                        // hold down
-                        cpu_data->cpu.lstickY = -127;
-                        break;
-                    }
-
-                    case (CPUBEHAVE_JUMP): {
-                        // run jump command
-                        LCancel_CPUPerformAction(cpu, 12, hmn);
-                        break;
-                    }
-                }
-
+        case (CPUSTATE_START): {
+            // if in the air somehow, enter recovery
+            if (cpu_data->phys.air_state == 1) {
+                eventData->cpu_state = CPUSTATE_RECOVER;
+                Lab_CPUThink_Recover(eventData, cpu_data, hmn, cpu);
                 break;
             }
 
-        case (CPUSTATE_GRABBED):
-        CPULOGIC_GRABBED: {
-                // if no longer being grabbed, exit
-                if (CPU_IsGrabbed(cpu) == 0) {
-                    eventData->cpu_state = CPUSTATE_RECOVER;
-                    goto CPULOGIC_RECOVER;
+            Lab_CPUThink_Start(cpu_data, hmn, cpu);
+            break;
+        }
+
+        case (CPUSTATE_GRABBED): {
+            // if no longer being grabbed, exit
+            if (CPU_IsGrabbed(cpu) == 0) {
+                eventData->cpu_state = CPUSTATE_RECOVER;
+                Lab_CPUThink_Recover(eventData, cpu_data, hmn, cpu);
+                break;
+            }
+
+            switch (LabOptions_CPU[OPTCPU_MASH].option_val) {
+                case (CPUMASH_NONE): {
+                    Fighter_ZeroCPUInputs(cpu_data);
+                    break;
                 }
-
-                switch (LabOptions_CPU[OPTCPU_MASH].option_val) {
-                    case (CPUMASH_NONE): {
-                        Fighter_ZeroCPUInputs(cpu_data);
-                        break;
-                    }
-                    case (CPUMASH_MED): {
-                        if (HSD_Randi(100) <= CPUMASHRNG_MED) {
-                            // remove last frame inputs
-                            cpu_data->input.held = 0;
-                            cpu_data->input.lstick_x = 0;
-                            cpu_data->input.lstick_y = 0;
-
-                            // input
-                            cpu_data->cpu.held = PAD_BUTTON_A;
-                            cpu_data->cpu.lstickX = 127;
-                        }
-                        break;
-                    }
-                    case (CPUMASH_HIGH): {
-                        if (HSD_Randi(100) <= CPUMASHRNG_HIGH) {
-                            // remove last frame inputs
-                            cpu_data->input.held = 0;
-                            cpu_data->input.lstick_x = 0;
-                            cpu_data->input.lstick_y = 0;
-
-                            // input
-                            cpu_data->cpu.held = PAD_BUTTON_A;
-                            cpu_data->cpu.lstickX = 127;
-                        }
-                        break;
-                    }
-                    case (CPUMASH_PERFECT): {
+                case (CPUMASH_MED): {
+                    if (HSD_Randi(100) <= CPUMASHRNG_MED) {
                         // remove last frame inputs
                         cpu_data->input.held = 0;
                         cpu_data->input.lstick_x = 0;
@@ -2766,309 +3036,151 @@ void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
                         // input
                         cpu_data->cpu.held = PAD_BUTTON_A;
                         cpu_data->cpu.lstickX = 127;
-                        break;
                     }
-                }
-
-                break;
-            }
-
-        case (CPUSTATE_SDI):
-        CPULOGIC_SDI: {
-                if (cpu_data->flags.hitlag == 0) {
-                    // if no more hitlag, enter tech state
-                    eventData->cpu_state = CPUSTATE_TECH;
-                    goto CPULOGIC_TECH;
-                } else if (cpu_data->dmg.hitlag_frames == 1) {
-                    // if final frame of hitlag, enter TDI state
-                    eventData->cpu_state = CPUSTATE_TDI;
-                    goto CPULOGIC_TDI;
-                }
-
-                // update move instance
-                if (eventData->cpu_lasthit != cpu_data->dmg.instancehitby) {
-                    eventData->cpu_sincehit = 0;
-                    eventData->cpu_hitnum++;
-                    eventData->cpu_lasthit = cpu_data->dmg.instancehitby;
-                    //OSReport("hit count %d/%d", eventData->cpu_hitnum, LabOptions_CPU[OPTCPU_CTRHITS].option_val);
-
-                    // decide random SDI direction for grounded cpu
-                    if ((LabOptions_CPU[OPTCPU_SDIFREQ].option_val != SDIFREQ_NONE) && (
-                            LabOptions_CPU[OPTCPU_SDIDIR].option_val == SDIDIR_RANDOM)) {
-                        eventData->cpu_sdidir = HSD_Randi(2);
-                    }
-                }
-
-                // perform SDI behavior
-                if (LabOptions_CPU[OPTCPU_SDIFREQ].option_val != SDIFREQ_NONE) {
-                    int chance = stc_sdifreqs[LabOptions_CPU[OPTCPU_SDIFREQ].option_val - 1];
-
-                    // chance to SDI
-                    if (HSD_Randi(chance) == 0) {
-                        float angle, magnitude;
-
-                        switch (LabOptions_CPU[OPTCPU_SDIDIR].option_val) {
-                            case SDIDIR_RANDOM: {
-                                if (cpu_data->phys.air_state == 0) {
-                                    // when grounded, only left right
-                                    magnitude = 1;
-
-                                    // decide left or right
-                                    if (eventData->cpu_sdidir == 0) {
-                                        angle = 0; // right
-                                    } else {
-                                        angle = M_PI; // left
-                                    }
-                                } else {
-                                    // when airborne, any direction
-                                    // random input
-                                    angle = HSD_Randi(360) * M_1DEGREE;
-                                    magnitude = 0.49 + (HSD_Randf() * 0.51);
-                                }
-
-                                break;
-                            }
-                            case SDIDIR_AWAY: {
-                                // get angle from center bubble to hit collision
-                                angle = atan2(hmn_data->unk_hitbox.pos.Y - cpu_data->unk_hitbox.pos.Y,
-                                              hmn_data->unk_hitbox.pos.X - cpu_data->unk_hitbox.pos.X);
-
-                                // flip
-                                angle += M_PI;
-                                while (angle > (M_PI * 2)) {
-                                    angle -= (M_PI * 2);
-                                }
-
-                                magnitude = 1;
-
-                                break;
-                            }
-                            case SDIDIR_TOWARD: {
-                                // get angle from center bubble to hit collision
-                                angle = atan2(hmn_data->unk_hitbox.pos.Y - cpu_data->unk_hitbox.pos.Y,
-                                              hmn_data->unk_hitbox.pos.X - cpu_data->unk_hitbox.pos.X);
-
-                                magnitude = 1;
-
-                                break;
-                            }
-                        }
-
-                        // store
-                        cpu_data->cpu.lstickX = cos(angle) * 127 * magnitude;
-                        cpu_data->cpu.lstickY = sin(angle) * 127 * magnitude;
-                    }
-                }
-
-                break;
-            }
-
-        case (CPUSTATE_TDI):
-        CPULOGIC_TDI: {
-                // if no more hitlag and not being thrown, enter tech state. this might never be hit, just being safe
-                if ((cpu_data->flags.hitlag == 0) && (is_thrown == 0)) {
-                    eventData->cpu_state = CPUSTATE_TECH;
-                    goto CPULOGIC_TECH;
-                }
-
-                // if in shield, no need to TDI
-                if ((cpu_data->state >= ASID_GUARDON) && (cpu_data->state <= ASID_GUARDREFLECT)) {
                     break;
                 }
+                case (CPUMASH_HIGH): {
+                    if (HSD_Randi(100) <= CPUMASHRNG_HIGH) {
+                        // remove last frame inputs
+                        cpu_data->input.held = 0;
+                        cpu_data->input.lstick_x = 0;
+                        cpu_data->input.lstick_y = 0;
 
-                // get knockback value
-                float kb_angle;
-                if (is_thrown == 1) {
-                    // if being thrown, get knockback info from attacker
-                    FighterData *attacker_data = cpu_data->grab.grab_attacker->userdata;
-                    kb_angle = ((float) attacker_data->throw_hitbox[0].angle * M_1DEGREE) * (attacker_data->
-                                   facing_direction);
-                } else {
-                    // not being thrown, get knockback angle normally
-                    //kb_angle = Fighter_GetKnockbackAngle(cpu_data) * cpu_data->dmg.direction;
-                    kb_angle = atan2(cpu_data->phys.kb_vel.Y, cpu_data->phys.kb_vel.X);
+                        // input
+                        cpu_data->cpu.held = PAD_BUTTON_A;
+                        cpu_data->cpu.lstickX = 127;
+                    }
+                    break;
                 }
+                case (CPUMASH_PERFECT): {
+                    // remove last frame inputs
+                    cpu_data->input.held = 0;
+                    cpu_data->input.lstick_x = 0;
+                    cpu_data->input.lstick_y = 0;
 
-                // perform TDI behavior
-                int tdi_kind = LabOptions_CPU[OPTCPU_TDI].option_val;
+                    // input
+                    cpu_data->cpu.held = PAD_BUTTON_A;
+                    cpu_data->cpu.lstickX = 127;
+                    break;
+                }
+            }
 
-            TDI_SWITCH:
-                switch (tdi_kind) {
-                    case (CPUTDI_RANDOM): {
-                        tdi_kind = HSD_Randi(CPUTDI_NUM - 1) + 1;
-                        goto TDI_SWITCH;
-                    }
+            break;
+        }
 
-                    case (CPUTDI_IN): {
-                        /*
-                        NOTE: im using 94 degrees here because some moves like marth
-                        uthrow use this angle, and drawing the line at 90 would make
-                        inward DI cause the opponent to DI in the direction marth is facing
-                        and looks confusing
-                        */
+        case (CPUSTATE_SDI): {
+            if (cpu_data->flags.hitlag == 0) {
+                // if no more hitlag, enter tech state
+                eventData->cpu_state = CPUSTATE_TECH;
+                Lab_CPUThink_Tech(eventData, hmn_data, cpu_data, hmn, cpu);
+                break;
+            } else if (cpu_data->dmg.hitlag_frames == 1) {
+                // if final frame of hitlag, enter TDI state
+                eventData->cpu_state = CPUSTATE_TDI;
+                Lab_CPUThink_TDI(eventData, hmn_data, cpu_data, is_thrown, hmn, cpu);
+                break;
+            }
 
-                        float orig_dir;
-                        if ((kb_angle > (-94 * M_1DEGREE)) && (kb_angle <= (94 * M_1DEGREE))) {
-                            orig_dir = -1;
-                        } else {
-                            orig_dir = 1;
-                        }
+            // update move instance
+            if (eventData->cpu_lasthit != cpu_data->dmg.instancehitby) {
+                eventData->cpu_sincehit = 0;
+                eventData->cpu_hitnum++;
+                eventData->cpu_lasthit = cpu_data->dmg.instancehitby;
+                //OSReport("hit count %d/%d", eventData->cpu_hitnum, LabOptions_CPU[OPTCPU_CTRHITS].option_val);
 
-                        // get optimal tdi
-                        float tdi_angle = kb_angle + (orig_dir * -(M_PI / 2));
+                // decide random SDI direction for grounded cpu
+                if ((LabOptions_CPU[OPTCPU_SDIFREQ].option_val != SDIFREQ_NONE) && (
+                        LabOptions_CPU[OPTCPU_SDIDIR].option_val == SDIDIR_RANDOM)) {
+                    eventData->cpu_sdidir = HSD_Randi(2);
+                }
+            }
 
-                        // convert to analog input
-                        cpu_data->cpu.lstickX = cos(tdi_angle) * 127;
-                        cpu_data->cpu.lstickY = sin(tdi_angle) * 127;
+            // perform SDI behavior
+            if (LabOptions_CPU[OPTCPU_SDIFREQ].option_val != SDIFREQ_NONE) {
+                int chance = stc_sdifreqs[LabOptions_CPU[OPTCPU_SDIFREQ].option_val - 1];
 
-                        break;
-                    }
+                // chance to SDI
+                if (HSD_Randi(chance) == 0) {
+                    float angle, magnitude;
 
-                    case (CPUTDI_OUT):
-                    TDI_OUT: {
-                            /*
-                            NOTE: im using 94 degrees here because some moves like marth
-                            uthrow use a 93 degree angle, and drawing the line at 90 would make
-                            inward DI cause the opponent to DI in the direction marth is facing
-                            and looks confusing
-                            */
+                    switch (LabOptions_CPU[OPTCPU_SDIDIR].option_val) {
+                        case SDIDIR_RANDOM: {
+                            if (cpu_data->phys.air_state == 0) {
+                                // when grounded, only left right
+                                magnitude = 1;
 
-                            float orig_dir;
-                            if ((kb_angle > (-94 * M_1DEGREE)) && (kb_angle <= (94 * M_1DEGREE))) {
-                                orig_dir = -1;
+                                // decide left or right
+                                if (eventData->cpu_sdidir == 0) {
+                                    angle = 0; // right
+                                } else {
+                                    angle = M_PI; // left
+                                }
                             } else {
-                                orig_dir = 1;
+                                // when airborne, any direction
+                                // random input
+                                angle = HSD_Randi(360) * M_1DEGREE;
+                                magnitude = 0.49 + (HSD_Randf() * 0.51);
                             }
-
-                            // get optimal tdi
-                            float tdi_angle = kb_angle + (orig_dir * M_PI / 2);
-
-                            // convert to analog input
-                            cpu_data->cpu.lstickX = cos(tdi_angle) * 127;
-                            cpu_data->cpu.lstickY = sin(tdi_angle) * 127;
 
                             break;
                         }
+                        case SDIDIR_AWAY: {
+                            // get angle from center bubble to hit collision
+                            angle = atan2(hmn_data->unk_hitbox.pos.Y - cpu_data->unk_hitbox.pos.Y,
+                                          hmn_data->unk_hitbox.pos.X - cpu_data->unk_hitbox.pos.X);
 
-                    case (CPUTDI_FLOORHUG): {
-                        // floothug = full ASDI down + outward DI
-                        cpu_data->cpu.cstickY = -127;
-                        goto TDI_OUT;
+                            // flip
+                            angle += M_PI;
+                            while (angle > (M_PI * 2)) {
+                                angle -= (M_PI * 2);
+                            }
 
-                        break;
-                    }
+                            magnitude = 1;
 
-                    case (CPUTDI_CUSTOM): {
-                        int cpu_hitnum = eventData->cpu_hitnum;
-
-                        // ensure we have a DI input for this hitnum
-                        if (cpu_hitnum <= stc_tdi_val_num) {
-                            // get the stick values for this hit num
-                            cpu_hitnum--;
-
-                            s8 lstickX = stc_tdi_vals[cpu_hitnum][0][0];
-                            s8 lstickY = stc_tdi_vals[cpu_hitnum][0][1];
-                            s8 cstickX = stc_tdi_vals[cpu_hitnum][1][0];
-                            s8 cstickY = stc_tdi_vals[cpu_hitnum][1][1];
-
-                            cpu_data->cpu.lstickX = ((float) lstickX / 80) * 127.0;
-                            cpu_data->cpu.lstickY = ((float) lstickY / 80) * 127.0;
-                            cpu_data->cpu.cstickX = ((float) cstickX / 80) * 127.0;
-                            cpu_data->cpu.cstickY = ((float) cstickY / 80) * 127.0;
-
-                            // increment
+                            break;
                         }
+                        case SDIDIR_TOWARD: {
+                            // get angle from center bubble to hit collision
+                            angle = atan2(hmn_data->unk_hitbox.pos.Y - cpu_data->unk_hitbox.pos.Y,
+                                          hmn_data->unk_hitbox.pos.X - cpu_data->unk_hitbox.pos.X);
 
-                        break;
+                            magnitude = 1;
+
+                            break;
+                        }
                     }
 
-                    case (CPUTDI_NONE): {
-                        Fighter_ZeroCPUInputs(cpu_data);
-                        break;
-                    }
+                    // store
+                    cpu_data->cpu.lstickX = cos(angle) * 127 * magnitude;
+                    cpu_data->cpu.lstickY = sin(angle) * 127 * magnitude;
                 }
-
-                // this is kinda meh, maybe i can come up with something better later
-                // spoof last input as current input as to not trigger SDI
-                // also spoof input as held for more than the SDI window
-                cpu_data->input.lstick_x = ((float) cpu_data->cpu.lstickX * 0.0078125);
-                cpu_data->input.timer_lstick_tilt_x = 5;
-                cpu_data->input.lstick_y = ((float) cpu_data->cpu.lstickY * 0.0078125);
-                cpu_data->input.timer_lstick_tilt_y = 5;
-
-                break;
             }
 
-        case (CPUSTATE_TECH):
-        CPULOGIC_TECH: {
-                // if no more hitstun, go to counter
-                if (cpu_data->flags.hitstun == 0) {
-                    // also reset stick timer (messes with airdodge wiggle)
-                    cpu_data->input.lstick_x = 0;
-                    cpu_data->input.timer_lstick_tilt_x = 254;
-                    eventData->cpu_state = CPUSTATE_COUNTER;
-                    goto CPULOGIC_COUNTER;
-                }
-
-                // perform tech behavior
-                int tech_kind = LabOptions_CPU[OPTCPU_TECH].option_val;
+            break;
+        }
+        case (CPUSTATE_TDI): {
+            Lab_CPUThink_TDI(eventData, hmn_data, cpu_data, is_thrown, hmn, cpu);
+            break;
+        }
+        case (CPUSTATE_TECH): {
+            Lab_CPUThink_Tech(eventData, hmn_data, cpu_data, hmn, cpu);
+            break;
+        }
+        case (CPUSTATE_GETUP): {
+            if ((cpu_data->state == ASID_DOWNWAITD) || (cpu_data->state == ASID_DOWNWAITU)) {
+                // if im in downwait, perform getup logic
+                // perform getup behavior
+                int getup = LabOptions_CPU[OPTCPU_GETUP].option_val;
                 s8 dir;
+                int inputs = 0;
                 s8 stickX = 0;
-                s8 sincePress = 0;
-                s8 since2Press = -1;
-                s8 sinceXSmash = -1;
-            TECH_SWITCH:
-                switch (tech_kind) {
-                    case (CPUTECH_RANDOM): {
-                        tech_kind = (HSD_Randi((sizeof(LabValues_Tech) / 4) - 1) + 1);
-                        goto TECH_SWITCH;
-                        break;
-                    }
-                    case (CPUTECH_NEUTRAL): {
-                        break;
-                    }
-                    case (CPUTECH_AWAY): {
-                        dir = Fighter_GetOpponentDir(cpu_data, hmn_data);
-                        stickX = 127 * (dir * -1);
-                        break;
-                    }
-                    case (CPUTECH_TOWARDS): {
-                        dir = Fighter_GetOpponentDir(cpu_data, hmn_data);
-                        stickX = 127 * (dir);
-                        break;
-                    }
-                    case (CPUTECH_NONE): {
-                        sincePress = -1;
-                        break;
-                    }
-                }
+                s8 stickY = 0;
 
-                // input tech
-                cpu_data->input.timer_LR = sincePress;
-                cpu_data->input.sinceRapidLR = since2Press;
-                cpu_data->cpu.lstickX = stickX;
-                cpu_data->input.timer_lstick_smash_x = sinceXSmash;
-
-                break;
-            }
-
-        case (CPUSTATE_GETUP):
-        CPULOGIC_GETUP: {
-                if ((cpu_data->state == ASID_DOWNWAITD) || (cpu_data->state == ASID_DOWNWAITU)) {
-                    // if im in downwait, perform getup logic
-                    // perform getup behavior
-                    int getup = LabOptions_CPU[OPTCPU_GETUP].option_val;
-                    s8 dir;
-                    int inputs = 0;
-                    s8 stickX = 0;
-                    s8 stickY = 0;
-
-                GETUP_SWITCH:
+                while (true) {
                     switch (getup) {
                         case (CPUGETUP_RANDOM): {
                             getup = (HSD_Randi((sizeof(LabValues_Tech) / 4) - 1) + 1);
-                            goto GETUP_SWITCH;
-                            break;
+                            continue;
                         }
                         case (CPUGETUP_STAND): {
                             stickY = 127;
@@ -3090,126 +3202,33 @@ void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu) {
                         }
                     }
 
-                    // input getup option
-                    cpu_data->cpu.held = inputs;
-                    cpu_data->cpu.lstickX = stickX;
-                    cpu_data->cpu.lstickY = stickY;
-                } else if ((cpu_data->state >= ASID_DOWNBOUNDU) && (cpu_data->state <= ASID_DOWNSPOTD)) {
-                    // if cpu is in any other down state, do nothing
-                    break;
-                } else {
-                    // if cpu is not in a down state, enter COUNTER
-                    eventData->cpu_state = CPUSTATE_COUNTER;
-                    goto CPULOGIC_COUNTER;
                     break;
                 }
 
+                // input getup option
+                cpu_data->cpu.held = inputs;
+                cpu_data->cpu.lstickX = stickX;
+                cpu_data->cpu.lstickY = stickY;
+            } else if ((cpu_data->state >= ASID_DOWNBOUNDU) && (cpu_data->state <= ASID_DOWNSPOTD)) {
+                // if cpu is in any other down state, do nothing
+                break;
+            } else {
+                // if cpu is not in a down state, enter COUNTER
+                eventData->cpu_state = CPUSTATE_COUNTER;
+                Lab_CPUThink_Counter(eventData, cpu_data, hmn, cpu);
                 break;
             }
 
-        case (CPUSTATE_COUNTER):
-        CPULOGIC_COUNTER: {
-                // check if the CPU has been actionable yet
-                if (eventData->cpu_isactionable == 0) {
-                    // check if actionable
-                    if (CPUAction_CheckMultipleState(cpu, 0) == 0) {
-                        break;
-                    } else {
-                        eventData->cpu_isactionable = 1; // set actionable flag to begin running code
-                        eventData->cpu_groundstate = cpu_data->phys.air_state; // remember initial ground state
-                    }
-                }
-
-                // if started in the air, didnt finish action, but now grounded, perform ground action
-                if ((eventData->cpu_groundstate == 1) && (cpu_data->phys.air_state == 0)) {
-                    eventData->cpu_groundstate = 0;
-                }
-
-                // increment frames since actionable
-                eventData->cpu_sincehit++;
-
-                // ensure hit count and frame count criteria are met
-                int action_id;
-                if (eventData->cpu_hitkind == HITKIND_DAMAGE) {
-                    if ((eventData->cpu_hitnum < LabOptions_CPU[OPTCPU_CTRHITS].option_val) || (
-                            eventData->cpu_sincehit < LabOptions_CPU[OPTCPU_CTRFRAMES].option_val)) {
-                        break;
-                    }
-
-                    // get counter action
-                    if (cpu_data->phys.air_state == 0 || (eventData->cpu_groundstate == 0)) {
-                        // if am grounded or started grounded
-                        int grndCtr = LabOptions_CPU[OPTCPU_CTRGRND].option_val;
-                        action_id = GrAcLookup[grndCtr];
-                    } else if (cpu_data->phys.air_state == 1) {
-                        // only if in the air at the time of hitstun ending
-                        int airCtr = LabOptions_CPU[OPTCPU_CTRAIR].option_val;
-                        action_id = AirAcLookup[airCtr];
-                    }
-                } else if (eventData->cpu_hitkind == HITKIND_SHIELD) {
-                    // if the shield wasnt hit enough times, return to start
-                    if (eventData->cpu_hitshieldnum < LabOptions_CPU[OPTCPU_SHIELDHITS].option_val) {
-                        eventData->cpu_state = CPUSTATE_START;
-                        goto CPULOGIC_START;
-                        break;
-                    }
-
-                    // if this isnt the frame to counter, keep holding shield
-                    if (eventData->cpu_sincehit < LabOptions_CPU[OPTCPU_CTRFRAMES].option_val) {
-                        cpu_data->cpu.held = PAD_TRIGGER_R;
-                        break;
-                    }
-
-                    // get action to perform
-                    int shieldCtr = LabOptions_CPU[OPTCPU_CTRSHIELD].option_val;
-                    action_id = ShieldAcLookup[shieldCtr];
-                } else {
-                    // wasnt hit, fell or something idk. enter start again
-                    goto CPUSTATE_ENTERSTART;
-                }
-
-                // if none, enter recover
-                if (action_id == 0) {
-                    eventData->cpu_state = CPUSTATE_RECOVER;
-                    goto CPULOGIC_RECOVER;
-                }
-
-                // perform counter behavior
-                //OSReport("executing input");
-                if (LCancel_CPUPerformAction(cpu, action_id, hmn) == 1) {
-                    eventData->cpu_state = CPUSTATE_RECOVER;
-                    //goto CPULOGIC_RECOVER;
-                }
-
-                break;
-            }
-
-        case (CPUSTATE_RECOVER):
-        CPULOGIC_RECOVER: {
-                // if onstage, go back to start
-                if (cpu_data->phys.air_state == 0) {
-                CPUSTATE_ENTERSTART:
-                    // clear inputs
-
-                    // go to start
-                    eventData->cpu_state = CPUSTATE_START;
-                    eventData->cpu_hitshield = 0;
-                    eventData->cpu_hitnum = 0;
-                    eventData->cpu_sincehit = 0;
-                    eventData->cpu_hitshield = 0;
-                    eventData->cpu_lasthit = -1;
-                    eventData->cpu_lastshieldstun = -1;
-                    eventData->cpu_hitkind = -1;
-                    eventData->cpu_hitshieldnum = 0;
-                    eventData->cpu_isactionable = 0;
-                    goto CPULOGIC_START;
-                }
-
-                // recover with CPU AI
-                cpu_data->cpu.ai = 0;
-
-                break;
-            }
+            break;
+        }
+        case (CPUSTATE_COUNTER): {
+            Lab_CPUThink_Counter(eventData, cpu_data, hmn, cpu);
+            break;
+        }
+        case (CPUSTATE_RECOVER): {
+            Lab_CPUThink_Recover(eventData, cpu_data, hmn, cpu);
+            break;
+        }
     }
 
     // update isthrown
@@ -5278,6 +5297,13 @@ void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj) {
     return;
 }
 
+int Export_EnterName_Exit(GOBJ *export_gobj) {
+    Export_EnterNameExit(export_gobj);
+    Export_SelCardInit(export_gobj);
+    SFX_PlayCommon(0);
+    return 0;
+}
+
 int Export_EnterNameThink(GOBJ *export_gobj) {
     ExportData *export_data = export_gobj->userdata;
 
@@ -5293,7 +5319,7 @@ int Export_EnterNameThink(GOBJ *export_gobj) {
     // first ensure memcard is still inserted
     s32 memSize, sectorSize;
     if (CARDProbeEx(export_data->slot, &memSize, &sectorSize) != CARD_RESULT_READY) {
-        goto EXIT;
+        return Export_EnterName_Exit(export_gobj);
     }
 
     if ((inputs & HSD_BUTTON_LEFT) || (inputs & HSD_BUTTON_DPAD_LEFT)) {
@@ -5373,11 +5399,7 @@ int Export_EnterNameThink(GOBJ *export_gobj) {
             SFX_PlayCommon(0);
         } else if (input_down & HSD_BUTTON_B) {
             // exit here
-        EXIT:
-            Export_EnterNameExit(export_gobj);
-            Export_SelCardInit(export_gobj);
-            SFX_PlayCommon(0);
-            return 0;
+            return Export_EnterName_Exit(export_gobj);
         }
     }
     // if Y
