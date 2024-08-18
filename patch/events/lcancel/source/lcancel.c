@@ -83,11 +83,11 @@ int Barrel_OnHurt(GOBJ *barrel_gobj) {
 
     switch (LcOptions_Main[0].option_val) {
         // stationary
-        case (1): {
+        case 1: {
             break;
         }
         // move
-        case (2): {
+        case 2: {
             // Break this barrel
             Barrel_Break(event_data->barrel_gobj);
 
@@ -201,13 +201,13 @@ void LCancel_Init(LCancelData *event_data) {
         // adjust scale
         Vec3 *scale = &hud_jobj->scale;
         // text scale
-        hud_text->scale.X = (scale->X * 0.01) * LCLTEXT_SCALE;
-        hud_text->scale.Y = (scale->Y * 0.01) * LCLTEXT_SCALE;
+        hud_text->scale.X = scale->X * 0.01 * LCLTEXT_SCALE;
+        hud_text->scale.Y = scale->Y * 0.01 * LCLTEXT_SCALE;
         hud_text->aspect.X = 165;
 
         // text position
-        hud_text->trans.X = text_pos.X + (scale->X / 4.0);
-        hud_text->trans.Y = (text_pos.Y * -1) + (scale->Y / 4.0);
+        hud_text->trans.X = text_pos.X + scale->X / 4.0;
+        hud_text->trans.Y = text_pos.Y * -1 + scale->Y / 4.0;
 
         // dummy text
         Text_AddSubtext(hud_text, 0, 0, "-");
@@ -243,12 +243,11 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
         if (event_data->tip.shield_isdisp == 0) {
             // update tip conditions
             // look for a freshly buffered guard off
-            if (((hmn_data->state == ASID_GUARDOFF) && (hmn_data->TM.state_frame == 0)) &&
+            if (hmn_data->state == ASID_GUARDOFF && hmn_data->TM.state_frame == 0 &&
                 // currently in guardoff first frame
-                (hmn_data->TM.state_prev[0] == ASID_GUARD) && // was just in wait
+                hmn_data->TM.state_prev[0] == ASID_GUARD && // was just in wait
                 // was in aerial landing a few frames ago
-                ((hmn_data->TM.state_prev[3] >= ASID_LANDINGAIRN) && (
-                     hmn_data->TM.state_prev[3] <= ASID_LANDINGAIRLW))) {
+                (hmn_data->TM.state_prev[3] >= ASID_LANDINGAIRN && hmn_data->TM.state_prev[3] <= ASID_LANDINGAIRLW)) {
                 // increment condition count
                 event_data->tip.shield_num++;
 
@@ -272,14 +271,14 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             // update hitbox active bool
             // check if currently in aerial attack)
             // check if in first frame of aerial attack
-            if ((hmn_data->state >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW)) {
+            if (hmn_data->state >= ASID_ATTACKAIRN && hmn_data->state <= ASID_ATTACKAIRLW) {
                 // reset hitbox bool on first frame of aerial attack
                 if (hmn_data->TM.state_frame == 0) {
                     event_data->tip.hitbox_active = 0;
                 }
 
                 // check if hitbox active
-                for (int i = 0; i < (sizeof(hmn_data->hitbox) / sizeof(ftHit)); i++) {
+                for (int i = 0; i < sizeof(hmn_data->hitbox) / sizeof(ftHit); i++) {
                     if (hmn_data->hitbox[i].active != 0) {
                         event_data->tip.hitbox_active = 1;
                         break;
@@ -288,11 +287,10 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             }
 
             // update tip conditions
-            if ((hmn_data->state >= ASID_LANDINGAIRN) && (hmn_data->state <= ASID_LANDINGAIRLW) && (
-                    hmn_data->TM.state_frame == 0) && // is in aerial landing
-                (event_data->is_fail == 0) &&
+            if (hmn_data->state >= ASID_LANDINGAIRN && hmn_data->state <= ASID_LANDINGAIRLW && hmn_data->TM.state_frame == 0 && // is in aerial landing
+                event_data->is_fail == 0 &&
                 // succeeded the last aerial landing
-                (event_data->tip.hitbox_active == 0)) {
+                event_data->tip.hitbox_active == 0) {
                 // increment condition count
                 event_data->tip.hitbox_num++;
 
@@ -316,7 +314,7 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             // update fastfell bool
             // check if currently in aerial attack)
             // check if in first frame of aerial attack
-            if ((hmn_data->state >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW)) {
+            if (hmn_data->state >= ASID_ATTACKAIRN && hmn_data->state <= ASID_ATTACKAIRLW) {
                 // reset hitbox bool on first frame of aerial attack
                 if (hmn_data->TM.state_frame == 0) {
                     event_data->tip.fastfall_active = 0;
@@ -329,12 +327,10 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
             }
 
             // update tip conditions
-            if ((hmn_data->state >= ASID_LANDINGAIRN) && (hmn_data->state <= ASID_LANDINGAIRLW) && (
-                    hmn_data->TM.state_frame == 0) && // is in aerial landing
-                ((hmn_data->input.timer_trigger_any_ignore_hitlag >= 7) && (
-                     hmn_data->input.timer_trigger_any_ignore_hitlag <= 15)) && // was early for an l-cancel
+            if (hmn_data->state >= ASID_LANDINGAIRN && hmn_data->state <= ASID_LANDINGAIRLW && hmn_data->TM.state_frame == 0 && // is in aerial landing
+                (hmn_data->input.timer_trigger_any_ignore_hitlag >= 7 && hmn_data->input.timer_trigger_any_ignore_hitlag <= 15) && // was early for an l-cancel
                 // succeeded the last aerial landing
-                (event_data->tip.fastfall_active == 0)) {
+                event_data->tip.fastfall_active == 0) {
                 // increment condition count
                 event_data->tip.fastfall_num++;
 
@@ -356,11 +352,11 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data) {
         // if not shown
         if (event_data->tip.late_isdisp == 0) {
             // update tip conditions
-            if ((hmn_data->state >= ASID_LANDINGAIRN) && (hmn_data->state <= ASID_LANDINGAIRLW) &&
+            if (hmn_data->state >= ASID_LANDINGAIRN && hmn_data->state <= ASID_LANDINGAIRLW &&
                 // is in aerial landing
-                (event_data->is_fail == 1) && // failed the l-cancel
+                event_data->is_fail == 1 && // failed the l-cancel
                 // was late for an l-cancel by pressing it just now
-                (hmn_data->input.down & (HSD_TRIGGER_L | HSD_TRIGGER_R | HSD_TRIGGER_Z))) {
+                hmn_data->input.down & (HSD_TRIGGER_L | HSD_TRIGGER_R | HSD_TRIGGER_Z)) {
                 // increment condition count
                 event_data->tip.late_num++;
 
@@ -401,8 +397,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
     }
 
     // if aerial landing
-    if (((hmn_data->state >= ASID_LANDINGAIRN) && (hmn_data->state <= ASID_LANDINGAIRLW)) && (
-            hmn_data->TM.state_frame == 0)) {
+    if (hmn_data->state >= ASID_LANDINGAIRN && hmn_data->state <= ASID_LANDINGAIRLW && hmn_data->TM.state_frame == 0) {
         // increment total lcls
         event_data->hud.lcl_total++;
 
@@ -436,7 +431,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
         JOBJ *arrow_jobj;
         JOBJ_GetChild(hud_jobj, (int)&arrow_jobj, LCLARROW_JOBJ, -1);
         event_data->hud.arrow_prevpos = arrow_jobj->trans.X;
-        event_data->hud.arrow_nextpos = event_data->hud.arrow_base_x - (frame_box_id * LCLARROW_OFFSET);
+        event_data->hud.arrow_nextpos = event_data->hud.arrow_base_x - frame_box_id * LCLARROW_OFFSET;
         JOBJ_ClearFlags(arrow_jobj, JOBJ_HIDDEN);
         event_data->hud.arrow_timer = LCLARROW_ANIMFRAMES;
 
@@ -449,7 +444,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
         event_data->is_fastfall = 0; // reset fastfall bool
 
         // Print succession
-        float succession = ((float) event_data->hud.lcl_success / (float) event_data->hud.lcl_total) * 100.0;
+        float succession = (float) event_data->hud.lcl_success / (float) event_data->hud.lcl_total * 100.0;
         Text_SetText(event_data->hud.text_scs, 0, "%.1f%%", succession);
 
         // Play HUD anim
@@ -460,8 +455,8 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
     // if autocancel landing
     // came from aerial attack
-    if (((hmn_data->state == ASID_LANDING) && (hmn_data->TM.state_frame == 0)) && // if first frame of landing
-        ((hmn_data->TM.state_prev[0] >= ASID_ATTACKAIRN) && (hmn_data->state <= ASID_ATTACKAIRLW))) {
+    if (hmn_data->state == ASID_LANDING && hmn_data->TM.state_frame == 0 && // if first frame of landing
+        (hmn_data->TM.state_prev[0] >= ASID_ATTACKAIRN && hmn_data->state <= ASID_ATTACKAIRLW)) {
         // state as autocancelled
         Text_SetText(event_data->hud.text_time, 0, "Auto-canceled");
 
@@ -477,7 +472,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
         event_data->hud.arrow_timer--;
 
         // get this frames position
-        float time = 1 - ((float) event_data->hud.arrow_timer / (float) LCLARROW_ANIMFRAMES);
+        float time = 1 - (float) event_data->hud.arrow_timer / (float) LCLARROW_ANIMFRAMES;
         float xpos = Bezier(time, event_data->hud.arrow_prevpos, event_data->hud.arrow_nextpos);
 
         // update position
@@ -519,7 +514,7 @@ void Event_Exit() {
 
 void LCancel_HUDCamThink(GOBJ *gobj) {
     // if HUD enabled and not paused
-    if ((LcOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2)) {
+    if (LcOptions_Main[1].option_val == 0 && Pause_CheckStatus(1) != 2) {
         CObjThink_Common(gobj);
     }
 }
@@ -538,7 +533,7 @@ void Barrel_Think(LCancelData *event_data) {
 
     switch (LcOptions_Main[0].option_val) {
         // stationary
-        case (1): {
+        case 1: {
             // if not spawned, spawn
             if (barrel_gobj == 0) {
                 // spawn barrel at center stage
@@ -560,9 +555,9 @@ void Barrel_Think(LCancelData *event_data) {
                     int line_index;
                     int line_kind;
                     Vec3 line_unk;
-                    float fromX = (hmn_data->phys.pos.X) + (hmn_data->facing_direction * 16);
+                    float fromX = hmn_data->phys.pos.X + hmn_data->facing_direction * 16;
                     float toX = fromX;
-                    float fromY = (hmn_data->phys.pos.Y + 5);
+                    float fromY = hmn_data->phys.pos.Y + 5;
                     float toY = fromY - 10;
                     int isGround = GrColl_RaycastGround(&coll_pos, &line_index, &line_kind, &line_unk, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, fromX, fromY, toX, toY, 0); // ensure player is grounded
                     if (isGround == 1) {
@@ -589,7 +584,7 @@ void Barrel_Think(LCancelData *event_data) {
             }
         }
         // move
-        case (2): {
+        case 2: {
             // if not spawned, spawn
             if (barrel_gobj == 0) {
                 // spawn barrel at center stage
@@ -627,9 +622,9 @@ void Barrel_Rand_Pos(Vec3 *pos, Vec3 *barrel_lastpos) {
         int line_index;
         int line_kind;
         Vec3 line_angle;
-        float from_x = Stage_GetCameraLeft() + (HSD_Randi(Stage_GetCameraRight() - Stage_GetCameraLeft())) + HSD_Randf();
+        float from_x = Stage_GetCameraLeft() + HSD_Randi(Stage_GetCameraRight() - Stage_GetCameraLeft()) + HSD_Randf();
         float to_x = from_x;
-        float from_y = Stage_GetCameraBottom() + (HSD_Randi(Stage_GetCameraTop() - Stage_GetCameraBottom())) + HSD_Randf();
+        float from_y = Stage_GetCameraBottom() + HSD_Randi(Stage_GetCameraTop() - Stage_GetCameraBottom()) + HSD_Randf();
         float to_y = from_y - 1000;
         int is_ground = GrColl_RaycastGround(pos, &line_index, &line_kind, &line_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, from_x, from_y, to_x, to_y, 0);
         raycast_num++;
@@ -638,7 +633,7 @@ void Barrel_Rand_Pos(Vec3 *pos, Vec3 *barrel_lastpos) {
         }
 
         // ensure it isnt too close to the previous
-        float distance = sqrtf(pow((pos->X - barrel_lastpos->X), 2) + pow((pos->Y - barrel_lastpos->Y), 2));
+        float distance = sqrtf(pow(pos->X - barrel_lastpos->X, 2) + pow(pos->Y - barrel_lastpos->Y, 2));
         if (distance < 25) {
             continue;
         }
@@ -679,7 +674,7 @@ GOBJ *Barrel_Spawn(int pos_kind) {
 
     switch (pos_kind) {
         // random pos
-        case (1): {
+        case 1: {
             Barrel_Rand_Pos(&pos, barrel_lastpos);
             break;
         }

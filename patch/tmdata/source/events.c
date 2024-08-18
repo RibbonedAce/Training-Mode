@@ -1169,7 +1169,7 @@ static EventDesc *Minigames_Events[] = {
 
 static EventPage Minigames_Page = {
     .name = "Minigames",
-    .eventNum = (sizeof(Minigames_Events) / 4) - 1,
+    .eventNum = sizeof(Minigames_Events) / 4 - 1,
     .events = Minigames_Events,
 };
 
@@ -1194,7 +1194,7 @@ static EventDesc *General_Events[] = {
 
 static EventPage General_Page = {
     .name = "General Tech",
-    (sizeof(General_Events) / 4) - 1,
+    sizeof(General_Events) / 4 - 1,
     General_Events,
 };
 
@@ -1208,7 +1208,7 @@ static EventDesc *Spacie_Events[] = {
 
 static EventPage Spacie_Page = {
     .name = "Spacie Tech",
-    (sizeof(Spacie_Events) / 4) - 1,
+    sizeof(Spacie_Events) / 4 - 1,
     Spacie_Events,
 };
 
@@ -1337,7 +1337,7 @@ void EventInit(int page, int eventID, MatchInit *matchData) {
     }
 
     // Check if CPU is using the same character and color as P1
-    if ((playerKind == cpuKind) && (playerCostume == cpuCostume)) {
+    if (playerKind == cpuKind && playerCostume == cpuCostume) {
         // this doesnt account for if theyre both using the last costume
         cpuCostume += 1;
     }
@@ -1384,7 +1384,7 @@ void Hazards_Disable() {
     int is_fixwind = 0;
 
     switch (stage_internal) {
-        case (GR_STORY): {
+        case GR_STORY: {
             // remove shyguy map gobj proc
             GOBJ *shyguy_gobj = Stage_GetMapGObj(3);
             GObj_RemoveProc(shyguy_gobj);
@@ -1397,7 +1397,7 @@ void Hazards_Disable() {
 
             break;
         }
-        case (GR_PSTAD): {
+        case GR_PSTAD: {
             // remove map gobj proc
             GOBJ *map_gobj = Stage_GetMapGObj(2);
             GObj_RemoveProc(map_gobj);
@@ -1406,7 +1406,7 @@ void Hazards_Disable() {
 
             break;
         }
-        case (GR_OLDPU): {
+        case GR_OLDPU: {
             // remove map gobj proc
             GOBJ *map_gobj = Stage_GetMapGObj(7);
             GObj_RemoveProc(map_gobj);
@@ -1420,7 +1420,7 @@ void Hazards_Disable() {
 
             break;
         }
-        case (GR_FD): {
+        case GR_FD: {
             // set bg skip flag
             GOBJ *map_gobj = Stage_GetMapGObj(3);
             map_gobjData *map_data = map_gobj->userdata;
@@ -1548,13 +1548,13 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
         jobj_border->scale.Y = 1;
         jobj_border->scale.Z = 1;
         corners[0]->trans.X = -(ROWBOX_WIDTH / 2) + ROWBOX_X;
-        corners[0]->trans.Y = (ROWBOX_HEIGHT / 2) + ROWBOX_Y + (i * ROWBOX_YOFFSET);
-        corners[1]->trans.X = (ROWBOX_WIDTH / 2) + ROWBOX_X;
-        corners[1]->trans.Y = (ROWBOX_HEIGHT / 2) + ROWBOX_Y + (i * ROWBOX_YOFFSET);
+        corners[0]->trans.Y = ROWBOX_HEIGHT / 2 + ROWBOX_Y + i * ROWBOX_YOFFSET;
+        corners[1]->trans.X = ROWBOX_WIDTH / 2 + ROWBOX_X;
+        corners[1]->trans.Y = ROWBOX_HEIGHT / 2 + ROWBOX_Y + i * ROWBOX_YOFFSET;
         corners[2]->trans.X = -(ROWBOX_WIDTH / 2) + ROWBOX_X;
-        corners[2]->trans.Y = -(ROWBOX_HEIGHT / 2) + ROWBOX_Y + (i * ROWBOX_YOFFSET);
-        corners[3]->trans.X = (ROWBOX_WIDTH / 2) + ROWBOX_X;
-        corners[3]->trans.Y = -(ROWBOX_HEIGHT / 2) + ROWBOX_Y + (i * ROWBOX_YOFFSET);
+        corners[2]->trans.Y = -(ROWBOX_HEIGHT / 2) + ROWBOX_Y + i * ROWBOX_YOFFSET;
+        corners[3]->trans.X = ROWBOX_WIDTH / 2 + ROWBOX_X;
+        corners[3]->trans.Y = -(ROWBOX_HEIGHT / 2) + ROWBOX_Y + i * ROWBOX_YOFFSET;
         JOBJ_SetFlags(jobj_border, JOBJ_HIDDEN);
         DOBJ_SetFlags(jobj_border->dobj, DOBJ_HIDDEN);
         jobj_border->dobj->next->mobj->mat->alpha = 0.6;
@@ -1569,7 +1569,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
         JOBJ_AddChild(gobj->hsd_object, jobj_arrow);
         // move it into position
         jobj_arrow->trans.X = TICKBOX_X;
-        jobj_arrow->trans.Y = TICKBOX_Y + (i * ROWBOX_YOFFSET);
+        jobj_arrow->trans.Y = TICKBOX_Y + i * ROWBOX_YOFFSET;
         jobj_arrow->trans.Z = ROWBOX_Z;
         jobj_arrow->scale.X = TICKBOX_SCALE;
         jobj_arrow->scale.Y = TICKBOX_SCALE;
@@ -1597,12 +1597,12 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
     jobj_highlight->scale.Y = MENUHIGHLIGHT_SCALE;
     jobj_highlight->scale.Z = MENUHIGHLIGHT_SCALE;
     corners[0]->trans.X = -(MENUHIGHLIGHT_WIDTH / 2) + MENUHIGHLIGHT_X;
-    corners[0]->trans.Y = (MENUHIGHLIGHT_HEIGHT / 2) + MENUHIGHLIGHT_Y;
-    corners[1]->trans.X = (MENUHIGHLIGHT_WIDTH / 2) + MENUHIGHLIGHT_X;
-    corners[1]->trans.Y = (MENUHIGHLIGHT_HEIGHT / 2) + MENUHIGHLIGHT_Y;
+    corners[0]->trans.Y = MENUHIGHLIGHT_HEIGHT / 2 + MENUHIGHLIGHT_Y;
+    corners[1]->trans.X = MENUHIGHLIGHT_WIDTH / 2 + MENUHIGHLIGHT_X;
+    corners[1]->trans.Y = MENUHIGHLIGHT_HEIGHT / 2 + MENUHIGHLIGHT_Y;
     corners[2]->trans.X = -(MENUHIGHLIGHT_WIDTH / 2) + MENUHIGHLIGHT_X;
     corners[2]->trans.Y = -(MENUHIGHLIGHT_HEIGHT / 2) + MENUHIGHLIGHT_Y;
-    corners[3]->trans.X = (MENUHIGHLIGHT_WIDTH / 2) + MENUHIGHLIGHT_X;
+    corners[3]->trans.X = MENUHIGHLIGHT_WIDTH / 2 + MENUHIGHLIGHT_X;
     corners[3]->trans.Y = -(MENUHIGHLIGHT_HEIGHT / 2) + MENUHIGHLIGHT_Y;
     GXColor highlight = MENUHIGHLIGHT_COLOR;
     jobj_highlight->dobj->next->mobj->mat->alpha = 0.6;
@@ -1632,7 +1632,7 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu) {
 
         // calculate scrollbar size
         int max_steps = menuData->currMenu->option_num - MENU_MAXOPTION;
-        float botPos = MENUSCROLL_MAXLENGTH + (max_steps * MENUSCROLL_PEROPTION);
+        float botPos = MENUSCROLL_MAXLENGTH + max_steps * MENUSCROLL_PEROPTION;
         if (botPos > MENUSCROLL_MINLENGTH) {
             botPos = MENUSCROLL_MINLENGTH;
         }
@@ -1731,7 +1731,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     for (int i = 0; i < option_num; i++) {
         // output option name
         optionX = MENU_OPTIONNAMEXPOS;
-        optionY = MENU_OPTIONNAMEYPOS + (i * MENU_TEXTYOFFSET);
+        optionY = MENU_OPTIONNAMEYPOS + i * MENU_TEXTYOFFSET;
         subtext = Text_AddSubtext(text, optionX, optionY, nullString);
     }
 
@@ -1756,7 +1756,7 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu) {
     for (int i = 0; i < option_num; i++) {
         // output option value
         optionX = MENU_OPTIONVALXPOS;
-        optionY = MENU_OPTIONVALYPOS + (i * MENU_TEXTYOFFSET);
+        optionY = MENU_OPTIONVALYPOS + i * MENU_TEXTYOFFSET;
         subtext = Text_AddSubtext(text, optionX, optionY, nullString);
     }
 }
@@ -1794,7 +1794,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     text->trans.X = MENU_DESCXPOS;
     text->trans.Y = MENU_DESCYPOS;
     text->trans.Z = MENU_TEXTZ;
-    text->aspect.X = (DESC_TXTASPECT);
+    text->aspect.X = DESC_TXTASPECT;
 
     char *msg = currOption->desc;
 
@@ -1838,10 +1838,10 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
         msg_line[line_length] = '\0';
 
         // increment msg
-        msg += (line_length + 1); // +1 to skip past newline
+        msg += line_length + 1; // +1 to skip past newline
 
         // print line
-        int y_delta = (i * DESC_YOFFSET);
+        int y_delta = i * DESC_YOFFSET;
         Text_AddSubtext(text, 0, y_delta, msg_line);
     }
 
@@ -1905,7 +1905,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
 
             // show box
             JOBJ_ClearFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
-        } else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC)) {
+        } else if (currOption->option_kind == OPTKIND_MENU || currOption->option_kind == OPTKIND_FUNC) {
             // if this option is a menu or function
             Text_SetText(text, i, nullString);
         }
@@ -1973,12 +1973,12 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
     popup_joint->scale.Z = POPUP_SCALE;
     popup_joint->trans.Z = POPUP_Z;
     corners[0]->trans.X = -(POPUP_WIDTH / 2);
-    corners[0]->trans.Y = (POPUP_HEIGHT / 2);
-    corners[1]->trans.X = (POPUP_WIDTH / 2);
-    corners[1]->trans.Y = (POPUP_HEIGHT / 2);
+    corners[0]->trans.Y = POPUP_HEIGHT / 2;
+    corners[1]->trans.X = POPUP_WIDTH / 2;
+    corners[1]->trans.Y = POPUP_HEIGHT / 2;
     corners[2]->trans.X = -(POPUP_WIDTH / 2);
     corners[2]->trans.Y = -(POPUP_HEIGHT / 2);
-    corners[3]->trans.X = (POPUP_WIDTH / 2);
+    corners[3]->trans.X = POPUP_WIDTH / 2;
     corners[3]->trans.Y = -(POPUP_HEIGHT / 2);
 
     // add to gobj
@@ -1992,7 +1992,7 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
 
     // position popup X and Y (based on cursor value)
     popup_joint->trans.X = POPUP_X;
-    popup_joint->trans.Y = POPUP_Y + (POPUP_YOFFSET * cursor);
+    popup_joint->trans.Y = POPUP_Y + POPUP_YOFFSET * cursor;
 
     // create a highlight jobj
     JOBJ *jobj_highlight = JOBJ_LoadJoint(menuAssets->popup);
@@ -2006,12 +2006,12 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu) {
     jobj_highlight->scale.Y = 1;
     jobj_highlight->scale.Z = 1;
     corners[0]->trans.X = -(POPUPHIGHLIGHT_WIDTH / 2) + POPUPHIGHLIGHT_X;
-    corners[0]->trans.Y = (POPUPHIGHLIGHT_HEIGHT / 2) + POPUPHIGHLIGHT_Y;
-    corners[1]->trans.X = (POPUPHIGHLIGHT_WIDTH / 2) + POPUPHIGHLIGHT_X;
-    corners[1]->trans.Y = (POPUPHIGHLIGHT_HEIGHT / 2) + POPUPHIGHLIGHT_Y;
+    corners[0]->trans.Y = POPUPHIGHLIGHT_HEIGHT / 2 + POPUPHIGHLIGHT_Y;
+    corners[1]->trans.X = POPUPHIGHLIGHT_WIDTH / 2 + POPUPHIGHLIGHT_X;
+    corners[1]->trans.Y = POPUPHIGHLIGHT_HEIGHT / 2 + POPUPHIGHLIGHT_Y;
     corners[2]->trans.X = -(POPUPHIGHLIGHT_WIDTH / 2) + POPUPHIGHLIGHT_X;
     corners[2]->trans.Y = -(POPUPHIGHLIGHT_HEIGHT / 2) + POPUPHIGHLIGHT_Y;
-    corners[3]->trans.X = (POPUPHIGHLIGHT_WIDTH / 2) + POPUPHIGHLIGHT_X;
+    corners[3]->trans.X = POPUPHIGHLIGHT_WIDTH / 2 + POPUPHIGHLIGHT_X;
     corners[3]->trans.Y = -(POPUPHIGHLIGHT_HEIGHT / 2) + POPUPHIGHLIGHT_Y;
     GXColor highlight = POPUPHIGHLIGHT_COLOR;
     jobj_highlight->dobj->next->mobj->mat->alpha = 0.6;
@@ -2047,13 +2047,13 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu) {
     text->trans.Z = POPUP_TEXTZ;
 
     // determine base Y value
-    float baseYPos = POPUP_OPTIONVALYPOS + (cursor * MENU_TEXTYOFFSET);
+    float baseYPos = POPUP_OPTIONVALYPOS + cursor * MENU_TEXTYOFFSET;
 
     // Output all values
     for (int i = 0; i < value_num; i++) {
         // output option value
         float optionX = POPUP_OPTIONVALXPOS;
-        float optionY = baseYPos + (i * POPUP_TEXTYOFFSET);
+        float optionY = baseYPos + i * POPUP_TEXTYOFFSET;
         Text_AddSubtext(text, optionX, optionY, nullString);
     }
 }
@@ -2183,12 +2183,12 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     s16 value_min = 0;
     s16 value_max = currOption->value_num;
 
-    if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
+    if ((inputs & HSD_BUTTON_DOWN) != 0 || (inputs & HSD_BUTTON_DPAD_DOWN) != 0) {
         // check for dpad down
         // loop to find next option
         int count = 1; //
         int cursor_next = 0; // how much to move the cursor by
-        while (((cursor + count + scroll) < option_num)) {
+        while (cursor + count + scroll < option_num) {
             // option exists, check if its enabled
             if (currMenu->options[cursor + count + scroll].disable == 0) {
                 cursor_next = count;
@@ -2215,8 +2215,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
             } else {
                 // cursor overflowed, correct it
                 // adjust
-                scroll -= (cursor_max - (cursor + 1));
-                cursor = (cursor_max - 1);
+                scroll -= cursor_max - (cursor + 1);
+                cursor = cursor_max - 1;
 
                 // update cursor
                 currMenu->cursor = cursor;
@@ -2228,12 +2228,12 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    } else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
+    } else if ((inputs & HSD_BUTTON_UP) != 0 || (inputs & HSD_BUTTON_DPAD_UP) != 0) {
         // check for dpad up
         // loop to find next option
         int count = 1; //
         int cursor_next = 0; // how much to move the cursor by
-        while (((cursor + scroll - count) >= 0)) {
+        while (cursor + scroll - count >= 0) {
             // option exists, check if its enabled
             if (currMenu->options[cursor + scroll - count].disable == 0) {
                 cursor_next = count;
@@ -2273,10 +2273,9 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    } else if (((inputs & HSD_BUTTON_LEFT) != 0) || ((inputs & HSD_BUTTON_DPAD_LEFT) != 0)) {
+    } else if ((inputs & HSD_BUTTON_LEFT) != 0 || (inputs & HSD_BUTTON_DPAD_LEFT) != 0) {
         // check for left
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (
-                currOption->option_kind == OPTKIND_FLOAT)) {
+        if (currOption->option_kind == OPTKIND_STRING || currOption->option_kind == OPTKIND_INT || currOption->option_kind == OPTKIND_FLOAT) {
             option_val -= 1;
             if (option_val >= value_min) {
                 isChanged = 1;
@@ -2293,11 +2292,10 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 }
             }
         }
-    } else if (((inputs & HSD_BUTTON_RIGHT) != 0) || ((inputs & HSD_BUTTON_DPAD_RIGHT) != 0)) {
+    } else if ((inputs & HSD_BUTTON_RIGHT) != 0 || (inputs & HSD_BUTTON_DPAD_RIGHT) != 0) {
         // check for right
         // check for valid option kind
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (
-                currOption->option_kind == OPTKIND_FLOAT)) {
+        if (currOption->option_kind == OPTKIND_STRING || currOption->option_kind == OPTKIND_INT || currOption->option_kind == OPTKIND_FLOAT) {
             option_val += 1;
             if (option_val < value_max) {
                 isChanged = 1;
@@ -2317,7 +2315,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     } else if (inputs_rapid & HSD_BUTTON_A) {
         // check for A
         // check to advance a menu
-        if ((currOption->option_kind == OPTKIND_MENU)) {
+        if (currOption->option_kind == OPTKIND_MENU) {
             // access this menu
             currMenu->state = EMSTATE_OPENSUB;
 
@@ -2339,7 +2337,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         }
 
         // check to run a function
-        if ((currOption->option_kind == OPTKIND_FUNC) && (currOption->onOptionSelect != 0)) {
+        if (currOption->option_kind == OPTKIND_FUNC && currOption->onOptionSelect != 0) {
             // execute function
             currOption->onOptionSelect(gobj);
 
@@ -2411,7 +2409,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
         cursor_max = MENU_POPMAXOPTION;
     }
 
-    if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
+    if ((inputs & HSD_BUTTON_DOWN) != 0 || (inputs & HSD_BUTTON_DPAD_DOWN) != 0) {
         // check for dpad down
         cursor += 1;
 
@@ -2427,7 +2425,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
         } else {
             // cursor overflowed, check to scroll
             // cursor+scroll is in bounds, increment scroll
-            if ((cursor + scroll) < value_num) {
+            if (cursor + scroll < value_num) {
                 // adjust
                 scroll++;
                 cursor--;
@@ -2442,7 +2440,7 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
             }
         }
-    } else if (((inputs & HSD_BUTTON_UP) != 0) || ((inputs & HSD_BUTTON_DPAD_UP) != 0)) {
+    } else if ((inputs & HSD_BUTTON_UP) != 0 || (inputs & HSD_BUTTON_DPAD_UP) != 0) {
         // check for dpad up
         cursor -= 1;
 
@@ -2518,7 +2516,7 @@ void EventMenu_Update(GOBJ *gobj) {
     if (menuData->custom_gobj_think != 0) {
         // if a custom menu is in use, run its function
         update_menu = menuData->custom_gobj_think(menuData->custom_gobj);
-    } else if ((menuData->isPaused == 1) && (currMenu->menu_think != 0)) {
+    } else if (menuData->isPaused == 1 && currMenu->menu_think != 0) {
         // if this menu has an upate function, run its function
         update_menu = currMenu->menu_think(gobj);
     }
@@ -2535,7 +2533,7 @@ void EventMenu_Update(GOBJ *gobj) {
 
                 // in develop mode, use X+DPad up
                 if (*stc_dblevel >= 3) {
-                    if ((pad->held & HSD_BUTTON_X) && (pad->down & HSD_BUTTON_DPAD_UP)) {
+                    if (pad->held & HSD_BUTTON_X && pad->down & HSD_BUTTON_DPAD_UP) {
                         isPress = 1;
                         menuData->controller_index = controller_index;
                         break;
@@ -2585,7 +2583,7 @@ void EventMenu_Update(GOBJ *gobj) {
                 Match_ShowHUD();
                 Match_AdjustSoundOnPause(0);
             }
-        } else if ((menuData->isPaused == 1) && (stc_event_vars.hide_menu == 0)) {
+        } else if (menuData->isPaused == 1 && stc_event_vars.hide_menu == 0) {
             // run menu logic if the menu is shown
             // Get the current menu
             currMenu = menuData->currMenu;
@@ -2639,7 +2637,7 @@ void TM_ConsoleThink(GOBJ *gobj) {
     // check to toggle console
     for (int i = 0; i < 4; i++) {
         HSD_Pad *pad = PadGet(i, PADGET_MASTER);
-        if (pad->held & (HSD_TRIGGER_L | HSD_TRIGGER_R) && (pad->down & HSD_TRIGGER_Z)) {
+        if (pad->held & (HSD_TRIGGER_L | HSD_TRIGGER_R) && pad->down & HSD_TRIGGER_Z) {
             // toggle visibility
             text->show_text ^= 1;
             text->show_background ^= 1;
@@ -2769,14 +2767,14 @@ int Savestate_Save(Savestate *savestate) {
     while (fighter != 0) {
         FighterData *fighter_data = fighter->userdata;
 
-        if ((fighter_data->cb.OnDeath != 0) ||
-            (fighter_data->cb.OnDeath2 != 0) ||
-            (fighter_data->cb.OnDeath3 != 0) ||
-            (fighter_data->heldItem != 0) ||
-            (fighter_data->x1978 != 0) ||
-            (fighter_data->accessory != 0) ||
+        if (fighter_data->cb.OnDeath != 0 ||
+            fighter_data->cb.OnDeath2 != 0 ||
+            fighter_data->cb.OnDeath3 != 0 ||
+            fighter_data->heldItem != 0 ||
+            fighter_data->x1978 != 0 ||
+            fighter_data->accessory != 0 ||
             // hardcode ness' usmash because it doesnt destroy the yoyo via onhit callback...
-            ((fighter_data->kind == 8) && ((fighter_data->state >= 342) && (fighter_data->state <= 344)))) {
+            (fighter_data->kind == 8 && (fighter_data->state >= 342 && fighter_data->state <= 344))) {
             // cannot save
             canSave = 0;
             break;
@@ -2878,24 +2876,24 @@ int Savestate_Save(Savestate *savestate) {
                         memcpy(&ft_data->cb, &fighter_data->cb, sizeof(fighter_data->cb)); // copy hitbox
 
                         // convert hitbox pointers
-                        for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++) {
+                        for (int k = 0; k < sizeof(fighter_data->hitbox) / sizeof(ftHit); k++) {
                             ft_data->hitbox[k].bone = BoneToID(fighter_data, fighter_data->hitbox[k].bone);
                             // pointers to hitbox victims
-                            for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) {
+                            for (int l = 0; l < sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim); l++) {
                                 ft_data->hitbox[k].victims[l].victim_data = FtDataToID(fighter_data->hitbox[k].victims[l].victim_data);
                             }
                         }
-                        for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
+                        for (int k = 0; k < sizeof(fighter_data->throw_hitbox) / sizeof(ftHit); k++) {
                             ft_data->throw_hitbox[k].bone = BoneToID(fighter_data, fighter_data->throw_hitbox[k].bone);
                             // pointers to hitbox victims
-                            for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) {
+                            for (int l = 0; l < sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim); l++) {
                                 ft_data->throw_hitbox[k].victims[l].victim_data = FtDataToID(fighter_data->throw_hitbox[k].victims[l].victim_data);
                             }
                         }
 
                         ft_data->unk_hitbox.bone = BoneToID(fighter_data, fighter_data->unk_hitbox.bone);
                         // pointers to hitbox victims
-                        for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) {
+                        for (int k = 0; k < sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim); k++) {
                             ft_data->unk_hitbox.victims[k].victim_data = FtDataToID(fighter_data->unk_hitbox.victims[k].victim_data);
                         }
 
@@ -2919,8 +2917,8 @@ int Savestate_Save(Savestate *savestate) {
         SFX_PlayCommon(1);
 
         // if not in frame advance, flash screen. I wrote it like this because the second condition kept getting optimized out
-        if ((Pause_CheckStatus(0) != 1)) {
-            if ((Pause_CheckStatus(1) != 2)) {
+        if (Pause_CheckStatus(0) != 1) {
+            if (Pause_CheckStatus(1) != 2) {
                 ScreenFlash_Create(2, 0);
             }
         }
@@ -2966,7 +2964,7 @@ int Savestate_Load(Savestate *savestate) {
         }
 
         // if the main fighter and backup exists
-        if ((queue[0].fighter != 0) && (savestate->ft_state[i].data[0].is_exist == 1)) {
+        if (queue[0].fighter != 0 && savestate->ft_state[i].data[0].is_exist == 1) {
             FtState *ft_state = &savestate->ft_state[i];
 
             isLoaded = 1;
@@ -3040,23 +3038,23 @@ int Savestate_Load(Savestate *savestate) {
                     fighter_data->grab.grab_victim = IDToGOBJ(ft_data->grab.grab_victim);
 
                     // convert pointers
-                    for (int k = 0; k < (sizeof(fighter_data->hitbox) / sizeof(ftHit)); k++) {
+                    for (int k = 0; k < sizeof(fighter_data->hitbox) / sizeof(ftHit); k++) {
                         fighter_data->hitbox[k].bone = IDToBone(fighter_data, ft_data->hitbox[k].bone);
                         // pointers to hitbox victims
-                        for (int l = 0; l < (sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim)); l++) {
+                        for (int l = 0; l < sizeof(fighter_data->hitbox->victims) / sizeof(HitVictim); l++) {
                             fighter_data->hitbox[k].victims[l].victim_data = IDToFtData(ft_data->hitbox[k].victims[l].victim_data);
                         }
                     }
-                    for (int k = 0; k < (sizeof(fighter_data->throw_hitbox) / sizeof(ftHit)); k++) {
+                    for (int k = 0; k < sizeof(fighter_data->throw_hitbox) / sizeof(ftHit); k++) {
                         fighter_data->throw_hitbox[k].bone = IDToBone(fighter_data, ft_data->throw_hitbox[k].bone);
                         // pointers to hitbox victims
-                        for (int l = 0; l < (sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim)); l++) {
+                        for (int l = 0; l < sizeof(fighter_data->throw_hitbox->victims) / sizeof(HitVictim); l++) {
                             fighter_data->throw_hitbox[k].victims[l].victim_data = IDToFtData(ft_data->throw_hitbox[k].victims[l].victim_data);
                         }
                     }
                     fighter_data->unk_hitbox.bone = IDToBone(fighter_data, ft_data->unk_hitbox.bone);
                     // pointers to hitbox victims
-                    for (int k = 0; k < (sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim)); k++) {
+                    for (int k = 0; k < sizeof(fighter_data->unk_hitbox.victims) / sizeof(HitVictim); k++) {
                         fighter_data->unk_hitbox.victims[k].victim_data = IDToFtData(ft_data->unk_hitbox.victims[k].victim_data);
                     }
 
@@ -3114,7 +3112,7 @@ int Savestate_Load(Savestate *savestate) {
                     Fighter_ColorRemove(fighter_data, 9);
 
                     // restore color
-                    for (int k = 0; k < (sizeof(fighter_data->color) / sizeof(ColorOverlay)); k++) {
+                    for (int k = 0; k < sizeof(fighter_data->color) / sizeof(ColorOverlay); k++) {
                         ColorOverlay *thiscolor = &fighter_data->color[k];
                         ColorOverlay *savedcolor = &ft_data->color[k];
 
@@ -3165,7 +3163,7 @@ int Savestate_Load(Savestate *savestate) {
                     Fighter_UpdateIK(fighter);
 
                     // if shield is up, update shield
-                    if ((fighter_data->state >= ASID_GUARDON) && (fighter_data->state <= ASID_GUARDREFLECT)) {
+                    if (fighter_data->state >= ASID_GUARDON && fighter_data->state <= ASID_GUARDREFLECT) {
                         // get gfx ID
                         int shieldGFX;
                         static u16 ShieldGFXLookup[] = {1047, 1048, -1, 1049, -1}; // covers GUARDON -> GUARDREFLECT
@@ -3176,7 +3174,7 @@ int Savestate_Load(Savestate *savestate) {
                         GXColor *shieldColors = R13_PTR(-0x5194);
                         GXColor *shieldColor = &shieldColors[color_index];
                         JOBJ *shieldBone = fighter_data->bones[fighter_data->ftData->modelLookup[0x11]].joint;
-                        int shieldColorParam = (shieldColor->r << 16) | (shieldColor->b << 8) | (shieldColor->g);
+                        int shieldColorParam = shieldColor->r << 16 | shieldColor->b << 8 | shieldColor->g;
                         Effect_SpawnSync(shieldGFX, fighter, shieldBone, shieldColorParam);
 
                         Fighter_UpdateShieldGFX(fighter, 1);
@@ -3341,13 +3339,12 @@ void Update_Savestates() {
                 HSD_Pad *pad = PadGet(fighter_data->ply, PADGET_MASTER);
 
                 // check for savestate
-                int blacklist = (
-                    HSD_BUTTON_DPAD_DOWN | HSD_BUTTON_DPAD_UP | HSD_TRIGGER_Z | HSD_TRIGGER_R | HSD_BUTTON_A |
-                    HSD_BUTTON_B | HSD_BUTTON_X | HSD_BUTTON_Y | HSD_BUTTON_START);
-                if (((pad->down & HSD_BUTTON_DPAD_RIGHT) != 0) && ((pad->held & (blacklist)) == 0)) {
+                int blacklist = HSD_BUTTON_DPAD_DOWN | HSD_BUTTON_DPAD_UP | HSD_TRIGGER_Z | HSD_TRIGGER_R | HSD_BUTTON_A |
+                                HSD_BUTTON_B | HSD_BUTTON_X | HSD_BUTTON_Y | HSD_BUTTON_START;
+                if ((pad->down & HSD_BUTTON_DPAD_RIGHT) != 0 && (pad->held & blacklist) == 0) {
                     // save state
                     Savestate_Save(stc_savestate);
-                } else if (((pad->down & HSD_BUTTON_DPAD_LEFT) != 0) && ((pad->held & (blacklist)) == 0)) {
+                } else if ((pad->down & HSD_BUTTON_DPAD_LEFT) != 0 && (pad->held & blacklist) == 0) {
                     // load state
                     Savestate_Load(stc_savestate);
                 }
@@ -3372,7 +3369,7 @@ int GOBJToID(GOBJ *gobj) {
     u8 ply = ft_data->ply;
     u8 ms = ft_data->flags.ms;
 
-    return ((ply << 4) | ms);
+    return ply << 4 | ms;
 }
 
 int FtDataToID(FighterData *fighter_data) {
@@ -3390,7 +3387,7 @@ int FtDataToID(FighterData *fighter_data) {
     u8 ply = fighter_data->ply;
     u8 ms = fighter_data->flags.ms;
 
-    return ((ply << 4) | ms);
+    return ply << 4 | ms;
 }
 
 int BoneToID(FighterData *fighter_data, JOBJ *bone) {
@@ -3426,7 +3423,7 @@ GOBJ *IDToGOBJ(int id) {
     }
 
     // get ply and ms
-    u8 ply = (id >> 4) & 0xF;
+    u8 ply = id >> 4 & 0xF;
     u8 ms = id & 0xF;
 
     // get the gobj for this fighter
@@ -3442,7 +3439,7 @@ FighterData *IDToFtData(int id) {
     }
 
     // get ply and ms
-    u8 ply = (id >> 4) & 0xF;
+    u8 ply = id >> 4 & 0xF;
     u8 ms = id & 0xF;
 
     // get the gobj for this fighter
@@ -3534,14 +3531,14 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     // background scale
     msg_jobj->scale = scale;
     // text scale
-    msg_text->scale.X = (scale.X * 0.01) * MSGTEXT_BASESCALE;
-    msg_text->scale.Y = (scale.Y * 0.01) * MSGTEXT_BASESCALE;
+    msg_text->scale.X = scale.X * 0.01 * MSGTEXT_BASESCALE;
+    msg_text->scale.Y = scale.Y * 0.01 * MSGTEXT_BASESCALE;
     msg_text->aspect.X = MSGTEXT_BASEWIDTH;
 
     JOBJ_SetMtxDirtySub(msg_jobj);
 
     // build string
-    char buffer[(MSG_LINEMAX * MSG_CHARMAX) + 1];
+    char buffer[MSG_LINEMAX * MSG_CHARMAX + 1];
     va_start(args, format);
     vsprintf(buffer, format, args);
     va_end(args);
@@ -3587,11 +3584,11 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
         msg_line[line_length] = '\0';
 
         // increment msg
-        msg += (line_length + 1); // +1 to skip past newline
+        msg += line_length + 1; // +1 to skip past newline
 
         // print line
-        int y_base = (line_num - 1) * ((-1 * MSGTEXT_YOFFSET) / 2);
-        int y_delta = (i * MSGTEXT_YOFFSET);
+        int y_base = (line_num - 1) * (-1 * MSGTEXT_YOFFSET / 2);
+        int y_delta = i * MSGTEXT_YOFFSET;
         Text_AddSubtext(msg_text, 0, y_base + y_delta, msg_line);
     }
 
@@ -3610,7 +3607,7 @@ void Message_Manager(GOBJ *mngr_gobj) {
 
         // anim update (time based logic)
         // iterate through backwards (because deletions)
-        for (int j = (MSGQUEUE_SIZE - 2); j >= 0; j--) {
+        for (int j = MSGQUEUE_SIZE - 2; j >= 0; j--) {
             GOBJ *this_msg_gobj = msg_queue[j];
 
             // if message exists
@@ -3630,9 +3627,9 @@ void Message_Manager(GOBJ *mngr_gobj) {
                 }
 
                 switch (this_msg_data->state) {
-                    case (MSGSTATE_DELETE): {
+                    case MSGSTATE_DELETE: {
                         // if timer is ended, remove the message
-                        if ((this_msg_data->anim_timer <= 0)) {
+                        if (this_msg_data->anim_timer <= 0) {
                             Message_Destroy(msg_queue, j);
                         }
 
@@ -3685,9 +3682,9 @@ void Message_Manager(GOBJ *mngr_gobj) {
                 this_msg_pos.X = base_pos.X; // Get this messages position
 
                 switch (this_msg_data->state) {
-                    case (MSGSTATE_DELETE): {
+                    case MSGSTATE_DELETE: {
                         // get time
-                        float t = ((this_msg_data->anim_timer) / (float) MSGTIMER_DELETE);
+                        float t = this_msg_data->anim_timer / (float) MSGTIMER_DELETE;
 
                         Vec3 *scale = &this_msg_jobj->scale;
                         Vec3 *pos = &this_msg_jobj->trans;
@@ -3695,24 +3692,24 @@ void Message_Manager(GOBJ *mngr_gobj) {
                         // BG scale
                         scale->Y = BezierBlend(t);
                         // text scale
-                        this_msg_text->scale.Y = (scale->Y * 0.01) * MSGTEXT_BASESCALE;
+                        this_msg_text->scale.Y = scale->Y * 0.01 * MSGTEXT_BASESCALE;
                         // text position
-                        this_msg_text->trans.Y = (pos->Y * -1) + (MSGTEXT_BASEY * (scale->Y / 4.0));
+                        this_msg_text->trans.Y = pos->Y * -1 + MSGTEXT_BASEY * (scale->Y / 4.0);
 
                         break;
                     }
                     default: {
                         // get time
-                        float t = (((float) MSGTIMER_SHIFT - this_msg_data->anim_timer) / MSGTIMER_SHIFT);
+                        float t = ((float) MSGTIMER_SHIFT - this_msg_data->anim_timer) / MSGTIMER_SHIFT;
 
                         // get initial and final position for animation
-                        float final_pos = base_pos.Y + ((float) j * pos_delta);
-                        float initial_pos = base_pos.Y + ((float) this_msg_data->prev_index * pos_delta);
+                        float final_pos = base_pos.Y + (float) j * pos_delta;
+                        float initial_pos = base_pos.Y + (float) this_msg_data->prev_index * pos_delta;
                         // if using frame advance, do not animate
                         if (Pause_CheckStatus(0) == 1) {
                             this_msg_pos.Y = final_pos;
                         } else {
-                            this_msg_pos.Y = (BezierBlend(t) * (final_pos - initial_pos)) + initial_pos;
+                            this_msg_pos.Y = BezierBlend(t) * (final_pos - initial_pos) + initial_pos;
                         }
 
                         Vec3 scale = this_msg_jobj->scale;
@@ -3721,8 +3718,8 @@ void Message_Manager(GOBJ *mngr_gobj) {
                         this_msg_jobj->trans.X = this_msg_pos.X;
                         this_msg_jobj->trans.Y = this_msg_pos.Y;
                         // text position
-                        this_msg_text->trans.X = this_msg_pos.X + (MSGTEXT_BASEX * (scale.X / 4.0));
-                        this_msg_text->trans.Y = (this_msg_pos.Y * -1) + (MSGTEXT_BASEY * (scale.Y / 4.0));
+                        this_msg_text->trans.X = this_msg_pos.X + MSGTEXT_BASEX * (scale.X / 4.0);
+                        this_msg_text->trans.Y = this_msg_pos.Y * -1 + MSGTEXT_BASEY * (scale.Y / 4.0);
 
                         // adjust bar
                         JOBJ *bar;
@@ -3757,7 +3754,7 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num) {
     msg_queue[msg_num] = 0;
 
     // shift others
-    for (int i = (msg_num); i < (MSGQUEUE_SIZE - 1); i++) {
+    for (int i = msg_num; i < MSGQUEUE_SIZE - 1; i++) {
         msg_queue[i] = msg_queue[i + 1];
 
         // update its prev pos
@@ -3788,7 +3785,7 @@ void Message_Add(GOBJ *msg_gobj, int queue_num) {
             MsgData *this_msg_data = this_msg_gobj->userdata;
 
             // Remove this message if its of the same kind
-            if ((this_msg_data->kind == msg_data->kind)) {
+            if (this_msg_data->kind == msg_data->kind) {
                 Message_Destroy(msg_queue, i); // remove the message and shift others
 
                 // if the message we're replacing is the most recent message, instantly
@@ -3807,7 +3804,7 @@ void Message_Add(GOBJ *msg_gobj, int queue_num) {
     }
 
     // shift other messages
-    for (int i = (MSGQUEUE_SIZE - 2); i >= 0; i--) {
+    for (int i = MSGQUEUE_SIZE - 2; i >= 0; i--) {
         // shift message
         msg_queue[i + 1] = msg_queue[i];
 
@@ -3853,13 +3850,13 @@ void Tip_Think(GOBJ *gobj) {
         JOBJ_GetChild(tip_gobj->hsd_object, (int)&tip_jobj, TIP_TXTJOINT, -1);
         JOBJ_GetWorldPosition(tip_jobj, 0, &tip_pos);
         Text *tip_text = stc_tipmgr.text;
-        tip_text->trans.X = tip_pos.X + (0 * (tip_jobj->scale.X / 4.0));
-        tip_text->trans.Y = (tip_pos.Y * -1) + (0 * (tip_jobj->scale.Y / 4.0));
+        tip_text->trans.X = tip_pos.X + 0 * (tip_jobj->scale.X / 4.0);
+        tip_text->trans.Y = tip_pos.Y * -1 + 0 * (tip_jobj->scale.Y / 4.0);
 
         // state logic
         switch (stc_tipmgr.state) {
             // in
-            case (0): {
+            case 0: {
                 // if anim is done, enter wait
                 if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0) {
                     stc_tipmgr.state = 1; // enter wait
@@ -3868,7 +3865,7 @@ void Tip_Think(GOBJ *gobj) {
                 break;
             }
             // wait
-            case (1): {
+            case 1: {
                 // sub timer
                 stc_tipmgr.lifetime--;
                 if (stc_tipmgr.lifetime <= 0) {
@@ -3884,7 +3881,7 @@ void Tip_Think(GOBJ *gobj) {
                 break;
             }
             // out
-            case (2): {
+            case 2: {
                 // if anim is done, destroy
                 if (JOBJ_CheckAObjEnd(tip_gobj->hsd_object) == 0) {
                     // remove text
@@ -3947,9 +3944,9 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     // background scale
     tip_jobj->scale = scale;
     // text scale
-    tip_text->scale.X = (scale.X * 0.01) * TIP_TXTSIZEX;
-    tip_text->scale.Y = (scale.Y * 0.01) * TIP_TXTSIZEY;
-    tip_text->aspect.X = (TIP_TXTASPECT / TIP_TXTSIZEX);
+    tip_text->scale.X = scale.X * 0.01 * TIP_TXTSIZEX;
+    tip_text->scale.Y = scale.Y * 0.01 * TIP_TXTSIZEY;
+    tip_text->aspect.X = TIP_TXTASPECT / TIP_TXTSIZEX;
 
     // apply enter anim
     JOBJ_RemoveAnimAll(tip_jobj);
@@ -3957,7 +3954,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     JOBJ_ReqAnimAll(tip_jobj, 0);
 
     // build string
-    char buffer[(TIP_LINEMAX * TIP_CHARMAX) + 1];
+    char buffer[TIP_LINEMAX * TIP_CHARMAX + 1];
     va_start(args, fmt);
     vsprintf(buffer, fmt, args);
     va_end(args);
@@ -4003,10 +4000,10 @@ int Tip_Display(int lifetime, char *fmt, ...) {
         msg_line[line_length] = '\0';
 
         // increment msg
-        msg += (line_length + 1); // +1 to skip past newline
+        msg += line_length + 1; // +1 to skip past newline
 
         // print line
-        int y_delta = (i * MSGTEXT_YOFFSET);
+        int y_delta = i * MSGTEXT_YOFFSET;
         Text_AddSubtext(tip_text, 0, y_delta, msg_line);
     }
 
@@ -4015,7 +4012,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
 
 void Tip_Destroy() {
     // check if tip exists and isnt in exit state, enter exit
-    if ((stc_tipmgr.gobj != 0) && (stc_tipmgr.state != 2)) {
+    if (stc_tipmgr.gobj != 0 && stc_tipmgr.state != 2) {
         // apply exit anim
         JOBJ *tip_root = stc_tipmgr.gobj->hsd_object;
         JOBJ_RemoveAnimAll(tip_root);
@@ -4077,82 +4074,82 @@ GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu) {
 EventDesc *GetEventDesc(int page, int event) {
     EventPage *thisPage = EventPages[page];
     EventDesc *thisEvent = thisPage->events[event];
-    return (thisEvent);
+    return thisEvent;
 }
 
 char *GetEventName(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->eventName);
+    return thisEvent->eventName;
 }
 
 char *GetEventDescription(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->eventDescription);
+    return thisEvent->eventDescription;
 }
 
 char *GetEventTut(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->eventTutorial);
+    return thisEvent->eventTutorial;
 }
 
 char *GetPageName(int page) {
     EventPage *thisPage = EventPages[page];
-    return (thisPage->name);
+    return thisPage->name;
 }
 
 char *GetEventFile(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->eventFile);
+    return thisEvent->eventFile;
 }
 
 char *GetCSSFile(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->eventCSSFile);
+    return thisEvent->eventCSSFile;
 }
 
 int GetPageEventNum(int page) {
     EventPage *thisPage = EventPages[page];
-    return (thisPage->eventNum);
+    return thisPage->eventNum;
 }
 
 char *GetTMVersShort() {
-    return (TM_VersShort);
+    return TM_VersShort;
 }
 
 char *GetTMVersLong() {
-    return (TM_VersLong);
+    return TM_VersLong;
 }
 
 char *GetTMCompile() {
-    return (TM_Compile);
+    return TM_Compile;
 }
 
 int GetPageNum() {
-    int pageNum = (sizeof(EventPages) / 4) - 1;
-    return (pageNum);
+    int pageNum = sizeof(EventPages) / 4 - 1;
+    return pageNum;
 }
 
 u8 GetIsChooseCPU(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->isChooseCPU);
+    return thisEvent->isChooseCPU;
 }
 
 u8 GetIsSelectStage(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->isSelectStage);
+    return thisEvent->isSelectStage;
 }
 
 s8 GetFighter(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->matchData->playerKind);
+    return thisEvent->matchData->playerKind;
 }
 
 s8 GetCPUFighter(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->matchData->cpuKind);
+    return thisEvent->matchData->cpuKind;
 }
 
 s16 GetStage(int page, int event) {
     EventDesc *thisEvent = GetEventDesc(page, event);
-    return (thisEvent->matchData->stage);
+    return thisEvent->matchData->stage;
 }

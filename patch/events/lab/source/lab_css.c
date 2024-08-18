@@ -57,7 +57,7 @@ void OnCSSLoad(ArchiveInfo *archive) {
     import_data.snap.image = calloc(GXGetTexBufferSize(RESIZE_WIDTH, RESIZE_HEIGHT, 4, 0, 0)); // allocate 128 entries
 
     // HUGE HACK ALERT
-    EventDesc *(*GetEventDesc)(int page, int event) = RTOC_PTR(TM_DATA + (24 * 4));
+    EventDesc *(*GetEventDesc)(int page, int event) = RTOC_PTR(TM_DATA + 24 * 4);
     EventDesc *event_desc = GetEventDesc(1, 0);
     event_desc->isSelectStage = 1;
     event_desc->matchData->stage = -1;
@@ -81,10 +81,10 @@ void Button_Create() {
     button_text->kerning = 1;
     button_text->align = 1;
     button_text->use_aspect = 1;
-    button_text->scale.X = (scale->X * 0.01) * 3;
-    button_text->scale.Y = (scale->Y * 0.01) * 3;
-    button_text->trans.X = button_jobj->trans.X + (0 * (scale->X / 4.0));
-    button_text->trans.Y = (button_jobj->trans.Y * -1) + (-1.6 * (scale->Y / 4.0));
+    button_text->scale.X = scale->X * 0.01 * 3;
+    button_text->scale.Y = scale->Y * 0.01 * 3;
+    button_text->trans.X = button_jobj->trans.X + 0 * (scale->X / 4.0);
+    button_text->trans.Y = button_jobj->trans.Y * -1 + -1.6 * (scale->Y / 4.0);
     Text_AddSubtext(button_text, 0, 0, "Import");
 }
 
@@ -101,12 +101,12 @@ void Button_Think(GOBJ *button_gobj) {
     Vec3 *button_pos = &button_jobj->trans;
 
     // check if cursor is hovered over button
-    if ((import_data.menu_gobj == 0) &&
-        (cursor_pos.X < (button_pos->X + BUTTON_WIDTH)) &&
-        (cursor_pos.X > (button_pos->X - BUTTON_WIDTH)) &&
-        (cursor_pos.Y < (button_pos->Y + BUTTON_HEIGHT)) &&
-        (cursor_pos.Y > (button_pos->Y - BUTTON_HEIGHT)) &&
-        (down & HSD_BUTTON_A)) {
+    if (import_data.menu_gobj == 0 &&
+        cursor_pos.X < button_pos->X + BUTTON_WIDTH &&
+        cursor_pos.X > button_pos->X - BUTTON_WIDTH &&
+        cursor_pos.Y < button_pos->Y + BUTTON_HEIGHT &&
+        cursor_pos.Y > button_pos->Y - BUTTON_HEIGHT &&
+        down & HSD_BUTTON_A) {
         import_data.menu_gobj = Menu_Create();
         SFX_PlayCommon(1);
     }
@@ -134,8 +134,8 @@ void Menu_SelCard_Init(GOBJ *menu_gobj) {
     memcard_text->kerning = 1;
     memcard_text->align = 1;
     memcard_text->trans.Z = menu_jobj->trans.Z + 2;
-    memcard_text->scale.X = (menu_jobj->scale.X * 0.01) * 5;
-    memcard_text->scale.Y = (menu_jobj->scale.Y * 0.01) * 5;
+    memcard_text->scale.X = menu_jobj->scale.X * 0.01 * 5;
+    memcard_text->scale.Y = menu_jobj->scale.Y * 0.01 * 5;
     import_data.option_text = memcard_text;
     Text_AddSubtext(memcard_text, -159, 45, "Slot A");
     Text_AddSubtext(memcard_text, 159, 45, "Slot B");
@@ -178,8 +178,8 @@ GOBJ *Menu_Create() {
     title_text->trans.X = -28;
     title_text->trans.Y = -21;
     title_text->trans.Z = menu_jobj->trans.Z;
-    title_text->scale.X = (menu_jobj->scale.X * 0.01) * 11;
-    title_text->scale.Y = (menu_jobj->scale.Y * 0.01) * 11;
+    title_text->scale.X = menu_jobj->scale.X * 0.01 * 11;
+    title_text->scale.Y = menu_jobj->scale.Y * 0.01 * 11;
     Text_AddSubtext(title_text, 0, 0, "-");
     import_data.title_text = title_text;
     Text *desc_text = Text_CreateText(SIS_ID, import_data.canvas);
@@ -189,8 +189,8 @@ GOBJ *Menu_Create() {
     desc_text->trans.X = -28;
     desc_text->trans.Y = 14.5;
     desc_text->trans.Z = menu_jobj->trans.Z;
-    desc_text->scale.X = (menu_jobj->scale.X * 0.01) * 5;
-    desc_text->scale.Y = (menu_jobj->scale.Y * 0.01) * 5;
+    desc_text->scale.X = menu_jobj->scale.X * 0.01 * 5;
+    desc_text->scale.Y = menu_jobj->scale.Y * 0.01 * 5;
     Text_AddSubtext(desc_text, 0, 0, "-");
     import_data.desc_text = desc_text;
 
@@ -252,11 +252,11 @@ void Menu_SelFile_Exit(GOBJ *menu_gobj) {
 void Menu_Destroy(GOBJ *menu_gobj) {
     // run specific menu state code
     switch (import_data.menu_state) {
-        case (IMP_SELCARD): {
+        case IMP_SELCARD: {
             Menu_SelCard_Exit(menu_gobj);
             break;
         }
-        case (IMP_SELFILE): {
+        case IMP_SELFILE: {
             Menu_SelFile_Exit(menu_gobj);
             break;
         }
@@ -290,12 +290,12 @@ int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
     int page_total = import_data.file_num / IMPORT_FILESPERPAGE;
 
     // ensure page exists
-    if ((page >= 0) && (page <= page_total)) {
+    if (page >= 0 && page <= page_total) {
         // determine files on page
-        if (((page + 1) * IMPORT_FILESPERPAGE) < import_data.file_num) {
+        if ((page + 1) * IMPORT_FILESPERPAGE < import_data.file_num) {
             files_on_page = IMPORT_FILESPERPAGE; // page is filled with files
         } else {
-            files_on_page = import_data.file_num - (page * IMPORT_FILESPERPAGE); // remaining files
+            files_on_page = import_data.file_num - page * IMPORT_FILESPERPAGE; // remaining files
         }
 
         // ensure page has at least one recording
@@ -323,7 +323,7 @@ int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
             int slot = import_data.memcard_slot;
 
             // update scroll bar position
-            import_data.scroll_top->trans.Y = ((float) page / (float) (page_total)) * (import_data.scroll_bot->trans.Y);
+            import_data.scroll_top->trans.Y = (float) page / (float) page_total * import_data.scroll_bot->trans.Y;
             JOBJ_SetMtxDirtySub(menu_gobj->hsd_object);
 
             // free prev buffers
@@ -357,7 +357,7 @@ int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page) {
                         // begin loading this page's files
                         for (int i = 0; i < files_on_page; i++) {
                             // get file info
-                            int this_file_index = (page * IMPORT_FILESPERPAGE) + i;
+                            int this_file_index = page * IMPORT_FILESPERPAGE + i;
                             char **file_name = import_data.file_info[this_file_index].file_name;
                             int file_no = import_data.file_info[this_file_index].file_no;
 
@@ -432,8 +432,8 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
     filename_text->trans.X = -27.8;
     filename_text->trans.Y = -13.6;
     filename_text->trans.Z = menu_jobj->trans.Z;
-    filename_text->scale.X = (menu_jobj->scale.X * 0.01) * 5;
-    filename_text->scale.Y = (menu_jobj->scale.Y * 0.01) * 5;
+    filename_text->scale.X = menu_jobj->scale.X * 0.01 * 5;
+    filename_text->scale.Y = menu_jobj->scale.Y * 0.01 * 5;
     import_data.filename_text = filename_text;
     for (int i = 0; i < IMPORT_FILESPERPAGE; i++) {
         Text_AddSubtext(filename_text, 0, i * 40, "");
@@ -446,8 +446,8 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
     fileinfo_text->use_aspect = 1;
     fileinfo_text->aspect.X = 300;
     fileinfo_text->trans.Z = menu_jobj->trans.Z;
-    fileinfo_text->scale.X = (menu_jobj->scale.X * 0.01) * 4.5;
-    fileinfo_text->scale.Y = (menu_jobj->scale.Y * 0.01) * 4.5;
+    fileinfo_text->scale.X = menu_jobj->scale.X * 0.01 * 4.5;
+    fileinfo_text->scale.Y = menu_jobj->scale.Y * 0.01 * 4.5;
     import_data.fileinfo_text = fileinfo_text;
     Text_AddSubtext(fileinfo_text, FILEINFO_X, FILEINFO_STAGEY, "Stage: ");
     Text_AddSubtext(fileinfo_text, FILEINFO_X, FILEINFO_HMNY, "HMN: ");
@@ -512,7 +512,7 @@ void Menu_SelFile_Init(GOBJ *menu_gobj) {
     if (page_total == 0) {
         JOBJ_SetFlagsAll(import_data.scroll_jobj, JOBJ_HIDDEN);
     } else {
-        import_data.scroll_bot->trans.Y = (-16.2 / (page_total + 1));
+        import_data.scroll_bot->trans.Y = -16.2 / (page_total + 1);
     }
 
     // display orig texture
@@ -557,7 +557,7 @@ void Menu_SelCard_Think(GOBJ *menu_gobj) {
                         // get free blocks
                         s32 byteNotUsed, filesNotUsed;
                         if (CARDFreeBlocks(i, &byteNotUsed, &filesNotUsed) == CARD_RESULT_READY) {
-                            import_data.memcard_free_blocks[i] = (byteNotUsed / 8192);
+                            import_data.memcard_free_blocks[i] = byteNotUsed / 8192;
                             import_data.memcard_free_files[i] = filesNotUsed;
                         }
                     } else {
@@ -644,9 +644,9 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
     }
 
     // check if any pending files to load
-    if ((import_data.snap.load_inprogress == 0) &&
+    if (import_data.snap.load_inprogress == 0 &&
         // checking inprogress again in case the code above set it to 0 this tick
-        (import_data.snap.loaded_num < import_data.files_on_page)) {
+        import_data.snap.loaded_num < import_data.files_on_page) {
         // find nearest unloaded file
         int file_to_load = 0;
         int cursor = import_data.cursor;
@@ -659,7 +659,7 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
             // search for unloaded snap nearest to the cursor
             int search_up = cursor;
             int search_down = cursor;
-            for (int i = 0; i < (IMPORT_FILESPERPAGE - 1); i++) {
+            for (int i = 0; i < IMPORT_FILESPERPAGE - 1; i++) {
                 search_up--;
                 search_down++;
 
@@ -684,7 +684,7 @@ void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj) {
         }
 
         // get filename and size for this file
-        int this_file_index = (import_data.page * IMPORT_FILESPERPAGE) + file_to_load;
+        int this_file_index = import_data.page * IMPORT_FILESPERPAGE + file_to_load;
         // page file index -> TMREC file index
         int file_size = import_data.file_info[this_file_index].file_size;
         char **file_name = import_data.file_info[this_file_index].file_name;
@@ -739,7 +739,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                 if (page_result == 1) {
                     // page loaded, update cursor
                     SFX_PlayCommon(2);
-                    import_data.cursor = (IMPORT_FILESPERPAGE - 1);
+                    import_data.cursor = IMPORT_FILESPERPAGE - 1;
                     import_data.page--;
                 } else if (page_result == -1) {
                     // create dialog
@@ -768,7 +768,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                 return;
             }
         } else if (down & (HSD_BUTTON_DOWN | HSD_BUTTON_DPAD_DOWN)) {
-            if (import_data.cursor == (IMPORT_FILESPERPAGE - 1)) {
+            if (import_data.cursor == IMPORT_FILESPERPAGE - 1) {
                 // check for cursor down
                 // if cursor is at the end of the page, try to advance to next
                 // try to load next page
@@ -784,7 +784,7 @@ void Menu_SelFile_Think(GOBJ *menu_gobj) {
                     SFX_PlayCommon(3);
                     return;
                 }
-            } else if ((import_data.cursor < import_data.files_on_page - 1)) {
+            } else if (import_data.cursor < import_data.files_on_page - 1) {
                 // if cursor can be advanced
                 import_data.cursor++;
                 SFX_PlayCommon(2);
@@ -878,11 +878,11 @@ void Menu_Think(GOBJ *menu_gobj) {
     *stc_css_delay = 2;
 
     switch (import_data.menu_state) {
-        case (IMP_SELCARD): {
+        case IMP_SELCARD: {
             Menu_SelCard_Think(menu_gobj);
             break;
         }
-        case (IMP_SELFILE): {
+        case IMP_SELFILE: {
             Menu_SelFile_Think(menu_gobj);
             break;
         }
@@ -1012,31 +1012,31 @@ void Menu_Confirm_Init(GOBJ *menu_gobj, int kind) {
     text->use_aspect = 1;
     text->aspect.X = 380;
     text->trans.Z = confirm_jobj->trans.Z;
-    text->scale.X = (confirm_jobj->scale.X * 0.01) * 6;
-    text->scale.Y = (confirm_jobj->scale.Y * 0.01) * 6;
+    text->scale.X = confirm_jobj->scale.X * 0.01 * 6;
+    text->scale.Y = confirm_jobj->scale.Y * 0.01 * 6;
     import_data.confirm.text = text;
 
     // decide text based on kind
     switch (kind) {
-        case (CFRM_LOAD): {
+        case CFRM_LOAD: {
             Text_AddSubtext(text, 0, -50, "Load this recording?");
             Text_AddSubtext(text, -65, 20, "Yes");
             Text_AddSubtext(text, 65, 20, "No");
             break;
         }
-        case (CFRM_OLD): {
+        case CFRM_OLD: {
             Text_AddSubtext(text, 0, -50, "Cannot load outdated recording.");
             Text_AddSubtext(text, 0, 20, "OK");
             Text_SetColor(import_data.confirm.text, 1, &text_gold);
             break;
         }
-        case (CFRM_NEW): {
+        case CFRM_NEW: {
             Text_AddSubtext(text, 0, -50, "Cannot load newer recording.");
             Text_AddSubtext(text, 0, 20, "OK");
             Text_SetColor(import_data.confirm.text, 1, &text_gold);
             break;
         }
-        case (CFRM_DEL): {
+        case CFRM_DEL: {
             Text_AddSubtext(text, 0, -50, "Delete this recording?");
             Text_AddSubtext(text, -65, 20, "Yes");
             Text_AddSubtext(text, 65, 20, "No");
@@ -1083,7 +1083,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
     }
 
     switch (import_data.confirm.kind) {
-        case (CFRM_LOAD): {
+        case CFRM_LOAD: {
             // cursor movement
             if (down & (HSD_BUTTON_RIGHT | HSD_BUTTON_DPAD_RIGHT)) {
                 // check for cursor right
@@ -1115,7 +1115,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                 if (cursor == 0) {
                     // get variables and junk
                     VSMinorData *css_minorscene = *stc_css_minorscene;
-                    int this_file_index = (import_data.page * IMPORT_FILESPERPAGE) + import_data.cursor;
+                    int this_file_index = import_data.page * IMPORT_FILESPERPAGE + import_data.cursor;
                     ExportHeader *header = &import_data.header[import_data.cursor];
                     Preload *preload = Preload_GetTable();
 
@@ -1159,7 +1159,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     *stc_css_exitkind = 1;
 
                     // HUGE HACK ALERT
-                    EventDesc *(*GetEventDesc)(int page, int event) = RTOC_PTR(TM_DATA + (24 * 4));
+                    EventDesc *(*GetEventDesc)(int page, int event) = RTOC_PTR(TM_DATA + 24 * 4);
                     EventDesc *event_desc = GetEventDesc(1, 0);
                     event_desc->isSelectStage = 0;
                     event_desc->matchData->stage = stage_kind;
@@ -1174,7 +1174,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
 
             break;
         }
-        case (CFRM_OLD): {
+        case CFRM_OLD: {
             // check for select
             if (down & (HSD_BUTTON_A | HSD_BUTTON_B)) {
                 Menu_Confirm_Exit(menu_gobj);
@@ -1183,7 +1183,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             }
             break;
         }
-        case (CFRM_NEW): {
+        case CFRM_NEW: {
             // check for select
             if (down & (HSD_BUTTON_A | HSD_BUTTON_B)) {
                 Menu_Confirm_Exit(menu_gobj);
@@ -1192,7 +1192,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
             }
             break;
         }
-        case (CFRM_DEL): {
+        case CFRM_DEL: {
             // cursor movement
             if (down & (HSD_BUTTON_RIGHT | HSD_BUTTON_DPAD_RIGHT)) {
                 // check for cursor right
@@ -1224,7 +1224,7 @@ void Menu_Confirm_Think(GOBJ *menu_gobj) {
                     SFX_PlayCommon(1);
 
                     // delete selected recording
-                    int this_file_index = (import_data.page * IMPORT_FILESPERPAGE) + import_data.cursor;
+                    int this_file_index = import_data.page * IMPORT_FILESPERPAGE + import_data.cursor;
                     Menu_SelFile_DeleteFile(menu_gobj, this_file_index);
 
                     // close dialog
