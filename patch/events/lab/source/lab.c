@@ -1639,8 +1639,8 @@ static char *keyboard_rows[2][4] = {
 static EventMenu *Event_Menu = &LabMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
-double Math_Pow(double x, double y) {
-    return pow(x, y);
+double Math_Sq(double x) {
+    return x * x;
 }
 
 // lz77 functions credited to https://github.com/andyherbert/lz1
@@ -3341,13 +3341,13 @@ void DIDraw_Update() {
                 ftCommonData *ftCmDt = R13_PTR(PLCO_FTCOMMON);
 
                 // Calculate ASDI
-                float asdi_mag = Math_Pow(ftCmDt->asdi_mag, 2);
+                float asdi_mag = Math_Sq(ftCmDt->asdi_mag);
                 float asdi_units = ftCmDt->asdi_units;
-                if (Math_Pow(cstickX, 2) + Math_Pow(cstickY, 2) >= asdi_mag) {
+                if (Math_Sq(cstickX) + Math_Sq(cstickY) >= asdi_mag) {
                     // CStick has priority, check if mag > 0.7
                     asdi.X = cstickX * asdi_units;
                     asdi.Y = cstickY * asdi_units;
-                } else if (Math_Pow(lstickX, 2) + Math_Pow(lstickY, 2) >= asdi_mag) {
+                } else if (Math_Sq(lstickX) + Math_Sq(lstickY) >= asdi_mag) {
                     // now check if lstick mag > 0.7
                     asdi.X = lstickX * asdi_units;
                     asdi.Y = lstickY * asdi_units;
@@ -3364,7 +3364,7 @@ void DIDraw_Update() {
                     float kb_mult = kb.Y * kb.Y + kb.X * kb.X;
                     if (kb_mult >= 0.00001) {
                         // get values
-                        float tdi_input = Math_Pow(-1 * kb.X * lstickY + lstickX * kb.Y, 2) / kb_mult;
+                        float tdi_input = Math_Sq(-1 * kb.X * lstickY + lstickX * kb.Y) / kb_mult;
                         float max_angle = ftCmDt->tdi_maxAngle * M_1DEGREE;
                         float kb_mag = sqrtf(kb_mult);
 

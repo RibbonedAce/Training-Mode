@@ -149,8 +149,8 @@ static EventMenu LClMenu_Main = {
 static EventMenu *Event_Menu = &LClMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
-double Math_Pow(double x, double y) {
-    return pow(x, y);
+double Math_Sq(double x) {
+    return x * x;
 }
 
 // L-Cancel functions
@@ -628,7 +628,7 @@ void Barrel_Rand_Pos(Vec3 *pos, Vec3 *barrel_lastpos) {
         }
 
         // ensure it isn't too close to the previous
-        float distance = sqrtf(Math_Pow(pos->X - barrel_lastpos->X, 2) + Math_Pow(pos->Y - barrel_lastpos->Y, 2));
+        float distance = sqrtf(Math_Sq(pos->X - barrel_lastpos->X) + Math_Sq(pos->Y - barrel_lastpos->Y));
         if (distance < 25) {
             continue;
         }
