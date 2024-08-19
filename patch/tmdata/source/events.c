@@ -1226,6 +1226,10 @@ static Savestate *stc_savestate;
 static int show_console = 1;
 static TipMgr stc_tipmgr;
 
+void fail_assertion(char *message) {
+    assert(message);
+}
+
 ///////////////////////
 /// Event Functions ///
 ///////////////////////
@@ -1808,7 +1812,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= DESC_LINEMAX) {
-            assert("DESC_LINEMAX exceeded!");
+            fail_assertion("DESC_LINEMAX exceeded!");
         }
 
         // Save information about this line
@@ -1827,7 +1831,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > DESC_CHARMAX) {
-            assert("DESC_CHARMAX exceeded!");
+            fail_assertion("DESC_CHARMAX exceeded!");
         }
 
         // copy char array
@@ -3409,7 +3413,7 @@ int BoneToID(FighterData *fighter_data, JOBJ *bone) {
 #if TM_DEBUG > 0
     // no bone found
     if (bone_id == -1) {
-        assert("no bone found");
+        fail_assertion("no bone found");
     }
 #endif
 
@@ -3554,7 +3558,7 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= MSG_LINEMAX) {
-            assert("MSG_LINEMAX exceeded!");
+            fail_assertion("MSG_LINEMAX exceeded!");
         }
 
         // Save information about this line
@@ -3573,7 +3577,7 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > MSG_CHARMAX) {
-            assert("MSG_CHARMAX exceeded!");
+            fail_assertion("MSG_CHARMAX exceeded!");
         }
 
         // copy char array
@@ -3773,7 +3777,7 @@ void Message_Add(GOBJ *msg_gobj, int queue_num) {
 
     // ensure this queue exists
     if (queue_num >= MSGQUEUE_NUM) {
-        assert("queue_num over!");
+        fail_assertion("queue_num over!");
     }
 
     // remove any existing messages of this kind
@@ -3970,7 +3974,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= TIP_LINEMAX) {
-            assert("TIP_LINEMAX exceeded!");
+            fail_assertion("TIP_LINEMAX exceeded!");
         }
 
         // Save information about this line
@@ -3989,7 +3993,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > TIP_CHARMAX) {
-            assert("TIP_CHARMAX exceeded!");
+            fail_assertion("TIP_CHARMAX exceeded!");
         }
 
         // copy char array

@@ -10,8 +10,6 @@
 #define MENU_MAXOPTION 9
 #define MENU_POPMAXOPTION 5
 
-#define TMLOG(...) DevelopText_AddString(event_vars->db_console_text, __VA_ARGS__)
-
 // EventOption option_kind definitions
 #define OPTKIND_MENU 0
 #define OPTKIND_STRING 1
@@ -178,18 +176,19 @@
 
 // disable all logs in release mode
 #if TM_DEBUG == 0
-#define OSReport (void)sizeof
-#define TMLOG (void)sizeof
-//#define assert (void)sizeof
+#define TMLOG(...)
+#define OSReport(...)
 #endif
 
 // use OSReport for all logs
 #if TM_DEBUG == 1
+#define TMLOG(...) DevelopText_AddString(event_vars->db_console_text, __VA_ARGS__)
 #define OSReport OSReport
 #endif
 
 // use TMLog for all logs
 #if TM_DEBUG == 2
+#define TMLOG(...) DevelopText_AddString(event_vars->db_console_text, __VA_ARGS__)
 #define OSReport TMLOG
 #endif
 
@@ -900,14 +899,15 @@ struct EventVars {
     GOBJ *menu_gobj; // event menu gobj
     int game_timer; // amount of game frames passed
     u8 hide_menu; // enable this to hide the base menu. used for custom menus.
+
     int (*Savestate_Save)(Savestate *savestate); // function pointer to save state
     int (*Savestate_Load)(Savestate *savestate); // function pointer to load state
     GOBJ *(*Message_Display)(int msg_kind, int queue_num, int msg_color, char *format, ...);
-
-    // function pointer to display message
-    int *(*Tip_Display)(int lifetime, char *fmt, ...);
-
+    int *(*Tip_Display)(int lifetime, char *fmt, ...);  // function pointer to display message
     void (*Tip_Destroy)(); // function pointer to destroy tip
+    void (*No_Logs)(...);
+    void (*Link_Coll_CheckLedge)(CollData *coll_data);
+
     Savestate *savestate; // points to the events main savestate
     evFunction evFunction; // event specific functions
     ArchiveInfo *event_archive; // event archive header

@@ -1639,6 +1639,10 @@ static char *keyboard_rows[2][4] = {
 static EventMenu *Event_Menu = &LabMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
+double Math_Pow(double x, double y) {
+    return pow(x, y);
+}
+
 // lz77 functions credited to https://github.com/andyherbert/lz1
 int x_to_the_n(int x, int n) {
     int i; /* Variable used in loop counter */
@@ -2448,7 +2452,7 @@ int LCancel_CPUPerformAction(GOBJ *cpu, int action_id, GOBJ *hmn) {
 
             // check if this is the current state
             if (isState == 1) {
-                // check if im on the right frame
+                // check if i'm on the right frame
                 if (cpu_frame >= action_input->frameLow) {
                     OSReport("exec input %d of %s\n", action_parse, CPU_ACTIONS_NAMES[action_id]);
 
@@ -3337,13 +3341,13 @@ void DIDraw_Update() {
                 ftCommonData *ftCmDt = R13_PTR(PLCO_FTCOMMON);
 
                 // Calculate ASDI
-                float asdi_mag = pow(ftCmDt->asdi_mag, 2);
+                float asdi_mag = Math_Pow(ftCmDt->asdi_mag, 2);
                 float asdi_units = ftCmDt->asdi_units;
-                if (pow(cstickX, 2) + pow(cstickY, 2) >= asdi_mag) {
+                if (Math_Pow(cstickX, 2) + Math_Pow(cstickY, 2) >= asdi_mag) {
                     // CStick has priority, check if mag > 0.7
                     asdi.X = cstickX * asdi_units;
                     asdi.Y = cstickY * asdi_units;
-                } else if (pow(lstickX, 2) + pow(lstickY, 2) >= asdi_mag) {
+                } else if (Math_Pow(lstickX, 2) + Math_Pow(lstickY, 2) >= asdi_mag) {
                     // now check if lstick mag > 0.7
                     asdi.X = lstickX * asdi_units;
                     asdi.Y = lstickY * asdi_units;
@@ -3360,7 +3364,7 @@ void DIDraw_Update() {
                     float kb_mult = kb.Y * kb.Y + kb.X * kb.X;
                     if (kb_mult >= 0.00001) {
                         // get values
-                        float tdi_input = pow(-1 * kb.X * lstickY + lstickX * kb.Y, 2) / kb_mult;
+                        float tdi_input = Math_Pow(-1 * kb.X * lstickY + lstickX * kb.Y, 2) / kb_mult;
                         float max_angle = ftCmDt->tdi_maxAngle * M_1DEGREE;
                         float kb_mag = sqrtf(kb_mult);
 

@@ -492,9 +492,6 @@ void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data) {
                 Text_SetText(event_data->hud.text_succession, 0, "%.2f%",
                              (float) event_data->wd_succeeded / (float) event_data->wd_attempted * 100.0);
 
-                // hide tip so bar is unobscured
-                //event_vars->Tip_Destroy();
-
                 // apply HUD animation
                 JOBJ_RemoveAnimAll(hud_jobj);
                 JOBJ_AddAnimAll(hud_jobj, 0, mat_anim, 0);

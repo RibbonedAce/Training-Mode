@@ -149,6 +149,10 @@ static EventMenu LClMenu_Main = {
 static EventMenu *Event_Menu = &LClMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
+double Math_Pow(double x, double y) {
+    return pow(x, y);
+}
+
 // L-Cancel functions
 void LCancel_Init(LCancelData *event_data) {
     // create hud cobj
@@ -168,15 +172,6 @@ void LCancel_Init(LCancelData *event_data) {
     JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->lcancel_assets->hud);
     GObj_AddObject(hud_gobj, 3, hud_jobj);
     GObj_AddGXLink(hud_gobj, GXLink_Common, 18, 80);
-
-    /*
-    // account for widescreen
-    float aspect = (hud_cobj->projection_param.perspective.aspect / 1.216667) - 1;
-    JOBJ *this_jobj;
-    JOBJ_GetChild(hud_jobj, &this_jobj, 1, -1);
-    this_jobj->trans.X += (this_jobj->trans.X * aspect);
-    JOBJ_SetMtxDirtySub(hud_jobj);
-    */
 
     // create text canvas
     int canvas = Text_CreateCanvas(2, hud_gobj, 14, 15, 0, 18, 81, 19);
@@ -632,8 +627,8 @@ void Barrel_Rand_Pos(Vec3 *pos, Vec3 *barrel_lastpos) {
             continue;
         }
 
-        // ensure it isnt too close to the previous
-        float distance = sqrtf(pow(pos->X - barrel_lastpos->X, 2) + pow(pos->Y - barrel_lastpos->Y, 2));
+        // ensure it isn't too close to the previous
+        float distance = sqrtf(Math_Pow(pos->X - barrel_lastpos->X, 2) + Math_Pow(pos->Y - barrel_lastpos->Y, 2));
         if (distance < 25) {
             continue;
         }
