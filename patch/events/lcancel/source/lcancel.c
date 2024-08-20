@@ -155,6 +155,7 @@ double Math_Sq(double x) {
 
 // L-Cancel functions
 void LCancel_Init(LCancelData *event_data) {
+    Test_Method();
     // create hud cobj
     GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
     ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;

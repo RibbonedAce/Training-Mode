@@ -2,12 +2,12 @@
 
 call "..\..\safe-mkdir.bat" "..\..\..\Additional ISO Files"
 call "..\..\safe-mkdir.bat" "..\..\..\Additional ISO Files\TM"
-call "..\..\safe-mkdir.bat" "output"
 echo.
 
-call "..\..\build-core.bat"^
+cd ..\..
+call build-core.bat^
+ events\lcancel^
  assets\lclData.dat^
  source\lcancel.c^
- output\EvLCl.dat^
- ..\..\..\MexTK^
- "..\..\..\Additional ISO Files\TM\EvLCl.dat"
+ TM\EvLCl.dat^
+ evFunction

@@ -2,6 +2,7 @@
 
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
+#include "../../../utils.h"
 
 #define LCLTEXT_SCALE 4.2
 #define LCLARROW_ANIMFRAMES 4
