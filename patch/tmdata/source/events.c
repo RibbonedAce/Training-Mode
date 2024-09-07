@@ -1226,7 +1226,7 @@ static Savestate *stc_savestate;
 static int show_console = 1;
 static TipMgr stc_tipmgr;
 
-void fail_assertion(char *message) {
+void Fail_Assertion(char *message) {
     assert(message);
 }
 
@@ -1812,7 +1812,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= DESC_LINEMAX) {
-            fail_assertion("DESC_LINEMAX exceeded!");
+            Fail_Assertion("DESC_LINEMAX exceeded!");
         }
 
         // Save information about this line
@@ -1831,7 +1831,7 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > DESC_CHARMAX) {
-            fail_assertion("DESC_CHARMAX exceeded!");
+            Fail_Assertion("DESC_CHARMAX exceeded!");
         }
 
         // copy char array
@@ -3558,7 +3558,7 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= MSG_LINEMAX) {
-            fail_assertion("MSG_LINEMAX exceeded!");
+            Fail_Assertion("MSG_LINEMAX exceeded!");
         }
 
         // Save information about this line
@@ -3577,7 +3577,7 @@ GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, 
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > MSG_CHARMAX) {
-            fail_assertion("MSG_CHARMAX exceeded!");
+            Fail_Assertion("MSG_CHARMAX exceeded!");
         }
 
         // copy char array
@@ -3694,7 +3694,7 @@ void Message_Manager(GOBJ *mngr_gobj) {
                         Vec3 *pos = &this_msg_jobj->trans;
 
                         // BG scale
-                        scale->Y = BezierBlend(t);
+                        scale->Y = Bezier_Blend(t);
                         // text scale
                         this_msg_text->scale.Y = scale->Y * 0.01 * MSGTEXT_BASESCALE;
                         // text position
@@ -3713,7 +3713,7 @@ void Message_Manager(GOBJ *mngr_gobj) {
                         if (Pause_CheckStatus(0) == 1) {
                             this_msg_pos.Y = final_pos;
                         } else {
-                            this_msg_pos.Y = BezierBlend(t) * (final_pos - initial_pos) + initial_pos;
+                            this_msg_pos.Y = Bezier_Blend(t) * (final_pos - initial_pos) + initial_pos;
                         }
 
                         Vec3 scale = this_msg_jobj->scale;
@@ -3777,7 +3777,7 @@ void Message_Add(GOBJ *msg_gobj, int queue_num) {
 
     // ensure this queue exists
     if (queue_num >= MSGQUEUE_NUM) {
-        fail_assertion("queue_num over!");
+        Fail_Assertion("queue_num over!");
     }
 
     // remove any existing messages of this kind
@@ -3832,10 +3832,6 @@ void Message_CObjThink(GOBJ *gobj) {
     if (Pause_CheckStatus(1) != 2) {
         CObjThink_Common(gobj);
     }
-}
-
-float BezierBlend(float t) {
-    return t * t * (3.0f - 2.0f * t);
 }
 
 void Tip_Think(GOBJ *gobj) {
@@ -3974,7 +3970,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     while (msg_cursor_curr != 0) {
         // check if exceeds max lines
         if (line_num >= TIP_LINEMAX) {
-            fail_assertion("TIP_LINEMAX exceeded!");
+            Fail_Assertion("TIP_LINEMAX exceeded!");
         }
 
         // Save information about this line
@@ -3993,7 +3989,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
         // check if over char max
         u8 line_length = line_length_arr[i];
         if (line_length > TIP_CHARMAX) {
-            fail_assertion("TIP_CHARMAX exceeded!");
+            Fail_Assertion("TIP_CHARMAX exceeded!");
         }
 
         // copy char array

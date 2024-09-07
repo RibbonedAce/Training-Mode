@@ -2,6 +2,7 @@
 
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
+#include "../../../utils.h"
 
 #define TEXT_SCALE 4.2
 #define WDJOBJ_TEXT 6
@@ -95,8 +96,6 @@ enum TargetState {
     TRGSTATE_DESPAWN,
 };
 
-float Bezier(float time, float start, float end);
-
 float Target_GetWdashDistance(FighterData *hmn_data, float mag);
 
 GOBJ *Target_Spawn(WavedashData *event_data, FighterData *fighter_data);
@@ -107,5 +106,3 @@ int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offs
 void Target_Think(GOBJ *target_gobj);
 
 void Wavedash_HUDCamThink(GOBJ *gobj);
-
-void Event_Exit();

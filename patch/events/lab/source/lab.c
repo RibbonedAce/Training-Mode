@@ -1639,28 +1639,13 @@ static char *keyboard_rows[2][4] = {
 static EventMenu *Event_Menu = &LabMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
-double Math_Sq(double x) {
-    return x * x;
-}
-
 // lz77 functions credited to https://github.com/andyherbert/lz1
-int x_to_the_n(int x, int n) {
-    int i; /* Variable used in loop counter */
-    int number = 1;
-
-    for (i = 0; i < n; ++i) {
-        number *= x;
-    }
-
-    return number;
-}
-
-u32 lz77_compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width) {
+u32 LZ77_Compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width) {
     u16 pointer_pos, temp_pointer_pos, output_pointer, pointer_length, temp_pointer_length;
     u32 compressed_pointer, output_size, coding_pos, output_lookahead_ref, look_behind, look_ahead;
     u16 pointer_pos_max, pointer_length_max;
-    pointer_pos_max = x_to_the_n(2, 16 - pointer_length_width);
-    pointer_length_max = x_to_the_n(2, pointer_length_width);
+    pointer_pos_max = X_To_The_N(2, 16 - pointer_length_width);
+    pointer_length_max = X_To_The_N(2, pointer_length_width);
 
     *(u32 *) compressed_text = uncompressed_size;
     *(compressed_text + 4) = pointer_length_width;
@@ -1702,7 +1687,7 @@ u32 lz77_compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_t
     return output_size;
 }
 
-u32 lz77_decompress(u8 *compressed_text, u8 *uncompressed_text) {
+u32 LZ77_Decompress(u8 *compressed_text, u8 *uncompressed_text) {
     u8 pointer_length_width;
     u16 input_pointer, pointer_length, pointer_pos, pointer_length_mask;
     u32 compressed_pointer, coding_pos, pointer_offset, uncompressed_size;
@@ -1711,7 +1696,7 @@ u32 lz77_decompress(u8 *compressed_text, u8 *uncompressed_text) {
     pointer_length_width = *(compressed_text + 4);
     compressed_pointer = 5;
 
-    pointer_length_mask = x_to_the_n(2, pointer_length_width) - 1;
+    pointer_length_mask = X_To_The_N(2, pointer_length_width) - 1;
 
     for (coding_pos = 0; coding_pos < uncompressed_size; ++coding_pos) {
         input_pointer = *(u16 *) (compressed_text + compressed_pointer);
@@ -1905,13 +1890,7 @@ void Lab_ChangeHUD(GOBJ *menu_gobj, int value) {
 }
 
 void Lab_Exit(int value) {
-    Match *match = (Match *)MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
+    Default_Event_Exit();
 
     // Unfreeze
     LabOptions_General[OPTGEN_FRAME].option_val = 0;
@@ -4752,7 +4731,7 @@ void Record_MemcardLoad(int slot, int file_no) {
 
             // decompress
             RecordingSave *loaded_recsave = calloc(sizeof(RecordingSave) * 1.06);
-            lz77_decompress(compressed_recording, (u8 *)loaded_recsave);
+            LZ77_Decompress(compressed_recording, (u8 *)loaded_recsave);
 
             // copy buffer to savestate
             memcpy(rec_state, &loaded_recsave->savestate, sizeof(Savestate));
@@ -4863,7 +4842,7 @@ void Savestates_Update() {
     }
 }
 
-int RowPixelToBlockPixel(int pixel_x, int pixel_y, int width, int height) {
+int Row_Pixel_To_Block_Pixel(int pixel_x, int pixel_y, int width, int height) {
     // get block width and height
     int block_width = divide_roundup(width, 4);
 
@@ -4880,7 +4859,7 @@ int RowPixelToBlockPixel(int pixel_x, int pixel_y, int width, int height) {
     return block_pixel;
 }
 
-void ImageScale(RGB565 *out_img, RGB565 *in_img, int OutWidth, int OutHeight, int InWidth, int InHeight) {
+void Image_Scale(RGB565 *out_img, RGB565 *in_img, int OutWidth, int OutHeight, int InWidth, int InHeight) {
     int x_ratio = InWidth / OutWidth;
     int y_ratio = InHeight / OutHeight;
     int px, py;
@@ -4890,8 +4869,8 @@ void ImageScale(RGB565 *out_img, RGB565 *in_img, int OutWidth, int OutHeight, in
         for (int x = 0; x < OutWidth; x++) {
             px = x * x_ratio;
             py = y * y_ratio;
-            in_pixel = RowPixelToBlockPixel(x, y, OutWidth, OutHeight);
-            out_pixel = RowPixelToBlockPixel(px, py, InWidth, InHeight);
+            in_pixel = Row_Pixel_To_Block_Pixel(x, y, OutWidth, OutHeight);
+            out_pixel = Row_Pixel_To_Block_Pixel(px, py, InWidth, InHeight);
             out_img[in_pixel] = in_img[out_pixel];
         }
     }
@@ -4946,7 +4925,7 @@ void Export_Init(GOBJ *menu_gobj) {
     RGB565 *orig_img = snap_image.img_ptr;
     RGB565 *new_img = calloc(img_size);
     export_data->scaled_image = new_img;
-    ImageScale(new_img, orig_img, RESIZE_WIDTH, RESIZE_HEIGHT, EXP_SCREENSHOT_WIDTH, EXP_SCREENSHOT_HEIGHT);
+    Image_Scale(new_img, orig_img, RESIZE_WIDTH, RESIZE_HEIGHT, EXP_SCREENSHOT_WIDTH, EXP_SCREENSHOT_HEIGHT);
     OSReport("scaled image to %d kb\n", img_size / 1000);
     resized_image.img_ptr = new_img; // store pointer to resized image
     export_data->screenshot_jobj->dobj->mobj->tobj->imagedesc = &resized_image; // replace pointer to imagedesc
@@ -5888,7 +5867,7 @@ int Export_SelCardThink(GOBJ *export_gobj) {
 
 int Export_Compress(u8 *dest, u8 *source, u32 size) {
     int pre_tick = OSGetTick();
-    int compress_size = lz77_compress(source, size, dest, 8);
+    int compress_size = LZ77_Compress(source, size, dest, 8);
     int post_tick = OSGetTick();
     int time_dif = OSTicksToMilliseconds(post_tick - pre_tick);
 

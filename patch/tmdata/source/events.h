@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../MexTK/mex.h"
+#include "../../utils.h"
 
 #define TM_VERSSHORT "TM v3.0-a8"
 #define TM_VERSLONG "Training Mode v3.0 Alpha 8"
@@ -1030,8 +1031,6 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num);
 void Message_Add(GOBJ *msg_gobj, int queue_num);
 
 void Message_CObjThink(GOBJ *gobj);
-
-float BezierBlend(float t);
 
 int Tip_Display(int lifetime, char *fmt, ...);
 

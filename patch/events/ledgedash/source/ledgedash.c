@@ -18,6 +18,11 @@ static GXColor *tmgbar_colors[] = {
     &tmgbar_red,
 };
 
+// Tips Functions
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
+    Tips_Toggle(value);
+}
+
 // Main Menu
 static char **LdshOptions_Start[] = {"Ledge", "Respawn Platform"};
 static char **LdshOptions_Reset[] = {"On", "Off"};
@@ -63,7 +68,7 @@ static EventOption LdshOptions_Main[] = {
         .option_name = "Tips", // pointer to a string
         .desc = "Toggle the onscreen display of tips.", // string describing what this option does
         .option_values = LdshOptions_HUD, // pointer to an array of strings
-        .onOptionChange = Tips_Toggle,
+        .onOptionChange = Tips_Toggle_Callback,
     },
     /*Help*/ {
         .option_kind = OPTKIND_FUNC, // the type of option this is; menu, string list, integers list, etc
@@ -86,7 +91,7 @@ static EventOption LdshOptions_Main[] = {
         .desc = "Return to the Event Selection Screen.", // string describing what this option does
         .option_values = 0, // pointer to an array of strings
         .onOptionChange = 0,
-        .onOptionSelect = Event_Exit,
+        .onOptionSelect = Default_Event_Exit,
     },
 };
 
@@ -423,11 +428,7 @@ void Ledgedash_FtInit(LedgedashData *event_data) {
 void Event_Init(GOBJ *gobj) {
     LedgedashData *event_data = gobj->userdata;
 
-    // theres got to be a better way to do this...
-    event_vars = *event_vars_ptr;
-
-    // get assets
-    event_data->assets = File_GetSymbol(event_vars->event_archive, "ldshData");
+    Init_Event_Vars("ldshData");
 
     // standardize camera
     float *unk_cam = (float *)0x803bcca0;
@@ -814,20 +815,6 @@ void Event_Think(GOBJ *event) {
     Ledgedash_ChangeLedgeThink(event_data, hmn);
 }
 
-void Event_Exit() {
-    Match *match = (Match *)MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
-    update->pause_develop = 0;
-}
-
 void Ledgedash_HUDCamThink(GOBJ *gobj) {
     // if HUD enabled and not paused
     if (LdshOptions_Main[2].option_val == 0 && Pause_CheckStatus(1) != 2) {
@@ -1059,12 +1046,4 @@ int RebirthWait_IASA(GOBJ *fighter) {
     }
 
     return 0;
-}
-
-// Tips Functions
-void Tips_Toggle(GOBJ *menu_gobj, int value) {
-    // destroy existing tips when disabling
-    if (value == 1) {
-        event_vars->Tip_Destroy();
-    }
 }

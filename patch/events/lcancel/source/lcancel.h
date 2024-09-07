@@ -19,7 +19,7 @@ struct LCancelAssets {
 
 struct LCancelData {
     EventDesc *event_desc;
-    LCancelAssets *lcancel_assets;
+    LCancelAssets *assets;
     GOBJ *barrel_gobj;
     Vec3 barrel_lastpos;
     u8 is_fail; // status of the last l-cancel
@@ -55,10 +55,6 @@ struct LCancelData {
 
 static void *item_callbacks[];
 
-float Bezier(float time, float start, float end);
-
-void Tips_Toggle(GOBJ *menu_gobj, int value);
-
 void LCancel_HUDCamThink(GOBJ *gobj);
 
 void Barrel_Think(LCancelData *event_data);
@@ -66,7 +62,3 @@ void Barrel_Think(LCancelData *event_data);
 void Barrel_Toggle(GOBJ *menu_gobj, int value);
 
 GOBJ *Barrel_Spawn(int pos_kind);
-
-void Barrel_Null();
-
-void Event_Exit();

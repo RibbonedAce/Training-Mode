@@ -4,7 +4,7 @@
 @rem %2 = Assets file location within event directory. Example: assets\labData.dat
 @rem %3 = Source code file location within event directory. Example: source\lab.c
 @rem %4 = Output file location within Additional ISO Files directory. Example: TM\TmDt.dat
-@rem %5 = Symbol injetion type for MexTK to use. Example: evFunction
+@rem %5 = Symbol injection type for MexTK to use. Example: evFunction
 
 set "MEX_DIR=..\MexTK"
 set "ISO_DIR=..\Additional ISO Files"

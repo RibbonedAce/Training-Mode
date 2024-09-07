@@ -2,6 +2,7 @@
 
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
+#include "../../../utils.h"
 
 #define LSDH_TIPDURATION 1.7 * 60
 #define LDSH_HITBOXNUM 30 * 4
@@ -79,10 +80,6 @@ enum LDSH_ACTION {
     LDACT_ATTACK,
     LDACT_LANDING,
 };
-
-void Event_Exit();
-
-void Tips_Toggle(GOBJ *menu_gobj, int value);
 
 void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value);
 

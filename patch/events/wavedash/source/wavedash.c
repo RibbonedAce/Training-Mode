@@ -56,7 +56,7 @@ static EventOption WdOptions_Main[] = {
         .desc = "Return to the Event Selection Screen.", // string describing what this option does
         .option_values = 0, // pointer to an array of strings
         .onOptionChange = 0,
-        .onOptionSelect = Event_Exit,
+        .onOptionSelect = Default_Event_Exit,
     },
 };
 
@@ -177,14 +177,8 @@ void Event_Init(GOBJ *gobj) {
     WavedashData *event_data = gobj->userdata;
     GOBJ *hmn = Fighter_GetGObj(0);
     FighterData *hmn_data = hmn->userdata;
-    //GOBJ *cpu = Fighter_GetGObj(1);
-    //FighterData *cpu_data = cpu->userdata;
 
-    // there's got to be a better way to do this...
-    event_vars = *event_vars_ptr;
-
-    // get l-cancel assets
-    event_data->assets = File_GetSymbol(event_vars->event_archive, "wdshData");
+    Init_Event_Vars("wdshData");
 
     // create HUD
     Wavedash_Init(event_data);
@@ -202,8 +196,7 @@ void Target_ChangeState(GOBJ *target_gobj, int state) {
     target_data->state = state;
 
     // add anim
-    JOBJ_AddAnimAll(target_jobj, event_data->assets->target_jointanim[state], event_data->assets->target_matanim[state],
-                    0);
+    JOBJ_AddAnimAll(target_jobj, event_data->assets->target_jointanim[state], event_data->assets->target_matanim[state], 0);
     JOBJ_ReqAnimAll(target_jobj, 0); // req anim
 }
 
@@ -538,30 +531,11 @@ void Event_Think(GOBJ *event) {
     Wavedash_Think(event_data, hmn_data);
 }
 
-void Event_Exit() {
-    Match *match = (Match *)MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
-    update->pause_develop = 0;
-}
-
 void Wavedash_HUDCamThink(GOBJ *gobj) {
     // if HUD enabled and not paused
     if (WdOptions_Main[1].option_val == 0 && Pause_CheckStatus(1) != 2) {
         CObjThink_Common(gobj);
     }
-}
-
-float Bezier(float time, float start, float end) {
-    float bez = time * time * (3.0f - 2.0f * time);
-    return bez * (end - start) + start;
 }
 
 GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data) {
@@ -574,8 +548,7 @@ GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data) {
     // ensure min exists
     int min_exists = 0;
     min_exists += Target_CheckArea(event_data, hmn_data->coll_data.ground_index, &hmn_data->phys.pos, max, 0, 0, 0);
-    min_exists += Target_CheckArea(event_data, hmn_data->coll_data.ground_index, &hmn_data->phys.pos, max * -1, 0, 0,
-                                   0);
+    min_exists += Target_CheckArea(event_data, hmn_data->coll_data.ground_index, &hmn_data->phys.pos, max * -1, 0, 0, 0);
     if (min_exists != 0) {
         // begin looking for valid ground at a random distance
         int is_ground = 0;

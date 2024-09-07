@@ -4,6 +4,12 @@
 static char **LcOptions_Barrel[] = {"Off", "Stationary", "Move"};
 static char **LcOptions_HUD[] = {"On", "Off"};
 
+// Tips Functions
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
+    Tips_Toggle(value);
+}
+
+
 static EventOption LcOptions_Main[] = {
     /*Target*/ {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
@@ -34,7 +40,7 @@ static EventOption LcOptions_Main[] = {
         .option_name = "Tips", // pointer to a string
         .desc = "Toggle the onscreen display of tips.", // string describing what this option does
         .option_values = LcOptions_HUD, // pointer to an array of strings
-        .onOptionChange = Tips_Toggle,
+        .onOptionChange = Tips_Toggle_Callback,
     },
     /*Help*/ {
         .option_kind = OPTKIND_FUNC, // the type of option this is; menu, string list, integers list, etc
@@ -57,7 +63,7 @@ static EventOption LcOptions_Main[] = {
         .desc = "Return to the Event Selection Screen.", // string describing what this option does
         .option_values = 0, // pointer to an array of strings
         .onOptionChange = 0,
-        .onOptionSelect = Event_Exit,
+        .onOptionSelect = Default_Event_Exit,
     },
 };
 
@@ -149,13 +155,8 @@ static EventMenu LClMenu_Main = {
 static EventMenu *Event_Menu = &LClMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
-double Math_Sq(double x) {
-    return x * x;
-}
-
 // L-Cancel functions
 void LCancel_Init(LCancelData *event_data) {
-    Test_Method();
     // create hud cobj
     GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
     ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
@@ -170,7 +171,7 @@ void LCancel_Init(LCancelData *event_data) {
     GOBJ *hud_gobj = GObj_Create(0, 0, 0);
     event_data->hud.gobj = hud_gobj;
     // Load jobj
-    JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->lcancel_assets->hud);
+    JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->assets->hud);
     GObj_AddObject(hud_gobj, 3, hud_jobj);
     GObj_AddGXLink(hud_gobj, GXLink_Common, 18, 80);
 
@@ -222,11 +223,7 @@ void LCancel_Init(LCancelData *event_data) {
 void Event_Init(GOBJ *gobj) {
     LCancelData *event_data = gobj->userdata;
 
-    // there's got to be a better way to do this...
-    event_vars = *event_vars_ptr;
-
-    // get l-cancel assets
-    event_data->lcancel_assets = File_GetSymbol(event_vars->event_archive, "lclData");
+    Init_Event_Vars("lclData");
 
     // create HUD
     LCancel_Init(event_data);
@@ -445,7 +442,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
         // Play HUD anim
         JOBJ_RemoveAnimAll(hud_jobj);
-        JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[is_fail], 0);
+        JOBJ_AddAnimAll(hud_jobj, 0, event_data->assets->hudmatanim[is_fail], 0);
         JOBJ_ReqAnimAll(hud_jobj, 0);
     }
 
@@ -458,7 +455,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data) {
 
         // Play HUD anim
         JOBJ_RemoveAnimAll(hud_jobj);
-        JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[2], 0);
+        JOBJ_AddAnimAll(hud_jobj, 0, event_data->assets->hudmatanim[2], 0);
         JOBJ_ReqAnimAll(hud_jobj, 0);
     }
 
@@ -494,35 +491,12 @@ void Event_Think(GOBJ *event) {
     Barrel_Think(event_data);
 }
 
-void Event_Exit() {
-    Match *match = (Match *)MATCH;
-
-    // end game
-    match->state = 3;
-
-    // cleanup
-    Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = (HSD_Update *)HSD_UPDATE;
-    update->pause_develop = 0;
-}
-
 void LCancel_HUDCamThink(GOBJ *gobj) {
     // if HUD enabled and not paused
     if (LcOptions_Main[1].option_val == 0 && Pause_CheckStatus(1) != 2) {
         CObjThink_Common(gobj);
     }
 }
-
-// Tips Functions
-void Tips_Toggle(GOBJ *menu_gobj, int value) {
-    // destroy existing tips when disabling
-    if (value == 1) {
-        event_vars->Tip_Destroy();
-    }
-}
-
 // Barrel Functions
 void Barrel_Think(LCancelData *event_data) {
     GOBJ *barrel_gobj = event_data->barrel_gobj;
@@ -711,7 +685,7 @@ GOBJ *Barrel_Spawn(int pos_kind) {
     spawnItem.unk7 = 0x80;
     spawnItem.is_spin = 0;
     GOBJ *barrel_gobj = Item_CreateItem2(&spawnItem);
-    Item_CollAir(barrel_gobj, Barrel_Null);
+    Item_CollAir(barrel_gobj, null);
 
     // replace collision callback
     ItemData *barrel_data = barrel_gobj->userdata;
@@ -722,13 +696,4 @@ GOBJ *Barrel_Spawn(int pos_kind) {
     event_data->barrel_lastpos = pos;
 
     return barrel_gobj;
-}
-
-void Barrel_Null() {
-}
-
-// Misc
-float Bezier(float time, float start, float end) {
-    float bez = time * time * (3.0f - 2.0f * time);
-    return bez * (end - start) + start;
 }
