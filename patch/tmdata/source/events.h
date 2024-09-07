@@ -220,7 +220,7 @@ struct evMenu {
     JOBJDesc *playback;
     JOBJDesc *message;
     COBJDesc *hud_cobjdesc;
-    JOBJ *tip_jobj;
+    JOBJDesc *tip_jobj;
     void **tip_jointanim; // pointer to array
 };
 

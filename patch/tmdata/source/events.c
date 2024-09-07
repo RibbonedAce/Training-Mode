@@ -3924,7 +3924,7 @@ int Tip_Display(int lifetime, char *fmt, ...) {
     GOBJ *tip_gobj = GObj_Create(0, 0, 0);
     stc_tipmgr.gobj = tip_gobj;
     GObj_AddGXLink(tip_gobj, GXLink_Common, MSG_GXLINK, 80);
-    JOBJ *tip_jobj = JOBJ_LoadJoint(stc_event_vars.menu_assets->tip_jobj->desc);
+    JOBJ *tip_jobj = JOBJ_LoadJoint(stc_event_vars.menu_assets->tip_jobj);
     GObj_AddObject(tip_gobj, R13_U8(-0x3E55), tip_jobj);
 
     // account for widescreen
