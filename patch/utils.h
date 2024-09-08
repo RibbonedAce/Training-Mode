@@ -34,3 +34,9 @@ void Default_Event_Exit();
 int X_To_The_N(int x, int n);
 
 void Create_HUDCam(void *hudCamThinkCallback);
+
+GOBJ *Setup_HUD(JOBJ *hud_jobj);
+
+void Init_Text(int canvas, Text **text_arr, JOBJ *hud_jobj, int num_objs, int offset, float text_scale);
+
+int Default_Text_CreateCanvas(GOBJ *hud_gobj);

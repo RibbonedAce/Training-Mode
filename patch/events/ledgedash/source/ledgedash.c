@@ -117,47 +117,15 @@ void Ledgedash_HUDCamThink(GOBJ *gobj) {
 void Ledgedash_HUDInit(LedgedashData *event_data) {
     Create_HUDCam(Ledgedash_HUDCamThink);
 
-    GOBJ *hud_gobj = GObj_Create(0, 0, 0);
-    event_data->hud.gobj = hud_gobj;
     // Load jobj
     JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->assets->hud);
-    GObj_AddObject(hud_gobj, 3, hud_jobj);
-    GObj_AddGXLink(hud_gobj, GXLink_Common, 18, 80);
+    event_data->hud.gobj = Setup_HUD(hud_jobj);
 
     // create text canvas
-    int canvas = Text_CreateCanvas(2, hud_gobj, 14, 15, 0, 18, 81, 19);
-    event_data->hud.canvas = canvas;
+    event_data->hud.canvas = Default_Text_CreateCanvas(event_data->hud.gobj);
 
     // init text
-    Text **text_arr = &event_data->hud.text_angle;
-    for (int i = 0; i < 2; i++) {
-        // Create text object
-        Text *hud_text = Text_CreateText(2, canvas);
-        text_arr[i] = hud_text;
-        hud_text->kerning = 1;
-        hud_text->align = 1;
-        hud_text->use_aspect = 1;
-
-        // Get position
-        Vec3 text_pos;
-        JOBJ *text_jobj;
-        JOBJ_GetChild(hud_jobj, (int)&text_jobj, 2 + i, -1);
-        JOBJ_GetWorldPosition(text_jobj, 0, &text_pos);
-
-        // adjust scale
-        Vec3 *scale = &hud_jobj->scale;
-        // text scale
-        hud_text->scale.X = scale->X * 0.01 * LCLTEXT_SCALE;
-        hud_text->scale.Y = scale->Y * 0.01 * LCLTEXT_SCALE;
-        hud_text->aspect.X = 165;
-
-        // text position
-        hud_text->trans.X = text_pos.X + scale->X / 4.0;
-        hud_text->trans.Y = text_pos.Y * -1 + scale->Y / 4.0;
-
-        // dummy text
-        Text_AddSubtext(hud_text, 0, 0, "-");
-    }
+    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, LCLTEXT_SCALE);
 
     // reset all bar colors
     JOBJ *timingbar_jobj;
