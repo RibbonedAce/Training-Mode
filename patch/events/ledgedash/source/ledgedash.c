@@ -109,18 +109,13 @@ static EventMenu LdshMenu_Main = {
 static EventMenu *Event_Menu = &LdshMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
+void Ledgedash_HUDCamThink(GOBJ *gobj) {
+    HUDCamThink(LdshOptions_Main[2]);
+}
+
 // Ledgedash functions
 void Ledgedash_HUDInit(LedgedashData *event_data) {
-    // create hud cobj
-    GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
-    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
-    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
-    COBJDesc *cam_desc = dmgScnMdls[1][0];
-    COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
-    // init camera
-    GObj_AddObject(hudcam_gobj, R13_U8(-0x3E55), hud_cobj);
-    GOBJ_InitCamera(hudcam_gobj, Ledgedash_HUDCamThink, 7);
-    hudcam_gobj->cobj_links = 1 << 18;
+    Create_HUDCam(Ledgedash_HUDCamThink);
 
     GOBJ *hud_gobj = GObj_Create(0, 0, 0);
     event_data->hud.gobj = hud_gobj;
@@ -128,15 +123,6 @@ void Ledgedash_HUDInit(LedgedashData *event_data) {
     JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->assets->hud);
     GObj_AddObject(hud_gobj, 3, hud_jobj);
     GObj_AddGXLink(hud_gobj, GXLink_Common, 18, 80);
-
-    // account for widescreen
-    /*
-    float aspect = (hud_cobj->projection_param.perspective.aspect / 1.216667) - 1;
-    JOBJ *this_jobj;
-    JOBJ_GetChild(hud_jobj, &this_jobj, 1, -1);
-    this_jobj->trans.X += (this_jobj->trans.X * aspect);
-    JOBJ_SetMtxDirtySub(hud_jobj);
-    */
 
     // create text canvas
     int canvas = Text_CreateCanvas(2, hud_gobj, 14, 15, 0, 18, 81, 19);
@@ -813,13 +799,6 @@ void Event_Think(GOBJ *event) {
     Ledgedash_HitLogThink(event_data, hmn);
     Ledgedash_ResetThink(event_data, hmn);
     Ledgedash_ChangeLedgeThink(event_data, hmn);
-}
-
-void Ledgedash_HUDCamThink(GOBJ *gobj) {
-    // if HUD enabled and not paused
-    if (LdshOptions_Main[2].option_val == 0 && Pause_CheckStatus(1) != 2) {
-        CObjThink_Common(gobj);
-    }
 }
 
 // Menu Toggle functions

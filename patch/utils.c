@@ -37,3 +37,16 @@ int X_To_The_N(int x, int n) {
 
     return number;
 }
+
+void Create_HUDCam(void *hudCamThinkCallback) {
+    // create hud cobj
+    GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
+    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
+    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
+    COBJDesc *cam_desc = dmgScnMdls[1][0];
+    COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
+    // init camera
+    GObj_AddObject(hudcam_gobj, R13_U8(-0x3E55), hud_cobj);
+    GOBJ_InitCamera(hudcam_gobj, hudCamThinkCallback, 7);
+    hudcam_gobj->cobj_links = 1 << 18;
+}

@@ -74,18 +74,13 @@ static EventMenu WdMenu_Main = {
 static EventMenu *Event_Menu = &WdMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
+void Wavedash_HUDCamThink(GOBJ *gobj) {
+    HUDCamThink(WdOptions_Main[1]);
+}
+
 // Event functions
 void Wavedash_Init(WavedashData *event_data) {
-    // create hud cobj
-    GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
-    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
-    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
-    COBJDesc *cam_desc = dmgScnMdls[1][0];
-    COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
-    // init camera
-    GObj_AddObject(hudcam_gobj, R13_U8(-0x3E55), hud_cobj);
-    GOBJ_InitCamera(hudcam_gobj, Wavedash_HUDCamThink, 7);
-    hudcam_gobj->cobj_links = 1 << 18;
+    Create_HUDCam(Wavedash_HUDCamThink);
 
     GOBJ *hud_gobj = GObj_Create(0, 0, 0);
     event_data->hud.gobj = hud_gobj;
@@ -529,13 +524,6 @@ void Event_Think(GOBJ *event) {
     hmn_data->shield.health = 60;
 
     Wavedash_Think(event_data, hmn_data);
-}
-
-void Wavedash_HUDCamThink(GOBJ *gobj) {
-    // if HUD enabled and not paused
-    if (WdOptions_Main[1].option_val == 0 && Pause_CheckStatus(1) != 2) {
-        CObjThink_Common(gobj);
-    }
 }
 
 GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data) {

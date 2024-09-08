@@ -15,6 +15,14 @@
     } \
 }
 
+// if HUD enabled and not paused
+// can't do an actual function since event_vars doesn't work properly across files
+#define HUDCamThink(eventOption) { \
+    if (eventOption.option_val == 0 && Pause_CheckStatus(1) != 2) { \
+        CObjThink_Common(gobj); \
+    } \
+}
+
 double Math_Sq(double x);
 
 float Bezier(float time, float start, float end);
@@ -24,3 +32,5 @@ float Bezier_Blend(float t);
 void Default_Event_Exit();
 
 int X_To_The_N(int x, int n);
+
+void Create_HUDCam(void *hudCamThinkCallback);

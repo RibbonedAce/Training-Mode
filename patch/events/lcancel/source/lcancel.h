@@ -55,8 +55,6 @@ struct LCancelData {
 
 static void *item_callbacks[];
 
-void LCancel_HUDCamThink(GOBJ *gobj);
-
 void Barrel_Think(LCancelData *event_data);
 
 void Barrel_Toggle(GOBJ *menu_gobj, int value);

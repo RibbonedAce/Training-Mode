@@ -85,8 +85,6 @@ void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value);
 
 void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value);
 
-void Ledgedash_HUDCamThink(GOBJ *gobj);
-
 GOBJ *Ledgedash_HitLogInit();
 
 void Ledgedash_HitLogGX(GOBJ *gobj, int pass);

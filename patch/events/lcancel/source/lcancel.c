@@ -9,7 +9,6 @@ void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
     Tips_Toggle(value);
 }
 
-
 static EventOption LcOptions_Main[] = {
     /*Target*/ {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
@@ -155,18 +154,13 @@ static EventMenu LClMenu_Main = {
 static EventMenu *Event_Menu = &LClMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
+void LCancel_HUDCamThink(GOBJ *gobj) {
+    HUDCamThink(LcOptions_Main[1]);
+}
+
 // L-Cancel functions
 void LCancel_Init(LCancelData *event_data) {
-    // create hud cobj
-    GOBJ *hudcam_gobj = GObj_Create(19, 20, 0);
-    ArchiveInfo **ifall_archive = (ArchiveInfo **)0x804d6d5c;
-    COBJDesc ***dmgScnMdls = File_GetSymbol(*ifall_archive, (char *)0x803f94d0);
-    COBJDesc *cam_desc = dmgScnMdls[1][0];
-    COBJ *hud_cobj = COBJ_LoadDesc(cam_desc);
-    // init camera
-    GObj_AddObject(hudcam_gobj, R13_U8(-0x3E55), hud_cobj);
-    GOBJ_InitCamera(hudcam_gobj, LCancel_HUDCamThink, 7);
-    hudcam_gobj->cobj_links = 1 << 18;
+    Create_HUDCam(LCancel_HUDCamThink);
 
     GOBJ *hud_gobj = GObj_Create(0, 0, 0);
     event_data->hud.gobj = hud_gobj;
@@ -491,12 +485,6 @@ void Event_Think(GOBJ *event) {
     Barrel_Think(event_data);
 }
 
-void LCancel_HUDCamThink(GOBJ *gobj) {
-    // if HUD enabled and not paused
-    if (LcOptions_Main[1].option_val == 0 && Pause_CheckStatus(1) != 2) {
-        CObjThink_Common(gobj);
-    }
-}
 // Barrel Functions
 void Barrel_Think(LCancelData *event_data) {
     GOBJ *barrel_gobj = event_data->barrel_gobj;
