@@ -737,11 +737,10 @@ static EventMenu LabMenu_Record;
 s8 *onload_fileno = (s8 *)(R13 + -0x4670);
 s8 *onload_slot = (s8 *)(R13 + -0x466F);
 
-void Event_Update();
+// Lab
+u32 LZ77_Compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width);
 
-void Event_Think(GOBJ *event);
-
-void Button_Think(GOBJ *button_gobj);
+u32 LZ77_Decompress(u8 *compressed_text, u8 *uncompressed_text);
 
 void Lab_ChangePlayerPercent(GOBJ *menu_gobj, int value);
 
@@ -759,9 +758,9 @@ void Lab_ChangeEnvCollDisplay(GOBJ *menu_gobj, int value);
 
 void Lab_ChangeCamMode(GOBJ *menu_gobj, int value);
 
-void Lab_ChangeInfoPreset(GOBJ *menu_gobj, int value);
-
 void Lab_ChangeInfoRow(GOBJ *menu_gobj, int value);
+
+void Lab_ChangeInfoPreset(GOBJ *menu_gobj, int value);
 
 void Lab_ChangeInfoSizePos(GOBJ *menu_gobj, int value);
 
@@ -769,9 +768,83 @@ void Lab_ChangeInfoPlayer(GOBJ *menu_gobj, int value);
 
 void Lab_ChangeHUD(GOBJ *menu_gobj, int value);
 
-void Lab_SelectCustomTDI(GOBJ *menu_gobj);
+void Lab_Exit(int value);
+
+GOBJ *InfoDisplay_Init();
+
+void InfoDisplay_GX(GOBJ *gobj, int pass);
+
+void InfoDisplay_Think(GOBJ *gobj);
+
+float Fighter_GetOpponentDir(FighterData *from, FighterData *to);
+
+int CPUAction_CheckMultipleState(GOBJ *cpu, int group_kind);
+
+int CPU_IsThrown(GOBJ *cpu);
+
+int CPU_IsGrabbed(GOBJ *cpu);
+
+int LCancel_CPUPerformAction(GOBJ *cpu, int action_id, GOBJ *hmn);
+
+void Lab_CPUThink_Start(FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu);
+
+void Lab_CPUThink_Enter_Start(LCancelData *eventData, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu);
+
+void Lab_CPUThink_Recover(LCancelData *eventData, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu);
+
+void Lab_CPUThink_Counter(LCancelData *eventData, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu);
+
+void Lab_CPUThink_Tech(LCancelData *eventData, FighterData *hmn_data, FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu);
+
+void Lab_CPUThink_TDI_Out(FighterData *cpu_data, float kb_angle);
+
+void Lab_CPUThink_TDI(LCancelData *eventData, FighterData *hmn_data, FighterData *cpu_data, int is_thrown, GOBJ *hmn, GOBJ *cpu);
+
+void LCancel_CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu);
+
+int Update_CheckPause();
+
+int Update_CheckAdvance();
+
+void DIDraw_Init();
+
+void DIDraw_Update();
 
 void DIDraw_GX();
+
+void Update_Camera();
+
+void Lab_SelectCustomTDI(GOBJ *menu_gobj);
+
+void CustomTDI_Update(GOBJ *gobj);
+
+void CustomTDI_Destroy(GOBJ *gobj);
+
+void Inputs_GX(GOBJ *gobj, int pass);
+
+void Inputs_Think(GOBJ *gobj);
+
+void Inputs_Init();
+
+GOBJ *Record_Init();
+
+void Record_CObjThink(GOBJ *gobj);
+
+int Record_GetCurrFrame();
+
+int Record_GetEndFrame();
+
+void Record_GX(GOBJ *gobj, int pass);
+
+void Record_Think(GOBJ *rec_gobj);
+
+void Record_Update(int ply, RecInputData *input_data, int rec_mode);
+
+void Record_OnSuccessfulSave();
+
+void Record_InitState(GOBJ *menu_gobj);
+
+void Record_RestoreState(GOBJ *menu_gobj);
 
 void Record_ChangeHMNSlot(GOBJ *menu_gobj, int value);
 
@@ -781,78 +854,106 @@ void Record_ChangeHMNMode(GOBJ *menu_gobj, int value);
 
 void Record_ChangeCPUMode(GOBJ *menu_gobj, int value);
 
-void Record_ChangeSlot(GOBJ *menu_gobj, int value);
+int Record_GetRandomSlot(RecInputData **input_data);
 
-void Record_MemcardSave(GOBJ *menu_gobj);
+void Memcard_Wait();
 
 void Record_MemcardLoad(int slot, int file_no);
 
-void Record_InitState(GOBJ *menu_gobj);
-
-void Record_RestoreState(GOBJ *menu_gobj);
-
-void Record_CObjThink(GOBJ *gobj);
-
-void Record_GX(GOBJ *gobj, int pass);
-
-void Record_Think(GOBJ *rec_gobj);
-
-void Record_Update(int ply, RecInputData *inputs, int rec_mode);
-
-int Record_OptimizedSave(Savestate *savestate);
-
-int Record_OptimizedLoad(Savestate *savestate);
-
-int Record_GetRandomSlot(RecInputData **input_data);
-
-int Record_GOBJToID(GOBJ *gobj);
-
-int Record_FtDataToID(FighterData *fighter_data);
-
-int Record_BoneToID(FighterData *fighter_data, JOBJ *bone);
-
-GOBJ *Record_IDToGOBJ(int id);
-
-FighterData *Record_IDToFtData(int id);
-
-JOBJ *Record_IDToBone(FighterData *fighter_data, int id);
+void Record_StartExport(GOBJ *menu_gobj);
 
 void Snap_CObjThink(GOBJ *gobj);
 
-void Record_StartExport(GOBJ *menu_gobj);
+void Savestates_Update();
+
+int Row_Pixel_To_Block_Pixel(int pixel_x, int pixel_y, int width, int height);
+
+void Image_Scale(RGB565 *out_img, RGB565 *in_img, int OutWidth, int OutHeight, int InWidth, int InHeight);
 
 void Export_Init(GOBJ *menu_gobj);
 
+void Export_EnterNameExit(GOBJ *export_gobj);
+
+void Export_ConfirmInit(GOBJ *export_gobj);
+
+void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj);
+
+int Export_EnterName_Exit(GOBJ *export_gobj);
+
+int Export_EnterNameThink(GOBJ *export_gobj);
+
+void Export_ConfirmExit(GOBJ *export_gobj);
+
+int Export_Process(GOBJ *export_gobj);
+
+int Export_ConfirmThink(GOBJ *export_gobj);
+
 int Export_Think(GOBJ *export_gobj);
+
+void Export_SelCardExit(GOBJ *export_gobj);
 
 void Export_Destroy(GOBJ *export_gobj);
 
 void Export_SelCardInit(GOBJ *export_gobj);
 
+void Export_EnterNameInit(GOBJ *export_gobj);
+
 int Export_SelCardThink(GOBJ *export_gobj);
 
 int Export_Compress(u8 *dest, u8 *source, u32 size);
 
-void CustomTDI_Update(GOBJ *gobj);
+void Event_Init(GOBJ *gobj);
 
-void CustomTDI_Destroy(GOBJ *gobj);
+void Event_Update();
 
-void Lab_Exit(int value);
+void Event_Think(GOBJ *event);
 
-void InfoDisplay_Think(GOBJ *gobj);
-
-void InfoDisplay_GX(GOBJ *gobj, int pass);
+// Lab CSS
+void OnCSSLoad(ArchiveInfo *archive);
 
 void Button_Create();
 
 void Button_Think(GOBJ *button_gobj);
 
+void Menu_SelCard_Init(GOBJ *menu_gobj);
+
+GOBJ *Menu_Create();
+
+void Menu_SelCard_Exit(GOBJ *menu_gobj);
+
+void Menu_SelFile_Exit(GOBJ *menu_gobj);
+
+void Menu_Destroy(GOBJ *menu_gobj);
+
+void Memcard_Wait();
+
+int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page);
+
+void Menu_SelFile_Init(GOBJ *menu_gobj);
+
+void Menu_SelCard_Think(GOBJ *menu_gobj);
+
+void Menu_SelFile_LoadAsyncThink(GOBJ *menu_gobj);
+
+void Menu_SelFile_Think_Exit(GOBJ *menu_gobj);
+
+void Menu_SelFile_Think(GOBJ *menu_gobj);
+
+void Menu_Think(GOBJ *menu_gobj);
+
+void Menu_SelFile_DeleteUnsupported(GOBJ *menu_gobj);
+
+int Menu_SelFile_DeleteFile(GOBJ *menu_gobj, int file_index);
+
 void Menu_Confirm_Init(GOBJ *menu_gobj, int kind);
+
+void Menu_No_Delete_Corrupt(GOBJ *menu_gobj);
+
+void Menu_Return_to_FileSel(GOBJ *menu_gobj);
+
+void Menu_Confirm_Think_Exit(GOBJ *menu_gobj);
 
 void Menu_Confirm_Think(GOBJ *menu_gobj);
 
 void Menu_Confirm_Exit(GOBJ *menu_gobj);
 
-GOBJ *Menu_Create();
-
-void Menu_Think(GOBJ *menu_gobj);

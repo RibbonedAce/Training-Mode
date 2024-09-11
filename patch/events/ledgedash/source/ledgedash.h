@@ -81,6 +81,38 @@ enum LDSH_ACTION {
     LDACT_LANDING,
 };
 
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
+
+void Ledgedash_HUDCamThink(GOBJ *gobj);
+
+void Ledgedash_HUDInit(LedgedashData *event_data);
+
+void Fighter_UpdatePosition(GOBJ *fighter);
+
+void Ledgedash_InitVariables(LedgedashData *event_data);
+
+void Fighter_UpdateCamera(GOBJ *fighter);
+
+void Fighter_PlaceOnLedge(LedgedashData *event_data, GOBJ *hmn, int line_index, float ledge_dir);
+
+void Ledgedash_FtInit(LedgedashData *event_data);
+
+void Event_Init(GOBJ *gobj);
+
+int Fighter_CheckFall(FighterData *hmn_data);
+
+void Tips_Think(LedgedashData *event_data, FighterData *hmn_data);
+
+void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data);
+
+void Ledgedash_HitLogThink(LedgedashData *event_data, GOBJ *hmn);
+
+void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn);
+
+void Ledgedash_ChangeLedgeThink(LedgedashData *event_data, GOBJ *hmn);
+
+void Event_Think(GOBJ *event);
+
 void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value);
 
 void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value);
@@ -89,8 +121,9 @@ GOBJ *Ledgedash_HitLogInit();
 
 void Ledgedash_HitLogGX(GOBJ *gobj, int pass);
 
+int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir);
+
 void RebirthWait_Phys(GOBJ *fighter);
 
 int RebirthWait_IASA(GOBJ *fighter);
 
-int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir);

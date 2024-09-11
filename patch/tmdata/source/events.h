@@ -976,24 +976,59 @@ static int *eventDataBackup;
 static EventVars *event_vars;
 static GOBJ *stc_msgmgr;
 
-// Function prototypes
-EventDesc *GetEventDesc(int page, int event);
+void Fail_Assertion(char *message);
+
+void Event_Init(GOBJ *gobj);
 
 void EventInit(int page, int eventID, MatchInit *matchData);
 
+void Hazards_Disable();
+
 void EventLoad();
 
-GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu);
+void EventMenu_MenuGX(GOBJ *gobj, int pass);
 
-void EventMenu_Think(GOBJ *eventMenu, int pass);
+void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu);
 
-void EventMenu_COBJThink(GOBJ *gobj);
+void EventMenu_TextGX(GOBJ *gobj, int pass);
 
-void EventMenu_Draw(GOBJ *eventMenu);
+void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu);
 
-int Text_AddSubtextManual(Text *text, char *string, int posx, int posy, int scalex, int scaley);
+void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu);
 
-EventMenu *EventMenu_GetCurrentMenu(GOBJ *gobj);
+void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu);
+
+void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu);
+
+void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option);
+
+void EventMenu_DestroyPopup(GOBJ *gobj);
+
+void EventMenu_DestroyMenu(GOBJ *gobj);
+
+void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu);
+
+void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu);
+
+void EventMenu_Update(GOBJ *gobj);
+
+void EventUpdate();
+
+void TM_ConsoleThink(GOBJ *gobj);
+
+void TM_CreateConsole();
+
+void OnFileLoad(ArchiveInfo *archive);
+
+void TM_CreateWatermark();
+
+void OnSceneChange();
+
+void OnBoot();
+
+void Tip_Init();
+
+void OnStartMelee();
 
 int Savestate_Save(Savestate *savestate);
 
@@ -1013,13 +1048,8 @@ FighterData *IDToFtData(int id);
 
 JOBJ *IDToBone(FighterData *fighter_data, int id);
 
-void EventUpdate();
-
 void Event_IncTimer(GOBJ *gobj);
 
-void Test_Think(GOBJ *gobj);
-
-// Message
 void Message_Init();
 
 GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, ...);
@@ -1032,8 +1062,44 @@ void Message_Add(GOBJ *msg_gobj, int queue_num);
 
 void Message_CObjThink(GOBJ *gobj);
 
+void Tip_Think(GOBJ *gobj);
+
 int Tip_Display(int lifetime, char *fmt, ...);
 
-void Tip_Destroy(); // 0 = immediately destroy, 1 = force exit
+void Tip_Destroy();
 
-void Tip_Think(GOBJ *gobj);
+GOBJ *EventMenu_Init(EventDesc *event_desc, EventMenu *start_menu);
+
+EventDesc *GetEventDesc(int page, int event);
+
+char *GetEventName(int page, int event);
+
+char *GetEventDescription(int page, int event);
+
+char *GetEventTut(int page, int event);
+
+char *GetPageName(int page);
+
+char *GetEventFile(int page, int event);
+
+char *GetCSSFile(int page, int event);
+
+int GetPageEventNum(int page);
+
+char *GetTMVersShort();
+
+char *GetTMVersLong();
+
+char *GetTMCompile();
+
+int GetPageNum();
+
+u8 GetIsChooseCPU(int page, int event);
+
+u8 GetIsSelectStage(int page, int event);
+
+s8 GetFighter(int page, int event);
+
+s8 GetCPUFighter(int page, int event);
+
+s16 GetStage(int page, int event);

@@ -53,10 +53,29 @@ struct LCancelData {
     } tip;
 };
 
-static void *item_callbacks[];
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
+
+void Barrel_Break(GOBJ *barrel_gobj);
+
+int Barrel_OnHurt(GOBJ *barrel_gobj);
+
+int Barrel_OnDestroy(GOBJ *barrel_gobj);
+
+void LCancel_HUDCamThink(GOBJ *gobj);
+
+void LCancel_HUDInit(LCancelData *event_data);
+
+void Event_Init(GOBJ *gobj);
+
+void Tips_Think(LCancelData *event_data, FighterData *hmn_data);
+
+void LCancel_Think(LCancelData *event_data, FighterData *hmn_data);
+
+void Event_Think(GOBJ *event);
 
 void Barrel_Think(LCancelData *event_data);
 
-void Barrel_Toggle(GOBJ *menu_gobj, int value);
+void Barrel_Rand_Pos(Vec3 *pos, Vec3 *barrel_lastpos);
 
 GOBJ *Barrel_Spawn(int pos_kind);
+

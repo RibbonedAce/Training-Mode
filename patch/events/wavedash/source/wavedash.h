@@ -96,10 +96,29 @@ enum TargetState {
     TRGSTATE_DESPAWN,
 };
 
-float Target_GetWdashDistance(FighterData *hmn_data, float mag);
+void Wavedash_HUDCamThink(GOBJ *gobj);
 
-GOBJ *Target_Spawn(WavedashData *event_data, FighterData *fighter_data);
+void Wavedash_HUDInit(WavedashData *event_data);
+
+void Target_Init(WavedashData *event_data, FighterData *hmn_data);
+
+void Event_Init(GOBJ *gobj);
+
+void Target_ChangeState(GOBJ *target_gobj, int state);
+
+void Target_Manager(WavedashData *event_data, FighterData *hmn_data);
+
+void Tips_Think(WavedashData *event_data, FighterData *hmn_data);
+
+void Wavedash_Think(WavedashData *event_data, FighterData *hmn_data);
+
+void Event_Think(GOBJ *event);
+
+GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data);
+
+void Target_Think(GOBJ *target_gobj);
+
+float Target_GetWdashDistance(FighterData *hmn_data, float mag);
 
 int Target_CheckArea(WavedashData *event_data, int line, Vec3 *pos, float x_offset, int *ret_line, Vec3 *ret_pos, Vec3 *ret_slope);
 
-void Target_Think(GOBJ *target_gobj);
