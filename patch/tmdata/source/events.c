@@ -3413,7 +3413,7 @@ int BoneToID(FighterData *fighter_data, JOBJ *bone) {
 #if TM_DEBUG > 0
     // no bone found
     if (bone_id == -1) {
-        fail_assertion("no bone found");
+        Fail_Assertion("no bone found");
     }
 #endif
 
