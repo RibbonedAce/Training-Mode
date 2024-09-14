@@ -182,75 +182,6 @@ invincible while the lava rises!"
   .set GeneralTech.NumOfEvents, 13 -1
 
 #Event List
-#region LCancel
-  .set Event_LCancel,0
-  #Event Name
-    .macro Event_LCancel_Name
-      .string "L-Cancel Training"
-    .endm
-
-    .macro Event_LCancel_Description
-      .string "Practice L-Cancelling on
-a stationary CPU."
-    .endm
-
-    .macro Event_LCancel_Tutorial
-      .string "TvLC"
-    .endm
-
-    .macro Event_LCancel_ChooseCPU
-      .byte Event_LCancel
-    .endm
-
-    .macro Event_LCancel_PreloadData
-    .endm
-
-    .macro Event_LCancel_LoadSSS
-      .byte Event_LCancel
-    .endm
-
-    .macro Event_LCancel_PlayableCharacters
-    .endm
-
-    .macro Event_LCancel_ScoreType
-      .byte KO
-    .endm
-
-#endregion
-#region Ledgedash
-  .set Event_Ledgedash,1
-  #Event Name
-    .macro Event_Ledgedash_Name
-      .string "Ledgedash Training"
-    .endm
-
-    .macro Event_Ledgedash_Description
-      .string "Practice Ledgedashes!
-Use D-Pad to change ledge."
-    .endm
-
-    .macro Event_Ledgedash_Tutorial
-      .string "TvLedDa"
-    .endm
-
-    .macro Event_Ledgedash_ChooseCPU
-    .endm
-
-    .macro Event_Ledgedash_PreloadData
-    .endm
-
-    .macro Event_Ledgedash_LoadSSS
-      .byte Event_Ledgedash
-    .endm
-
-    .macro Event_Ledgedash_PlayableCharacters
-    .endm
-
-    .macro Event_Ledgedash_ScoreType
-      .byte KO
-    .endm
-
-#endregion
 #region Combo
   .set Event_Combo,2
   #Event Name
@@ -844,8 +775,6 @@ Minigames:
 .align 2
 
 GeneralTech:
-  Event_LCancel_Name
-  Event_Ledgedash_Name
   Event_Combo_Name
   Event_AttackOnShield_Name
   Event_Reversal_Name
@@ -883,8 +812,6 @@ Minigames:
 .align 2
 ################
 GeneralTech:
-  Event_LCancel_Description
-  Event_Ledgedash_Description
   Event_Combo_Description
   Event_AttackOnShield_Description
   Event_Reversal_Description
@@ -922,8 +849,6 @@ ChooseCPU_Minigames:
 .align 2
 ############################
 ChooseCPU_GeneralTech:
-  Event_LCancel_ChooseCPU
-  Event_Ledgedash_ChooseCPU
   Event_SDI_ChooseCPU
   Event_Reversal_ChooseCPU
   Event_Powershield_ChooseCPU
@@ -962,8 +887,6 @@ PreloadEvents_Minigames:
 .align 2
 ############################
 PreloadEvents_GeneralTech:
-  Event_LCancel_PreloadData
-  Event_Ledgedash_PreloadData
   Event_SDI_PreloadData
   Event_Reversal_PreloadData
   Event_Powershield_PreloadData
@@ -1002,8 +925,6 @@ Minigames:
 .align 2
 ############################
 GeneralTech:
-  Event_LCancel_LoadSSS
-  Event_Ledgedash_LoadSSS
   Event_SDI_LoadSSS
   Event_Reversal_LoadSSS
   Event_Powershield_LoadSSS
@@ -1042,8 +963,6 @@ Minigames:
 .align 2
 ############################
 GeneralTech:
-  Event_LCancel_PlayableCharacters
-  Event_Ledgedash_PlayableCharacters
   Event_SDI_PlayableCharacters
   Event_Reversal_PlayableCharacters
   Event_Powershield_PlayableCharacters
@@ -1093,8 +1012,6 @@ Event_Ledgestall_Tutorial
 .align 2
 
 GeneralTech:
-Event_LCancel_Tutorial
-Event_Ledgedash_Tutorial
 Event_Combo_Tutorial
 Event_AttackOnShield_Tutorial
 Event_Reversal_Tutorial
@@ -1211,8 +1128,6 @@ InitSettings:
 .set EventOSD_Multishine,0x00000000
 .set EventOSD_Reaction,0x00000000
 
-.set EventOSD_LCancel,0x00000003
-.set EventOSD_Ledgedash,0x04000000
 .set EventOSD_Eggs,0x00000000
 .set EventOSD_SDI,0x10000400
 .set EventOSD_Reversal,0x002C0009
