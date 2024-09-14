@@ -16,7 +16,6 @@ typedef struct PfshHitlogData PfshHitlogData;
 
 struct PivotFsmashAssets {
     JOBJDesc *hud;
-    void **hudmatanim; // pointer to array
 };
 
 struct PivotFsmashData {
@@ -30,8 +29,6 @@ struct PivotFsmashData {
 
     struct {
         GOBJ *gobj;
-        Text *text_angle;
-        Text *text_galint;
         int canvas;
         int timer;
         float airdodge_angle;
@@ -91,8 +88,6 @@ void Fighter_UpdatePosition(GOBJ *fighter);
 
 void PivotFsmash_InitVariables(PivotFsmashData *event_data);
 
-void Fighter_UpdateCamera(GOBJ *fighter);
-
 void Fighter_PlaceOnLedge(PivotFsmashData *event_data, GOBJ *hmn, int line_index, float ledge_dir);
 
 void PivotFsmash_FtInit(PivotFsmashData *event_data);
@@ -105,8 +100,6 @@ void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
 void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data);
 
-void PivotFsmash_HitLogThink(PivotFsmashData *event_data, GOBJ *hmn);
-
 void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn);
 
 void PivotFsmash_ChangeLedgeThink(PivotFsmashData *event_data, GOBJ *hmn);
@@ -116,12 +109,6 @@ void Event_Think(GOBJ *event);
 void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value);
 
 void PivotFsmash_ToggleAutoReset(GOBJ *menu_gobj, int value);
-
-GOBJ *PivotFsmash_HitLogInit();
-
-void PivotFsmash_HitLogGX(GOBJ *gobj, int pass);
-
-int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir);
 
 void RebirthWait_Phys(GOBJ *fighter);
 

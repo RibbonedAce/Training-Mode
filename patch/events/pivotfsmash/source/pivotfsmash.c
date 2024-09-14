@@ -125,7 +125,7 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     event_data->hud.canvas = Default_Text_CreateCanvas(event_data->hud.gobj);
 
     // init text
-    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, LCLTEXT_SCALE);
+//    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, LCLTEXT_SCALE);
 
     // reset all bar colors
     JOBJ *timingbar_jobj;
@@ -197,24 +197,6 @@ void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
         event_data->hud.action_log[i] = 0;
     }
-}
-
-void Fighter_UpdateCamera(GOBJ *fighter) {
-    FighterData *fighter_data = fighter->userdata;
-
-    // Update camerabox pos
-    Fighter_UpdateCameraBox(fighter);
-
-    // Update tween
-    fighter_data->cameraBox->boundleft_curr = fighter_data->cameraBox->boundleft_proj;
-    fighter_data->cameraBox->boundright_curr = fighter_data->cameraBox->boundright_proj;
-
-    // update camera position
-    Match_CorrectCamera();
-
-    // reset onscreen bool
-    //Fighter_UpdateOnscreenBool(fighter);
-    fighter_data->flags.is_offscreen = 0;
 }
 
 void Fighter_PlaceOnLedge(PivotFsmashData *event_data, GOBJ *hmn, int line_index, float ledge_dir) {
@@ -295,8 +277,6 @@ void Fighter_PlaceOnLedge(PivotFsmashData *event_data, GOBJ *hmn, int line_index
     cam->cam_pos.X = ledge_pos.X + ledge_dir * 20;
     cam->cam_pos.Y = ledge_pos.Y + 15;
 
-    Fighter_UpdateCamera(hmn);
-
     // remove all particles
     for (int i = 0; i < PTCL_LINKMAX; i++) {
         Particle2 **ptcls = &stc_ptcl[i];
@@ -352,30 +332,6 @@ void Fighter_PlaceOnLedge(PivotFsmashData *event_data, GOBJ *hmn, int line_index
 
 // Fighter fuctions
 void PivotFsmash_FtInit(PivotFsmashData *event_data) {
-    GOBJ *hmn = Fighter_GetGObj(0);
-
-    // create camera box
-    CameraBox *cam = CameraBox_Alloc();
-    cam->boundleft_proj = -10;
-    cam->boundright_proj = 10;
-    cam->boundtop_proj = 10;
-    cam->boundbottom_proj = -10;
-    cam->boundleft_curr = cam->boundleft_proj;
-    cam->boundright_curr = cam->boundright_proj;
-    cam->boundtop_curr = cam->boundtop_proj;
-    cam->boundbottom_curr = cam->boundbottom_proj;
-    event_data->cam = cam;
-
-    // search for nearest ledge
-    float ledge_dir;
-    int line_index = Ledge_Find(0, 0, &ledge_dir);
-    if (line_index != -1) {
-        Fighter_PlaceOnLedge(event_data, hmn, line_index, ledge_dir);
-    } else {
-        event_data->cam->flags = 0;
-        event_data->ledge_line = -1;
-        event_vars->Tip_Display(500 * 60, "Error:\nIt appears there are no \nledges on this stage...");
-    }
 }
 
 // Init Function
@@ -383,21 +339,6 @@ void Event_Init(GOBJ *gobj) {
     PivotFsmashData *event_data = gobj->userdata;
 
     Init_Event_Vars("pfshData");
-
-    OSReport("Event assets\n");
-    OSReport(event_data->assets->hud->child->class_name);
-
-    // standardize camera
-    float *unk_cam = (float *)0x803bcca0;
-    stc_stage->fov_r = 0; // no camera rotation
-    stc_stage->x28 = 1; // pan value?
-    stc_stage->x2c = 1; // pan value?
-    stc_stage->x30 = 1; // pan value?
-    stc_stage->x34 = 130; // zoom out
-    unk_cam[0x40 / 4] = 30;
-
-    // Init hitlog
-    event_data->hitlog_gobj = PivotFsmash_HitLogInit();
 
     // Init HUD
     PivotFsmash_HUDInit(event_data);
@@ -587,99 +528,14 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
                 d = d->next;
             }
 
-            // output remaining airdodge angle
-            if (event_data->hud.is_airdodge == 1) {
-                Text_SetText(event_data->hud.text_angle, 0, "%.2f", fabs(event_data->hud.airdodge_angle / M_1DEGREE));
-            } else {
-                Text_SetText(event_data->hud.text_angle, 0, "-");
-            }
-
-            // output remaining GALINT
-            void *matanim;
-            Text *text_galint = event_data->hud.text_galint;
-            if (hmn_data->hurtstatus.ledge_intang_left > 0) {
-                SFX_Play(303);
-                matanim = event_data->assets->hudmatanim[0];
-                Text_SetText(text_galint, 0, "%df", hmn_data->hurtstatus.ledge_intang_left);
-            } else if (hmn_data->TM.vuln_frames < 25) {
-                matanim = event_data->assets->hudmatanim[1];
-                Text_SetText(text_galint, 0, "-%df", hmn_data->TM.vuln_frames);
-            } else {
-                matanim = event_data->assets->hudmatanim[1];
-                Text_SetText(text_galint, 0, "-");
-            }
-
-            // init hitbox num
-            PfshHitlogData *hitlog_data = event_data->hitlog_gobj->userdata;
-            hitlog_data->num = 0;
-
             // apply HUD animation
             JOBJ_RemoveAnimAll(hud_jobj);
-            JOBJ_AddAnimAll(hud_jobj, 0, matanim, 0);
             JOBJ_ReqAnimAll(hud_jobj, 0);
         }
     }
 
     // update HUD anim
     JOBJ_AnimAll(hud_jobj);
-}
-
-void PivotFsmash_HitLogThink(PivotFsmashData *event_data, GOBJ *hmn) {
-    FighterData *hmn_data = hmn->userdata;
-    PfshHitlogData *hitlog_data = event_data->hitlog_gobj->userdata;
-
-    // log hitboxes
-    if (event_data->hud.is_actionable == 1 && hmn_data->hurtstatus.ledge_intang_left > 0) {
-        // iterate through fighter hitboxes
-        for (int i = 0; i < sizeof(hmn_data->hitbox) / sizeof(ftHit); i++) {
-            ftHit *this_hit = &hmn_data->hitbox[i];
-
-            if (this_hit->active != 0 && // if hitbox is active
-                // if not over max
-                hitlog_data->num < PFSH_HITBOXNUM) {
-                // log info
-                PfshHitboxData *this_pfsh_hit = &hitlog_data->hitlog[hitlog_data->num];
-                this_pfsh_hit->size = this_hit->size;
-                this_pfsh_hit->pos_curr = this_hit->pos;
-                this_pfsh_hit->pos_prev = this_hit->pos_prev;
-                this_pfsh_hit->kind = this_hit->attribute;
-
-                // increment hitboxes
-                hitlog_data->num++;
-            }
-        }
-
-        // iterate through items belonging to fighter
-        GOBJList *gobj_list = *stc_gobj_list;
-        GOBJ *this_item = gobj_list->item;
-        while (this_item != 0) {
-            ItemData *this_itemdata = this_item->userdata;
-
-            // ensure belongs to the fighter
-            if (this_itemdata->fighter->fighter == hmn) {
-                // iterate through item hitboxes
-                for (int i = 0; i < sizeof(hmn_data->hitbox) / sizeof(ftHit); i++) {
-                    itHit *this_hit = &this_itemdata->hitbox[i];
-
-                    if (this_hit->active != 0 && // if hitbox is active
-                        // if not over max
-                        hitlog_data->num < PFSH_HITBOXNUM) {
-                        // log info
-                        PfshHitboxData *this_pfsh_hit = &hitlog_data->hitlog[hitlog_data->num];
-                        this_pfsh_hit->size = this_hit->size;
-                        this_pfsh_hit->pos_curr = this_hit->pos;
-                        this_pfsh_hit->pos_prev = this_hit->pos_prev;
-                        this_pfsh_hit->kind = this_hit->attribute;
-
-                        // increment hitboxes
-                        hitlog_data->num++;
-                    }
-                }
-            }
-
-            this_item = this_item->next;
-        }
-    }
 }
 
 void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn) {
@@ -734,21 +590,6 @@ void PivotFsmash_ChangeLedgeThink(PivotFsmashData *event_data, GOBJ *hmn) {
         } else if (event_data->ledge_dir == 1) {
             ledge_pos = collvert[this_line->info->vert_prev].pos_curr.X;
         }
-
-        // find ledge
-        float ledge_dir;
-        int line_index = -1;
-        if (hmn_data->input.down & HSD_BUTTON_DPAD_LEFT) {
-            line_index = Ledge_Find(-1, ledge_pos, &ledge_dir);
-        } else if (hmn_data->input.down & HSD_BUTTON_DPAD_RIGHT) {
-            line_index = Ledge_Find(1, ledge_pos, &ledge_dir);
-        }
-
-        if (line_index != -1) {
-            Fighter_PlaceOnLedge(event_data, hmn, line_index, ledge_dir);
-        } else {
-            Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
-        }
     }
 }
 
@@ -767,9 +608,8 @@ void Event_Think(GOBJ *event) {
     }
 
     PivotFsmash_HUDThink(event_data, hmn_data);
-    PivotFsmash_HitLogThink(event_data, hmn);
-    PivotFsmash_ResetThink(event_data, hmn);
-    PivotFsmash_ChangeLedgeThink(event_data, hmn);
+//    PivotFsmash_ResetThink(event_data, hmn);
+//    PivotFsmash_ChangeLedgeThink(event_data, hmn);
 }
 
 // Menu Toggle functions
@@ -782,193 +622,6 @@ void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
 }
 
 void PivotFsmash_ToggleAutoReset(GOBJ *menu_gobj, int value) {
-    PivotFsmashData *event_data = event_vars->event_gobj->userdata;
-
-    if (value == 0) {
-        // enable camera
-        event_data->cam->kind = 0;
-    } else {
-        // disable camera
-        event_data->cam->kind = 1;
-    }
-}
-
-// Hitlog functions
-GOBJ *PivotFsmash_HitLogInit() {
-    GOBJ *hit_gobj = GObj_Create(0, 0, 0);
-    PfshHitlogData *hit_data = calloc(sizeof(PfshHitlogData));
-    GObj_AddUserData(hit_gobj, 4, HSD_Free, hit_data);
-    GObj_AddGXLink(hit_gobj, PivotFsmash_HitLogGX, 5, 0);
-
-    // init array
-    hit_data->num = 0;
-
-    return hit_gobj;
-}
-
-void PivotFsmash_HitLogGX(GOBJ *gobj, int pass) {
-    static GXColor hitlog_ambient = {128, 0, 0, 50};
-    static GXColor hit_diffuse = {255, 99, 99, 50};
-    static GXColor grab_diffuse = {255, 0, 255, 50};
-    static GXColor detect_diffuse = {255, 255, 255, 50};
-
-    PfshHitlogData *hitlog_data = gobj->userdata;
-
-    for (int i = 0; i < hitlog_data->num; i++) {
-        PfshHitboxData *this_pfsh_hit = &hitlog_data->hitlog[i];
-
-        // determine color
-        GXColor *diffuse;
-        if (this_pfsh_hit->kind == 0) {
-            diffuse = &hit_diffuse;
-        } else if (this_pfsh_hit->kind == 8) {
-            diffuse = &grab_diffuse;
-        } else if (this_pfsh_hit->kind == 11) {
-            diffuse = &detect_diffuse;
-        } else {
-            diffuse = &hit_diffuse;
-        }
-
-        Develop_DrawSphere(this_pfsh_hit->size, &this_pfsh_hit->pos_curr, (Vec2 *)&this_pfsh_hit->pos_prev, diffuse, &hitlog_ambient);
-    }
-}
-
-int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir) {
-    // get line and vert pointers
-    CollLine *collline = *stc_collline;
-
-    // get initial closest
-    float xpos_closest;
-    if (search_dir == -1) {
-        // search left
-        xpos_closest = -5000;
-    } else if (search_dir == 1) {
-        // search right
-        xpos_closest = 5000;
-    } else {
-        // search both
-        xpos_closest = 5000;
-    }
-
-    // look for the closest ledge
-    int index_closest = -1;
-    CollGroup *this_group = *stc_firstcollgroup;
-    // loop through ground links
-    while (this_group != 0) {
-        // 2 passes, one for ground and one for dynamic lines
-        int line_index, line_num;
-        for (int i = 0; i < 2; i++) {
-            if (i == 0) {
-                // first pass, use floors
-                line_index = this_group->desc->floor_start; // first ground link
-                line_num = line_index + this_group->desc->floor_num; // ground link num
-            } else {
-                // second pass, use dynamics
-                line_index = this_group->desc->dyn_start; // first ground link
-                line_num = line_index + this_group->desc->dyn_num; // ground link num
-            }
-
-            // loop through lines
-            while (line_index < line_num) {
-                // get all data for this line
-                CollLine *this_line = &collline[line_index]; // ??? i actually dont know why i cant access this directly
-                CollLineInfo *this_lineinfo = this_line->info;
-
-                // check if this link is a ledge
-                if (this_lineinfo->is_ledge) {
-                    // check both sides of this ledge
-                    Vec3 ledge_pos;
-                    for (int j = 0; j < 2; j++) {
-                        // first pass, check left
-                        if (j == 0) {
-                            GrColl_GetLedgeLeft2(line_index, &ledge_pos);
-                        } else if (j == 1) {
-                            GrColl_GetLedgeRight2(line_index, &ledge_pos);
-                        }
-
-                        // is within the camera range
-                        if (ledge_pos.X > Stage_GetCameraLeft() && ledge_pos.X < Stage_GetCameraRight() && ledge_pos.Y > Stage_GetCameraBottom() && ledge_pos.Y < Stage_GetCameraTop()) {
-                            // check for any obstructions
-                            float dir_mult;
-                            if (j == 0) {
-                                // left ledge
-                                dir_mult = -1;
-                            } else {
-                                // right ledge
-                                dir_mult = 1;
-                            }
-                            int ray_index;
-                            int ray_kind;
-                            Vec3 ray_angle;
-                            Vec3 ray_pos;
-                            float from_x = ledge_pos.X + 2 * dir_mult;
-                            float to_x = from_x;
-                            float from_y = ledge_pos.Y + 5;
-                            float to_y = from_y - 10;
-                            int is_ground = GrColl_RaycastGround(&ray_pos, &ray_index, &ray_kind, &ray_angle, (Vec3 *)-1, (Vec3 *)-1, (Vec3 *)-1, 0, from_x, from_y, to_x, to_y, 0);
-                            if (is_ground == 0) {
-                                int is_closer = 0;
-
-                                if (search_dir == -1) {
-                                    // check if to the left
-                                    if (ledge_pos.X > xpos_closest && ledge_pos.X < xpos_start) {
-                                        is_closer = 1;
-                                    }
-                                } else if (search_dir == 1) {
-                                    // check if to the right
-                                    if (ledge_pos.X < xpos_closest && ledge_pos.X > xpos_start) {
-                                        is_closer = 1;
-                                    }
-                                } else {
-                                    // check if any direction
-                                    float dist_old = fabs(xpos_start - xpos_closest);
-                                    float dist_new = fabs(xpos_start - ledge_pos.X);
-                                    if (dist_new < dist_old) {
-                                        is_closer = 1;
-                                    }
-                                }
-
-                                // determine direction
-                                if (is_closer) {
-                                    // now determine if this line is a ledge in this direction
-                                    if (j == 0) {
-                                        // left ledge
-                                        CollLine *prev_line = &collline[this_lineinfo->line_prev];
-                                        // ??? i actually don't know why i cant access this directly
-                                        // if prev line is a right wall / if prev line doesn't exist
-                                        if (this_lineinfo->line_prev == -1 || prev_line->is_rwall == 1) {
-                                            // save info on this line
-                                            xpos_closest = ledge_pos.X; // save left vert's X position
-                                            index_closest = line_index;
-                                            *ledge_dir = 1;
-                                        }
-                                    } else if (j == 1) {
-                                        // right ledge
-                                        CollLine *next_line = &collline[this_lineinfo->line_next];
-                                        // ??? i actually don't know why i cant access this directly
-                                        // if prev line is a right wall / if prev line doesn't exist
-                                        if (this_lineinfo->line_prev == -1 || next_line->is_lwall == 1) {
-                                            // save info on this line
-                                            xpos_closest = ledge_pos.X; // save left vert's X position
-                                            index_closest = line_index;
-                                            *ledge_dir = -1;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                line_index++;
-            }
-        }
-
-        // get next
-        this_group = this_group->next;
-    }
-
-    return index_closest;
 }
 
 void RebirthWait_Phys(GOBJ *fighter) {
