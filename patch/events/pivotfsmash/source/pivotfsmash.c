@@ -1,21 +1,13 @@
 #include "pivotfsmash.h"
 
-static GXColor tmgbar_black = {40, 40, 40, 255};
-static GXColor tmgbar_grey = {80, 80, 80, 255};
-static GXColor tmgbar_blue = {128, 128, 255, 255};
-static GXColor tmgbar_green = {128, 255, 128, 255};
-static GXColor tmgbar_yellow = {255, 255, 128, 255};
-static GXColor tmgbar_red = {255, 128, 128, 255};
-static GXColor tmgbar_indigo = {255, 128, 255, 255};
-static GXColor tmgbar_white = {255, 255, 255, 255};
 static GXColor *tmgbar_colors[] = {
-    &tmgbar_black,
-    &tmgbar_grey,
-    &tmgbar_green,
-    &tmgbar_yellow,
-    &tmgbar_indigo,
-    &tmgbar_white,
-    &tmgbar_red,
+    &color_black,
+    &color_grey,
+    &color_green,
+    &color_yellow,
+    &color_magenta,
+    &color_white,
+    &color_red,
 };
 
 // Tips Functions
@@ -24,32 +16,8 @@ void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
 }
 
 // Main Menu
-static char **PfshOptions_Start[] = {"Ledge", "Respawn Platform"};
-static char **PfshOptions_Reset[] = {"On", "Off"};
 static char **PfshOptions_HUD[] = {"On", "Off"};
 static EventOption PfshOptions_Main[] = {
-    /*Position*/ {
-        .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
-        .value_num = sizeof(PfshOptions_Start) / 4, // number of values for this option
-        .option_val = 0, // value of this option
-        .menu = 0, // pointer to the menu that pressing A opens
-        .option_name = "Starting Position", // pointer to a string
-        .desc = "Choose where the fighter is placed \nafter resetting positions.",
-        // string describing what this option does
-        .option_values = PfshOptions_Start, // pointer to an array of strings
-        .onOptionChange = PivotFsmash_ToggleStartPosition,
-    },
-    /*Reset*/ {
-        .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
-        .value_num = sizeof(PfshOptions_Reset) / 4, // number of values for this option
-        .option_val = 0, // value of this option
-        .menu = 0, // pointer to the menu that pressing A opens
-        .option_name = "Auto-Reset", // pointer to a string
-        .desc = "Toggle the automatic resetting of the \nfighter's position after ledgedash attempts.",
-        // string describing what this option does
-        .option_values = PfshOptions_Reset, // pointer to an array of strings
-        .onOptionChange = PivotFsmash_ToggleAutoReset,
-    },
     /*HUD*/ {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
         .value_num = sizeof(PfshOptions_HUD) / 4, // number of values for this option
@@ -60,24 +28,13 @@ static EventOption PfshOptions_Main[] = {
         .option_values = PfshOptions_HUD, // pointer to an array of strings
         .onOptionChange = 0,
     },
-    /*Tips*/ {
-        .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
-        .value_num = sizeof(PfshOptions_HUD) / 4, // number of values for this option
-        .option_val = 0, // value of this option
-        .menu = 0, // pointer to the menu that pressing A opens
-        .option_name = "Tips", // pointer to a string
-        .desc = "Toggle the onscreen display of tips.", // string describing what this option does
-        .option_values = PfshOptions_HUD, // pointer to an array of strings
-        .onOptionChange = Tips_Toggle_Callback,
-    },
     /*Help*/ {
         .option_kind = OPTKIND_FUNC, // the type of option this is; menu, string list, integers list, etc
         .value_num = 0, // number of values for this option
         .option_val = 0, // value of this option
         .menu = 0, // pointer to the menu that pressing A opens
         .option_name = "About", // pointer to a string
-        .desc =
-        "Ledgedashing is the act of wavedashing onto stage from ledge.\nThis is most commonly done by dropping off ledge, double jumping \nimmediately, and quickly airdodging onto stage. Each input \nis performed quickly after the last, making it difficult and risky.",
+        .desc = "You must forward throw puff, first. \nThen, dash forward, dash back for one frame, \nand hit the c-stick forward. If done correctly, you should \nbe able to hit puff before she can jump out.",
         // string describing what this option does
         .option_values = 0, // pointer to an array of strings
         .onOptionChange = 0,
@@ -110,7 +67,7 @@ static EventMenu *Event_Menu = &PfshMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
 void PivotFsmash_HUDCamThink(GOBJ *gobj) {
-    HUDCamThink(PfshOptions_Main[2]);
+    HUDCamThink(PfshOptions_Main[0]);
 }
 
 // Pivot F-Smash functions
@@ -144,7 +101,7 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
                 mat->alpha = 0.7;
 
                 // set color
-                mat->diffuse = tmgbar_black;
+                mat->diffuse = color_black;
             }
         }
 
@@ -199,152 +156,78 @@ void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     }
 }
 
-void Fighter_PlaceOnLedge(PivotFsmashData *event_data, GOBJ *hmn, int line_index, float ledge_dir) {
+void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     FighterData *hmn_data = hmn->userdata;
+    FighterData *cpu_data = cpu->userdata;
 
-    // save ledge info
-    event_data->ledge_line = line_index;
-    event_data->ledge_dir = ledge_dir;
+    // init refresh num
+    event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
 
-    // get ledge position
-    Vec3 ledge_pos;
-    if (ledge_dir > 0) {
-        GrColl_GetLedgeLeft2(line_index, &ledge_pos);
-    } else {
-        GrColl_GetLedgeRight2(line_index, &ledge_pos);
-    }
+    // get random position
+    float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
+    float hmn_direction = -1 + 2 * HSD_Randi(2);
+    Fighter_PlaceOnStage(hmn, hmn_pos, hmn_direction);
 
-    // remove velocity
-    hmn_data->phys.self_vel.X = 0;
-    hmn_data->phys.self_vel.Y = 0;
+    float cpu_pos = hmn_pos + 10 * hmn_direction;
+    float cpu_direction = -hmn_direction;
+    Fighter_PlaceOnStage(cpu, cpu_pos, cpu_direction);
 
-    // restore tether
-    hmn_data->flags.used_tether = 0;
+    hmn_data->dmg.percent = 0;
+    Fighter_SetHUDDamage(hmn_data->ply, 0);
 
-    // check if starting on ledge
-    if (PfshMenu_Main.options[0].option_val == 0) {
-        // init refresh num
-        event_data->tip.refresh_num = -1; // setting this to -1 because the per frame code will add 1 and make it 0
+    float cpu_dmg = 60 + HSD_Randi(20) + HSD_Randf();
+    cpu_data->dmg.percent = cpu_dmg;
+    Fighter_SetHUDDamage(cpu_data->ply, cpu_dmg);
 
-        // Sleep first
-        Fighter_EnterSleep(hmn, 0);
-        Fighter_EnterRebirth(hmn);
+    // Set CPU behavior again
+    cpu_data->cpu.ai = 15;
 
-        // place player on this ledge
-        FtCliffCatch *ft_state = (FtCliffCatch *)&hmn_data->state_var;
-        hmn_data->facing_direction = ledge_dir;
-        ft_state->ledge_index = line_index; // store line index
-        Fighter_EnterCliffWait(hmn);
-        ft_state->timer = 0; // spoof as on ledge for a frame already
-        Fighter_LoseGroundJump(hmn_data);
-        Fighter_EnableCollUpdate(hmn_data);
-        Coll_CheckLedge(&hmn_data->coll_data);
-        Fighter_MoveToCliff(hmn);
-        Fighter_UpdatePosition(hmn);
-        hmn_data->phys.self_vel.X = 0;
-        hmn_data->phys.self_vel.Y = 0;
-        ftCommonData *ftcommon = *stc_ftcommon;
-        Fighter_ApplyIntang(hmn, ftcommon->cliff_invuln_time);
-    } else {
-        // init refresh num
-        event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
+    PivotFsmash_InitVariables(event_data);
 
-        // place player in a random position in respawn wait
-        Fighter_EnterSleep(hmn, 0);
-        Fighter_EnterRebirth(hmn);
-        hmn_data->facing_direction = ledge_dir;
-
-        // get random position
-        float xpos_min = 40;
-        float xpos_max = 65;
-        float ypos_min = -30;
-        float ypos_max = 30;
-        hmn_data->phys.pos.X = ledge_dir * -1 * (xpos_min + HSD_Randi(xpos_max - xpos_min) + HSD_Randf()) + ledge_pos.X;
-        hmn_data->phys.pos.Y = ledge_dir * -1 * (ypos_min + HSD_Randi(ypos_max - ypos_min) + HSD_Randf()) + ledge_pos.Y;
-
-        // enter rebirth
-        Fighter_EnterRebirthWait(hmn);
-        hmn_data->cb.Phys = RebirthWait_Phys;
-        hmn_data->cb.IASA = RebirthWait_IASA;
-
-        Fighter_UpdateRebirthPlatformPos(hmn);
-
-        PivotFsmash_InitVariables(event_data);
-    }
-
-    // update camera box
-    CameraBox *cam = event_data->cam;
-    cam->cam_pos.X = ledge_pos.X + ledge_dir * 20;
-    cam->cam_pos.Y = ledge_pos.Y + 15;
-
-    // remove all particles
-    for (int i = 0; i < PTCL_LINKMAX; i++) {
-        Particle2 **ptcls = &stc_ptcl[i];
-        Particle2 *ptcl = *ptcls;
-        while (ptcl != 0) {
-            Particle2 *ptcl_next = ptcl->next;
-
-            // begin destroying this particle
-
-            // subtract some value, 8039c9f0
-            if (ptcl->x88 != 0) {
-                int *arr = ptcl->x88;
-                arr[0x50 / 4]--;
-            }
-            // remove from generator? 8039ca14
-            if (ptcl->gen != 0) {
-                psRemoveParticleAppSRT(ptcl);
-            }
-
-            // delete parent jobj, 8039ca48
-            psDeletePntJObjwithParticle(ptcl);
-
-            // update most recent ptcl pointer
-            *ptcls = ptcl->next;
-
-            // free alloc, 8039ca54
-            HSD_ObjFree((HSD_ObjAllocData *)0x804d0f60, ptcl);
-
-            // decrement ptcl total
-            u16 ptclnum = *stc_ptclnum;
-            ptclnum--;
-            *stc_ptclnum = ptclnum;
-
-            // get next
-            ptcl = ptcl_next;
-        }
-    }
-
-    // remove all camera shake gobjs (p_link 18, entity_class 3)
-    GOBJList *gobj_list = *stc_gobj_list;
-    GOBJ *gobj = gobj_list->match_cam;
-    while (gobj != 0) {
-        GOBJ *gobj_next = gobj->next;
-
-        // if entity class 3 (quake)
-        if (gobj->entity_class == 3) {
-            GObj_Destroy(gobj);
-        }
-
-        gobj = gobj_next;
-    }
+    Remove_Particles_And_CamShake();
 }
 
-// Fighter fuctions
-void PivotFsmash_FtInit(PivotFsmashData *event_data) {
+void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
+    FighterData *fighter_data = fighter->userdata;
+
+    // Sleep first
+    Fighter_EnterSleep(fighter, 0);
+    Fighter_EnterRebirth(fighter);
+    Match_CreateHUD(fighter_data->ply);
+
+    // place player in a random position in wait
+    fighter_data->facing_direction = facing_direction;
+    Fighter_EnterWait(fighter);
+
+    fighter_data->phys.pos.X = xpos;
+    fighter_data->phys.pos.Y = 0;
+    Fighter_UpdatePosition(fighter);
+
+    // remove velocity
+    fighter_data->phys.self_vel.X = 0;
+    fighter_data->phys.self_vel.Y = 0;
+}
+
+// Fighter functions
+void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    Fighter_Reset(event_data, hmn, cpu);
 }
 
 // Init Function
 void Event_Init(GOBJ *gobj) {
     PivotFsmashData *event_data = gobj->userdata;
-
     Init_Event_Vars("pfshData");
+
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+    GOBJ *cpu = Fighter_GetGObj(1);
+    FighterData *cpu_data = cpu->userdata;
 
     // Init HUD
     PivotFsmash_HUDInit(event_data);
 
-    // Init Fighter
-    PivotFsmash_FtInit(event_data);
+    // Init Fighters
+    PivotFsmash_FtInit(event_data, hmn, cpu);
 }
 
 int Fighter_CheckFall(FighterData *hmn_data) {
@@ -356,70 +239,17 @@ int Fighter_CheckFall(FighterData *hmn_data) {
     if (stick_x >= 0.2875 && hmn_data->input.timer_lstick_tilt_x < 2 ||
         stick_y <= -0.2875 && hmn_data->input.timer_lstick_tilt_y < 2) {
         is_fall = 1;
-        }
+    }
 
     return is_fall;
 }
 
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
-    if (PfshOptions_Main[3].option_val == 0) {
-        // check for early fall input in cliffcatch
-        if (event_data->tip.is_input_release == 0 && hmn_data->state == ASID_CLIFFCATCH && Fighter_CheckFall(hmn_data) == 1) {
-            event_data->tip.is_input_release = 1;
-            event_vars->Tip_Destroy();
-
-            // determine how many frames early
-            float *anim_ptr = Animation_GetAddress(hmn_data, hmn_data->anim_id);
-            float frame_total = anim_ptr[0x8 / 4];
-            float frames_early = frame_total - hmn_data->stateFrame;
-            event_vars->Tip_Display(3 * 60, "Misinput:\nFell %d frames early.", (int) frames_early + 1);
-        }
-
-        // check for early fall input on cliffwait frame 0
-        if (event_data->tip.is_input_release == 0 && hmn_data->state == ASID_CLIFFWAIT && hmn_data->TM.state_frame == 1 && Fighter_CheckFall(hmn_data) == 1) {
-            event_data->tip.is_input_release = 1;
-            event_vars->Tip_Destroy();
-            event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nFell 1 frame early.");
-        }
-
-        // check for late fall input
-        if (event_data->tip.is_input_release == 0 && hmn_data->state == ASID_CLIFFJUMPQUICK1 && Fighter_CheckFall(hmn_data) == 1) {
-            event_data->tip.is_input_release = 1;
-            event_vars->Tip_Destroy();
-
-            if (hmn_data->TM.state_frame == 0) {
-                // jumped and fell on same frame
-                event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nInputted jump and fall \non the same frame.");
-            } else {
-                // fell late
-                event_vars->Tip_Display(LSDH_TIPDURATION, "Misinput:\nJumped %d frame(s) early.",
-                                        hmn_data->TM.state_frame);
-            }
-        }
-
-        // check for ledgedash without refreshing
-        if (event_data->tip.refresh_displayed == 0 && event_data->hud.is_actionable == 1 && event_data->tip.refresh_num == 0) {
-            event_data->tip.refresh_displayed = 1;
-
-            // increment condition count
-            event_data->tip.refresh_cond_num++;
-
-            // after 3 conditions, display tip
-            if (event_data->tip.refresh_cond_num >= 3) {
-                // if tip is displayed, reset cond num
-                if (event_vars->Tip_Display(
-                    5 * 60,
-                    "Warning:\nIt is higly recommended to\nre-grab ledge after \nbeing reset to simulate \na realistic scenario!")) {
-                    event_data->tip.refresh_cond_num = 0;
-                }
-            }
-        }
-    }
 }
 
 void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
     // run tip logic
-    Tips_Think(event_data, hmn_data);
+//    Tips_Think(event_data, hmn_data);
 
     JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
 
@@ -514,7 +344,7 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
 
                         // check if GALINT frame
                         if (this_frame >= curr_frame && this_frame <= curr_frame + hmn_data->hurtstatus.ledge_intang_left) {
-                            bar_color = &tmgbar_blue;
+                            bar_color = &color_blue;
                         } else {
                             bar_color = tmgbar_colors[event_data->hud.action_log[this_frame]];
                         }
@@ -538,42 +368,34 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
     JOBJ_AnimAll(hud_jobj);
 }
 
-void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn) {
+void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     FighterData *hmn_data = hmn->userdata;
+    FighterData *cpu_data = cpu->userdata;
 
-    if (PfshOptions_Main[1].option_val == 0 && event_data->ledge_line != -1) {
-        // check if enabled and ledge exists
-        // check if reset timer is set
-        if (event_data->reset_timer > 0) {
-            // decrement reset timer
-            event_data->reset_timer--;
+    // check if reset timer is set
+    if (event_data->reset_timer > 0) {
+        // decrement reset timer
+        event_data->reset_timer--;
 
-            // if reset timer is up, go back to ledge
-            if (event_data->reset_timer == 0) {
-                Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
-            }
-        } else if (event_data->hud.is_actionable) {
-            // check to set reset timner
-            event_data->reset_timer = 30;
-        } else {
-            int state = hmn_data->state;
-
-            // reset actions
-            if (hmn_data->flags.dead == 1 || // if dead
-                (hmn_data->state == ASID_ESCAPEAIR && hmn_data->TM.state_frame >= 9) || // missed airdodge
-                (((state >= ASID_CLIFFCLIMBSLOW && state <= ASID_CLIFFJUMPQUICK2) ||
-                  // reset if any other ledge action
-                  (state >= ASID_ATTACKAIRN && state <= ASID_ATTACKAIRLW) ||
-                  (hmn_data->phys.air_state == 0 && (
-                       state != ASID_LANDING && state != ASID_LANDINGFALLSPECIAL && state != ASID_REBIRTHWAIT)))
-                 && // reset if grounded non landing
-                 hmn_data->TM.state_frame >= 7)) {
-                // reset and play sfx
-                Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
-                SFX_PlayCommon(3);
-                 }
+        // if reset timer is up, go back to ledge
+        if (event_data->reset_timer == 0) {
+            Fighter_Reset(event_data, hmn, cpu);
         }
+    } else if (Should_Reset_On_Timer(hmn_data, cpu_data)) {
+        // check to set reset timer
+        event_data->reset_timer = 30;
+    } else if (Should_Reset_Instantly(hmn_data, cpu_data)) {
+        // reset instantly
+        Fighter_Reset(event_data, hmn, cpu);
     }
+}
+
+int Should_Reset_On_Timer(FighterData *hmn_data, FighterData *cpu_data) {
+    return cpu_data->flags.dead == 1;
+}
+
+int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data) {
+    return hmn_data->flags.dead == 1;
 }
 
 void PivotFsmash_ChangeLedgeThink(PivotFsmashData *event_data, GOBJ *hmn) {
@@ -599,6 +421,7 @@ void Event_Think(GOBJ *event) {
 
     // get fighter data
     GOBJ *hmn = Fighter_GetGObj(0);
+    GOBJ *cpu = Fighter_GetGObj(1);
     FighterData *hmn_data = hmn->userdata;
 
     // no ledgefall
@@ -608,7 +431,7 @@ void Event_Think(GOBJ *event) {
     }
 
     PivotFsmash_HUDThink(event_data, hmn_data);
-//    PivotFsmash_ResetThink(event_data, hmn);
+    PivotFsmash_ResetThink(event_data, hmn, cpu);
 //    PivotFsmash_ChangeLedgeThink(event_data, hmn);
 }
 
@@ -616,9 +439,10 @@ void Event_Think(GOBJ *event) {
 void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
     // get fighter data
     GOBJ *hmn = Fighter_GetGObj(0);
+    GOBJ *cpu = Fighter_GetGObj(1);
     PivotFsmashData *event_data = event_vars->event_gobj->userdata;
 
-    Fighter_PlaceOnLedge(event_data, hmn, event_data->ledge_line, (float) event_data->ledge_dir);
+    Fighter_Reset(event_data, hmn, cpu);
 }
 
 void PivotFsmash_ToggleAutoReset(GOBJ *menu_gobj, int value) {

@@ -23,6 +23,15 @@
     } \
 }
 
+static GXColor color_black = {40, 40, 40, 255};
+static GXColor color_grey = {80, 80, 80, 255};
+static GXColor color_blue = {128, 128, 255, 255};
+static GXColor color_green = {128, 255, 128, 255};
+static GXColor color_yellow = {255, 255, 128, 255};
+static GXColor color_red = {255, 128, 128, 255};
+static GXColor color_magenta = {255, 128, 255, 255};
+static GXColor color_white = {255, 255, 255, 255};
+
 double Math_Sq(double x);
 
 float Bezier(float time, float start, float end);
@@ -40,3 +49,5 @@ GOBJ *Setup_HUD(JOBJ *hud_jobj);
 void Init_Text(int canvas, Text **text_arr, JOBJ *hud_jobj, int num_objs, int offset, float text_scale);
 
 int Default_Text_CreateCanvas(GOBJ *hud_gobj);
+
+void Remove_Particles_And_CamShake();

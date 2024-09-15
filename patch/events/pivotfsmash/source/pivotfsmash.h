@@ -88,9 +88,11 @@ void Fighter_UpdatePosition(GOBJ *fighter);
 
 void PivotFsmash_InitVariables(PivotFsmashData *event_data);
 
-void Fighter_PlaceOnLedge(PivotFsmashData *event_data, GOBJ *hmn, int line_index, float ledge_dir);
+void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
-void PivotFsmash_FtInit(PivotFsmashData *event_data);
+void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction);
+
+void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
 void Event_Init(GOBJ *gobj);
 
@@ -100,7 +102,11 @@ void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
 void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data);
 
-void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn);
+void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+
+int Should_Reset_On_Timer(FighterData *hmn_data, FighterData *cpu_data);
+
+int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data);
 
 void PivotFsmash_ChangeLedgeThink(PivotFsmashData *event_data, GOBJ *hmn);
 

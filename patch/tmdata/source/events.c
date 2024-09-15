@@ -246,7 +246,7 @@ static EventDesc Wavedash = {
 // Pivot F-Smash Training
 // Match Data
 static EventMatchData PivotFsmash_MatchData = {
-     .timer = MATCH_TIMER_COUNTUP,
+     .timer = MATCH_TIMER_HIDE,
      .matchType = MATCH_MATCHTYPE_TIME,
      .isDisableMusic = false,
      .hideGo = true,
