@@ -2,12 +2,12 @@
 
 static GXColor *tmgbar_colors[] = {
     &color_black,
-    &color_grey,
+    &color_blue,
     &color_green,
+    &color_red,
+    &color_cyan,
     &color_yellow,
     &color_magenta,
-    &color_white,
-    &color_red,
 };
 
 // Tips Functions
@@ -35,7 +35,6 @@ static EventOption PfshOptions_Main[] = {
         .menu = 0, // pointer to the menu that pressing A opens
         .option_name = "About", // pointer to a string
         .desc = "You must forward throw puff, first. \nThen, dash forward, dash back for one frame, \nand hit the c-stick forward. If done correctly, you should \nbe able to hit puff before she can jump out.",
-        // string describing what this option does
         .option_values = 0, // pointer to an array of strings
         .onOptionChange = 0,
     },
@@ -82,32 +81,30 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     event_data->hud.canvas = Default_Text_CreateCanvas(event_data->hud.gobj);
 
     // init text
-//    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, LCLTEXT_SCALE);
+//    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, DEFTEXT_SCALE);
 
     // reset all bar colors
-    JOBJ *timingbar_jobj;
-    JOBJ_GetChild(hud_jobj, (int)&timingbar_jobj, LCLJOBJ_BAR, -1); // get timing bar jobj
-    DOBJ *d = timingbar_jobj->dobj;
-    int count = 0;
-    while (d != 0) {
-        // if a box dobj
-        if (count >= 0 && count < 30) {
-            // if mobj exists (it will)
-            MOBJ *m = d->mobj;
-            if (m != 0) {
-                HSD_Material *mat = m->mat;
+    JOBJ *timingbar_jobj = hud_jobj->child->sibling->child->sibling->child->sibling;
 
-                // set alpha
-                mat->alpha = 0.7;
+    for (int count = 0; count < PFSHJOBJ_NUM_BAR; ++count) {
+        DOBJ *d = timingbar_jobj->child->dobj;
 
-                // set color
-                mat->diffuse = color_black;
-            }
+        // if mobj exists (it will)
+        MOBJ *m = d->mobj;
+        if (m != 0) {
+            HSD_Material *mat = m->mat;
+
+            // set alpha
+            mat->alpha = 0.7;
+
+            // set color
+            mat->diffuse = color_black;
         }
 
-        // inc
-        count++;
-        d = d->next;
+        timingbar_jobj = timingbar_jobj->sibling;
+        if (timingbar_jobj == 0) {
+            break;
+        }
     }
 }
 
@@ -253,115 +250,82 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
 
     JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
 
-    // only run logic if ledge exists
-    if (event_data->ledge_line != -1) {
-        // increment timer
-        event_data->hud.timer++;
+    // increment timer
+    event_data->hud.timer++;
 
-        // check to initialize timer
-        if (hmn_data->state == ASID_CLIFFWAIT && hmn_data->TM.state_frame == 1) {
-            PivotFsmash_InitVariables(event_data);
+    // check to initialize timer
+    if ((hmn_data->state == ASID_CATCH || hmn_data->state == ASID_CATCHDASH) && hmn_data->TM.state_frame == 1) {
+        PivotFsmash_InitVariables(event_data);
 
-            event_data->tip.refresh_num++;
+        event_data->tip.refresh_num++;
+    }
+
+    int curr_frame = event_data->hud.timer;
+
+    // update action log
+    if (curr_frame < sizeof(event_data->hud.action_log) / sizeof(u8)) {
+        if (hmn_data->state == ASID_CATCH || hmn_data->state == ASID_CATCHDASH ||
+                hmn_data->state == ASID_CATCHPULL || hmn_data->state == ASID_CATCHDASHPULL) {
+            // look for grab
+            event_data->hud.action_log[curr_frame] = PFACT_GRAB;
+        } else if (hmn_data->state == ASID_THROWF) {
+            // look for throw
+            event_data->hud.action_log[curr_frame] = PFACT_THROW;
+        } else if (hmn_data->state == ASID_DASH) {
+            // look for dash
+            event_data->hud.action_log[curr_frame] = PFACT_DASH;
+        } else if (hmn_data->state == ASID_TURN) {
+            // look for turnaround
+            event_data->hud.action_log[curr_frame] = PFACT_TURN;
+        } else if (hmn_data->state == ASID_ATTACKS4S) {
+            // look for smash
+            event_data->hud.action_log[curr_frame] = PFACT_SMASH;
+        } else if (hmn_data->state == ASID_WAIT || hmn_data->state == ASID_CATCHWAIT) {
+            // look for wait
+            event_data->hud.action_log[curr_frame] = PFACT_NONE;
+        } else {
+            // unknown state, probably a bug
+            OSReport("Unknown state: 0x%.8x\n", hmn_data->state);
+            event_data->hud.action_log[curr_frame] = PFACT_NONE;
         }
+    }
 
-        int curr_frame = event_data->hud.timer;
+    // look for actionable
+    if (hmn_data->state == ASID_ATTACKS4S && hmn_data->TM.state_frame > 15) {
+        event_data->hud.is_actionable = 1;
+        event_data->hud.actionable_frame = event_data->hud.timer;
 
-        // update action log
-        if (curr_frame < sizeof(event_data->hud.action_log) / sizeof(u8)) {
-            if (hmn_data->state == ASID_CLIFFWAIT) {
-                // look for cliffwait
-                event_data->hud.action_log[curr_frame] = LDACT_CLIFFWAIT;
-            } else if (hmn_data->state == ASID_FALL) {
-                // look for release
-                event_data->hud.is_release = 1;
-                event_data->hud.action_log[curr_frame] = LDACT_FALL;
-            } else if (hmn_data->state == ASID_JUMPAERIALF || hmn_data->state == ASID_JUMPAERIALB ||
-                     ((hmn_data->kind == 4 || hmn_data->kind == 15) && (
-                          // check for kirby and jiggs jump
-                          hmn_data->state >= 341 && hmn_data->state <= 345))) {
-                // look for jump
-                event_data->hud.is_jump = 1;
-                event_data->hud.action_log[curr_frame] = LDACT_JUMP;
-            } else if (hmn_data->state == ASID_ESCAPEAIR) {
-                // look for airdodge
-                event_data->hud.action_log[curr_frame] = LDACT_AIRDODGE;
-            } else if (hmn_data->attack_kind != 1) {
-                // look for aerial
-                event_data->hud.is_aerial = 1;
-                event_data->hud.action_log[curr_frame] = LDACT_ATTACK;
-            }
-            // look for land
-            else if (hmn_data->state == ASID_LANDING || hmn_data->state == ASID_LANDINGFALLSPECIAL || (
-                         hmn_data->state == ASID_WAIT && hmn_data->TM.state_frame == 0 && (
-                             hmn_data->TM.state_prev[0] != ASID_LANDING ||
-                             // this is first frame of a no impact land
-                             hmn_data->TM.state_prev[0] != ASID_LANDINGFALLSPECIAL))) {
-                event_data->hud.is_land = 1;
-                event_data->hud.action_log[curr_frame] = LDACT_LANDING;
-            }
-        }
+        // destroy any tips
+        event_vars->Tip_Destroy();
 
-        // grab airdodge angle
-        if (event_data->hud.is_airdodge == 0) {
-            if (hmn_data->state == ASID_ESCAPEAIR || hmn_data->TM.state_prev[0] == ASID_ESCAPEAIR) {
-                // determine airdodge angle
-                float angle = atan2(hmn_data->input.lstick_y, hmn_data->input.lstick_x) - -(M_PI / 2);
+        // update bar colors
+        JOBJ *timingbar_jobj = hud_jobj->child->sibling->child->sibling->child->sibling;
 
-                // save airdodge angle
-                event_data->hud.airdodge_angle = angle;
-                event_data->hud.is_airdodge = 1;
-            }
-        }
+        for (int count = 0; count < PFSHJOBJ_NUM_BAR; ++count) {
+            DOBJ *d = timingbar_jobj->child->dobj;
 
-        // look for actionable
-        if (event_data->hud.is_actionable == 0 && event_data->hud.is_release == 1 &&
-            ((((hmn_data->state == ASID_WAIT && (
-                    hmn_data->TM.state_prev[0] != ASID_LANDING || hmn_data->TM.state_prev[0] != ASID_LANDINGFALLSPECIAL) && hmn_data->TM.state_frame > 0) || hmn_data->TM.state_prev[0] == ASID_WAIT) && hmn_data->TM.state_frame <= 1) ||
-             // prev frame too cause you can attack on the same frame
-             (hmn_data->state == ASID_LANDING && hmn_data->TM.state_frame >= hmn_data->attr.normal_landing_lag) ||
-             (hmn_data->TM.state_prev[0] == ASID_LANDING && hmn_data->TM.state_prev_frames[0] >= hmn_data->attr.normal_landing_lag))) {
-            event_data->hud.is_actionable = 1;
-            event_data->hud.actionable_frame = event_data->hud.timer;
+            // if mobj exists (it will)
+            MOBJ *m = d->mobj;
+            if (m != 0) {
+                HSD_Material *mat = m->mat;
 
-            // destroy any tips
-            event_vars->Tip_Destroy();
+                // set alpha
+                mat->alpha = 0.7;
 
-            // update bar colors
-            JOBJ *timingbar_jobj;
-            JOBJ_GetChild(hud_jobj, (int)&timingbar_jobj, LCLJOBJ_BAR, -1); // get timing bar jobj
-            DOBJ *d = timingbar_jobj->dobj;
-            int count = 0;
-            while (d != 0) {
-                // if a box dobj
-                if (count >= 0 && count < 30) {
-                    // if mobj exists (it will)
-                    MOBJ *m = d->mobj;
-                    if (m != 0) {
-                        HSD_Material *mat = m->mat;
-                        int this_frame = 29 - count;
-                        GXColor *bar_color;
-
-                        // check if GALINT frame
-                        if (this_frame >= curr_frame && this_frame <= curr_frame + hmn_data->hurtstatus.ledge_intang_left) {
-                            bar_color = &color_blue;
-                        } else {
-                            bar_color = tmgbar_colors[event_data->hud.action_log[this_frame]];
-                        }
-
-                        mat->diffuse = *bar_color;
-                    }
-                }
-
-                // inc
-                count++;
-                d = d->next;
+                // set color
+                GXColor *bar_color = tmgbar_colors[event_data->hud.action_log[count]];
+                mat->diffuse = *bar_color;
             }
 
-            // apply HUD animation
-            JOBJ_RemoveAnimAll(hud_jobj);
-            JOBJ_ReqAnimAll(hud_jobj, 0);
+            timingbar_jobj = timingbar_jobj->sibling;
+            if (timingbar_jobj == 0 || count >= sizeof(event_data->hud.action_log) / sizeof(u8)) {
+                break;
+            }
         }
+
+        // apply HUD animation
+        JOBJ_RemoveAnimAll(hud_jobj);
+        JOBJ_ReqAnimAll(hud_jobj, 0);
     }
 
     // update HUD anim
@@ -446,31 +410,4 @@ void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
 }
 
 void PivotFsmash_ToggleAutoReset(GOBJ *menu_gobj, int value) {
-}
-
-void RebirthWait_Phys(GOBJ *fighter) {
-    FighterData *fighter_data = fighter->userdata;
-
-    // infinite time
-    fighter_data->state_var.stateVar1 = 2;
-}
-
-int RebirthWait_IASA(GOBJ *fighter) {
-    FighterData *fighter_data = fighter->userdata;
-
-    if (Fighter_IASACheck_JumpAerial(fighter)) {
-    } else {
-        ftCommonData *ftcommon = *stc_ftcommon;
-
-        // check for lstick movement
-        float stick_x = fabs(fighter_data->input.lstick_x);
-        float stick_y = fighter_data->input.lstick_y;
-        if (stick_x > 0.2875 && fighter_data->input.timer_lstick_tilt_x < 2 ||
-            stick_y < ftcommon->lstick_rebirthfall * -1 && fighter_data->input.timer_lstick_tilt_y < 4) {
-            Fighter_EnterFall(fighter);
-            return 1;
-        }
-    }
-
-    return 0;
 }

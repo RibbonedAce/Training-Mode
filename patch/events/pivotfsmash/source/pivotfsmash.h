@@ -6,8 +6,8 @@
 
 #define LSDH_TIPDURATION 1.7 * 60
 #define PFSH_HITBOXNUM 30 * 4
-#define LCLTEXT_SCALE 4.5
-#define LCLJOBJ_BAR 4
+#define DEFTEXT_SCALE 4.5
+#define PFSHJOBJ_NUM_BAR 72
 
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;
@@ -44,7 +44,7 @@ struct PivotFsmashData {
         u16 aerial_frame;
         u16 land_frame;
         u16 actionable_frame;
-        u8 action_log[30];
+        u8 action_log[PFSHJOBJ_NUM_BAR];
     } hud;
 
     struct {
@@ -69,13 +69,12 @@ struct PfshHitlogData {
 };
 
 enum PFSH_ACTION {
-    LDACT_NONE,
-    LDACT_CLIFFWAIT,
-    LDACT_FALL,
-    LDACT_JUMP,
-    LDACT_AIRDODGE,
-    LDACT_ATTACK,
-    LDACT_LANDING,
+    PFACT_NONE,
+    PFACT_GRAB,
+    PFACT_THROW,
+    PFACT_DASH,
+    PFACT_TURN,
+    PFACT_SMASH,
 };
 
 void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
@@ -115,8 +114,4 @@ void Event_Think(GOBJ *event);
 void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value);
 
 void PivotFsmash_ToggleAutoReset(GOBJ *menu_gobj, int value);
-
-void RebirthWait_Phys(GOBJ *fighter);
-
-int RebirthWait_IASA(GOBJ *fighter);
 
