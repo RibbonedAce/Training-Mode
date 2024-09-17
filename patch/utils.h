@@ -49,7 +49,7 @@ void Default_Event_Exit();
 
 int X_To_The_N(int x, int n);
 
-void Create_HUDCam(void *hudCamThinkCallback);
+void Create_HUDCam(void *hudcam_think_callback);
 
 GOBJ *Setup_HUD(JOBJ *hud_jobj);
 
