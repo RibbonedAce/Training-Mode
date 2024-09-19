@@ -7,7 +7,7 @@
 #define LSDH_TIPDURATION 1.7 * 60
 #define PFSH_HITBOXNUM 30 * 4
 #define DEFTEXT_SCALE 4.5
-#define PFSHJOBJ_NUM_BAR 72
+#define PFSHJOBJ_BARNUM 48
 
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;
@@ -44,7 +44,7 @@ struct PivotFsmashData {
         u16 aerial_frame;
         u16 land_frame;
         u16 actionable_frame;
-        u8 action_log[PFSHJOBJ_NUM_BAR];
+        u8 action_log[PFSHJOBJ_BARNUM];
     } hud;
 
     struct {

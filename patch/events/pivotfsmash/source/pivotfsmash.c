@@ -1,13 +1,12 @@
 #include "pivotfsmash.h"
 
 static GXColor *tmgbar_colors[] = {
-    &color_black,
+    &color_grey,
     &color_blue,
     &color_green,
     &color_red,
     &color_cyan,
     &color_yellow,
-    &color_magenta,
 };
 
 // Tips Functions
@@ -83,28 +82,30 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     // init text
 //    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, DEFTEXT_SCALE);
 
-    // reset all bar colors
-    JOBJ *timingbar_jobj = hud_jobj->child->sibling->child->sibling->child->sibling;
+    // reset bar colors
+    JOBJ *timingbar_parent = hud_jobj->child->sibling->child->sibling;
+    timingbar_parent->scale.X = 12.0 / PFSHJOBJ_BARNUM;
+    timingbar_parent->scale.Y = 0.5;
+    if (PFSHJOBJ_BARNUM < 24) {
+        timingbar_parent->scale.X = 0.5;
+    }
 
-    for (int count = 0; count < PFSHJOBJ_NUM_BAR; ++count) {
-        DOBJ *d = timingbar_jobj->child->dobj;
+    JOBJ *timingbar_back = timingbar_parent->child;
+    timingbar_back->scale.X = PFSHJOBJ_BARNUM;
 
-        // if mobj exists (it will)
-        MOBJ *m = d->mobj;
-        if (m != 0) {
-            HSD_Material *mat = m->mat;
+    JOBJ *timingbar_jobj = timingbar_back;
 
-            // set alpha
-            mat->alpha = 0.7;
+    for (int i = 0; i < PFSHJOBJ_BARNUM; ++i) {
+        timingbar_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
+        JOBJ_AddChild(timingbar_parent, timingbar_jobj);
 
-            // set color
-            mat->diffuse = color_black;
-        }
+        timingbar_jobj->trans.X = PFSHJOBJ_BARNUM * -1.0 / 2 + 0.5 + i;
+        timingbar_jobj->scale.X = 0.9;
+        timingbar_jobj->scale.Y = 0.9;
 
-        timingbar_jobj = timingbar_jobj->sibling;
-        if (timingbar_jobj == 0) {
-            break;
-        }
+        HSD_Material *mat = timingbar_jobj->child->dobj->mobj->mat;
+        mat->alpha = 0.7;
+        mat->diffuse = color_grey;
     }
 }
 
@@ -301,21 +302,15 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
         // update bar colors
         JOBJ *timingbar_jobj = hud_jobj->child->sibling->child->sibling->child->sibling;
 
-        for (int count = 0; count < PFSHJOBJ_NUM_BAR; ++count) {
+        for (int count = 0; count < PFSHJOBJ_BARNUM; ++count) {
             DOBJ *d = timingbar_jobj->child->dobj;
 
-            // if mobj exists (it will)
-            MOBJ *m = d->mobj;
-            if (m != 0) {
-                HSD_Material *mat = m->mat;
+            HSD_Material *mat = d->mobj->mat;
+            mat->alpha = 0.7;
 
-                // set alpha
-                mat->alpha = 0.7;
-
-                // set color
-                GXColor *bar_color = tmgbar_colors[event_data->hud.action_log[count]];
-                mat->diffuse = *bar_color;
-            }
+            // set color
+            GXColor *bar_color = tmgbar_colors[event_data->hud.action_log[count]];
+            mat->diffuse = *bar_color;
 
             timingbar_jobj = timingbar_jobj->sibling;
             if (timingbar_jobj == 0 || count >= sizeof(event_data->hud.action_log) / sizeof(u8)) {
