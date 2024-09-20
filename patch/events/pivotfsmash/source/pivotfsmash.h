@@ -31,19 +31,11 @@ struct PivotFsmashData {
         GOBJ *gobj;
         int canvas;
         int timer;
-        float airdodge_angle;
-        u8 is_release: 1;
-        u8 is_jump: 1;
-        u8 is_airdodge: 1;
-        u8 is_aerial: 1;
-        u8 is_land: 1;
-        u8 is_actionable: 1;
-        u16 release_frame;
-        u16 jump_frame;
-        u16 airdodge_frame;
-        u16 aerial_frame;
-        u16 land_frame;
-        u16 actionable_frame;
+        u8 is_grab: 1;
+        u8 is_throw: 1;
+        u8 is_dash: 1;
+        u8 is_turn: 1;
+        u8 is_smash: 1;
         u8 action_log[PFSHJOBJ_BARNUM];
     } hud;
 
@@ -103,7 +95,7 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data);
 
 void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
-int Should_Reset_On_Timer(FighterData *hmn_data, FighterData *cpu_data);
+int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data);
 
 int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data);
 

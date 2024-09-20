@@ -141,12 +141,11 @@ void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     event_data->tip.is_input_release = 0;
     event_data->tip.is_input_jump = 0;
     event_data->tip.refresh_displayed = 0;
-    event_data->hud.is_release = 0;
-    event_data->hud.is_jump = 0;
-    event_data->hud.is_airdodge = 0;
-    event_data->hud.is_aerial = 0;
-    event_data->hud.is_land = 0;
-    event_data->hud.is_actionable = 0;
+    event_data->hud.is_grab = false;
+    event_data->hud.is_throw = false;
+    event_data->hud.is_turn = false;
+    event_data->hud.is_dash = false;
+    event_data->hud.is_smash = false;
 
     // init action log
     for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
@@ -268,18 +267,29 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
         if (hmn_data->state == ASID_CATCH || hmn_data->state == ASID_CATCHDASH ||
                 hmn_data->state == ASID_CATCHPULL || hmn_data->state == ASID_CATCHDASHPULL) {
             // look for grab
+            event_data->hud.is_grab = true;
             event_data->hud.action_log[curr_frame] = PFACT_GRAB;
         } else if (hmn_data->state == ASID_THROWF) {
             // look for throw
+            event_data->hud.is_throw = true;
             event_data->hud.action_log[curr_frame] = PFACT_THROW;
         } else if (hmn_data->state == ASID_DASH) {
             // look for dash
+            if (event_data->hud.is_throw) {
+                event_data->hud.is_dash = true;
+            }
             event_data->hud.action_log[curr_frame] = PFACT_DASH;
         } else if (hmn_data->state == ASID_TURN) {
             // look for turnaround
+            if (event_data->hud.is_dash) {
+                event_data->hud.is_turn = true;
+            }
             event_data->hud.action_log[curr_frame] = PFACT_TURN;
         } else if (hmn_data->state == ASID_ATTACKS4S) {
             // look for smash
+            if (event_data->hud.is_turn) {
+                event_data->hud.is_smash = true;
+            }
             event_data->hud.action_log[curr_frame] = PFACT_SMASH;
         } else if (hmn_data->state == ASID_WAIT || hmn_data->state == ASID_CATCHWAIT) {
             // look for wait
@@ -291,11 +301,7 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
         }
     }
 
-    // look for actionable
     if (hmn_data->state == ASID_ATTACKS4S && hmn_data->TM.state_frame > 15) {
-        event_data->hud.is_actionable = 1;
-        event_data->hud.actionable_frame = event_data->hud.timer;
-
         // destroy any tips
         event_vars->Tip_Destroy();
 
@@ -340,7 +346,7 @@ void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
         if (event_data->reset_timer == 0) {
             Fighter_Reset(event_data, hmn, cpu);
         }
-    } else if (Should_Reset_On_Timer(hmn_data, cpu_data)) {
+    } else if (Should_Reset_On_Timer(event_data, hmn_data, cpu_data)) {
         // check to set reset timer
         event_data->reset_timer = 30;
     } else if (Should_Reset_Instantly(hmn_data, cpu_data)) {
@@ -349,12 +355,39 @@ void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     }
 }
 
-int Should_Reset_On_Timer(FighterData *hmn_data, FighterData *cpu_data) {
-    return cpu_data->flags.dead == 1;
+int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data) {
+    if (!event_data->hud.is_grab && cpu_data->dmg.hitlag_frames > 0) {
+        // CPU was damaged with something other than a grab
+        OSReport("Reset due to non-grab damage\n");
+        return true;
+    }
+    if (event_data->hud.is_grab && (cpu_data->state == ASID_CAPTURECUT
+            || cpu_data->state == ASID_THROWNHI || cpu_data->state == ASID_THROWNLW || cpu_data->state == ASID_THROWNB)) {
+        // CPU escaped the grab or was thrown the wrong way
+        OSReport("Reset due to grab escape\n");
+        return true;
+    }
+    if (event_data->hud.is_throw && cpu_data->state != ASID_THROWNF && !cpu_data->flags.hitstun) {
+        // CPU out of hitstun without player dashing
+        OSReport("Reset due to not dashing\n");
+        return true;
+    }
+    if (event_data->hud.is_turn && hmn_data->state == ASID_DASH) {
+        // Player missed pivot
+        OSReport("Reset due to missing pivot\n");
+        return true;
+    }
+    if (event_data->hud.is_smash && hmn_data->TM.state_frame > 10) {
+        // Player smash attack is complete
+        OSReport("Reset due to smash\n");
+        return true;
+    }
+
+    return false;
 }
 
 int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data) {
-    return hmn_data->flags.dead == 1;
+    return hmn_data->flags.dead == 1 || cpu_data->flags.dead == 1;
 }
 
 void PivotFsmash_ChangeLedgeThink(PivotFsmashData *event_data, GOBJ *hmn) {
