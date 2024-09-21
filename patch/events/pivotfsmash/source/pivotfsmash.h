@@ -6,8 +6,11 @@
 
 #define LSDH_TIPDURATION 1.7 * 60
 #define PFSH_HITBOXNUM 30 * 4
-#define DEFTEXT_SCALE 4.5
+#define DEFTEXT_SCALE 4
 #define PFSHJOBJ_BARNUM 48
+#define PFSHJOBJ_BARSCALE 1.5
+#define PFSHJOBJ_BARTRANSY 15
+#define PFSH_ACTIONNUM 6
 
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;

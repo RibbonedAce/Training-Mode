@@ -9,6 +9,15 @@ static GXColor *tmgbar_colors[] = {
     &color_yellow,
 };
 
+static char *tmgbar_helptext[] = {
+    "Wait",
+    "Grab",
+    "Throw",
+    "Dash",
+    "Turn",
+    "Smash",
+};
+
 // Tips Functions
 void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
     Tips_Toggle(value);
@@ -79,15 +88,14 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     // create text canvas
     event_data->hud.canvas = Default_Text_CreateCanvas(event_data->hud.gobj);
 
-    // init text
-//    Init_Text(event_data->hud.canvas, &event_data->hud.text_angle, hud_jobj, 2, 2, DEFTEXT_SCALE);
-
     // reset bar colors
-    JOBJ *timingbar_parent = hud_jobj->child->sibling->child->sibling;
-    timingbar_parent->scale.X = 12.0 / PFSHJOBJ_BARNUM;
-    timingbar_parent->scale.Y = 0.5;
-    if (PFSHJOBJ_BARNUM < 24) {
-        timingbar_parent->scale.X = 0.5;
+    JOBJ *timingbar_parent = hud_jobj->child->sibling;
+    timingbar_parent->trans.X = 0.0;
+    timingbar_parent->trans.Y = PFSHJOBJ_BARTRANSY;
+    timingbar_parent->scale.X = 24.0 * PFSHJOBJ_BARSCALE / PFSHJOBJ_BARNUM;
+    timingbar_parent->scale.Y = PFSHJOBJ_BARSCALE;
+    if (timingbar_parent->scale.X > PFSHJOBJ_BARSCALE) {
+        timingbar_parent->scale.X = PFSHJOBJ_BARSCALE;
     }
 
     JOBJ *timingbar_back = timingbar_parent->child;
@@ -100,12 +108,65 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
         JOBJ_AddChild(timingbar_parent, timingbar_jobj);
 
         timingbar_jobj->trans.X = PFSHJOBJ_BARNUM * -1.0 / 2 + 0.5 + i;
+        timingbar_jobj->trans.Y = 0;
         timingbar_jobj->scale.X = 0.9;
         timingbar_jobj->scale.Y = 0.9;
 
         HSD_Material *mat = timingbar_jobj->child->dobj->mobj->mat;
         mat->alpha = 0.7;
         mat->diffuse = color_grey;
+    }
+
+    // create example bar colors
+    JOBJ *timingbar_ex_parent = hud_jobj->child;
+    timingbar_ex_parent->trans.X = 0;
+    timingbar_ex_parent->trans.Y = 0;
+    timingbar_ex_parent->scale.X = 1;
+    timingbar_ex_parent->scale.Y = 1;
+
+    for (int i = 0; i < PFSH_ACTIONNUM; ++i) {
+        // Back square
+        JOBJ *timingbar_ex_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
+        JOBJ_AddChild(timingbar_ex_parent, timingbar_ex_jobj);
+
+        timingbar_ex_jobj->trans.X = 6 * (i - PFSH_ACTIONNUM / 2 + 0.5);
+        timingbar_ex_jobj->trans.Y = PFSHJOBJ_BARTRANSY + 4;
+        timingbar_ex_jobj->scale.X = 1.1 * PFSHJOBJ_BARSCALE;
+        timingbar_ex_jobj->scale.Y = 1.1 * PFSHJOBJ_BARSCALE;
+
+        HSD_Material *mat = timingbar_ex_jobj->child->dobj->mobj->mat;
+        mat->alpha = 1.0;
+        mat->diffuse = color_black;
+        
+        // Front square
+        timingbar_ex_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
+        JOBJ_AddChild(timingbar_ex_parent, timingbar_ex_jobj);
+
+        timingbar_ex_jobj->trans.X = 6 * (i - PFSH_ACTIONNUM / 2 + 0.5);
+        timingbar_ex_jobj->trans.Y = PFSHJOBJ_BARTRANSY + 4;
+        timingbar_ex_jobj->scale.X = 0.9 * PFSHJOBJ_BARSCALE;
+        timingbar_ex_jobj->scale.Y = 0.9 * PFSHJOBJ_BARSCALE;
+
+        mat = timingbar_ex_jobj->child->dobj->mobj->mat;
+        mat->alpha = 0.7;
+        mat->diffuse = *tmgbar_colors[i];
+    }
+
+    // init text
+    for (int i = 0; i < PFSH_ACTIONNUM; ++i) {
+        Text *text = Text_CreateText(2, event_data->hud.canvas);
+        text->kerning = true;
+        text->align = true;
+        text->use_aspect = true;
+
+        text->trans = hud_jobj->trans;
+        text->trans.X += 6 * (i - PFSH_ACTIONNUM / 2 + 0.5);
+        text->trans.Y -= PFSHJOBJ_BARTRANSY + 2.5;
+
+        text->scale.X = 0.01 * DEFTEXT_SCALE;
+        text->scale.Y = 0.01 * DEFTEXT_SCALE;
+
+        Text_AddSubtext(text, 0, 0, tmgbar_helptext[i]);
     }
 }
 
@@ -306,7 +367,7 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
         event_vars->Tip_Destroy();
 
         // update bar colors
-        JOBJ *timingbar_jobj = hud_jobj->child->sibling->child->sibling->child->sibling;
+        JOBJ *timingbar_jobj = hud_jobj->child->sibling->child->sibling;
 
         for (int count = 0; count < PFSHJOBJ_BARNUM; ++count) {
             DOBJ *d = timingbar_jobj->child->dobj;
