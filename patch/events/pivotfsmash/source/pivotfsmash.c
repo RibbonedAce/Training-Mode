@@ -199,6 +199,7 @@ void Fighter_UpdatePosition(GOBJ *fighter) {
 
 void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     event_data->hud.timer = 0;
+    event_data->reset_timer = 0;
     event_data->tip.is_input_release = 0;
     event_data->tip.is_input_jump = 0;
     event_data->tip.refresh_displayed = 0;
@@ -214,22 +215,25 @@ void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     }
 }
 
-void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction) {
     FighterData *hmn_data = hmn->userdata;
     FighterData *cpu_data = cpu->userdata;
 
     // init refresh num
     event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
 
-    // get random position
+    // get random position if not already set
     float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
-    float hmn_direction = -1 + 2 * HSD_Randi(2);
+    if (hmn_direction != -1 && hmn_direction != 1) {
+        hmn_direction = -1 + 2 * HSD_Randi(2);
+    }
     Fighter_PlaceOnStage(hmn, hmn_pos, hmn_direction);
 
     float cpu_pos = hmn_pos + 10 * hmn_direction;
     float cpu_direction = -hmn_direction;
     Fighter_PlaceOnStage(cpu, cpu_pos, cpu_direction);
 
+    // Set damage
     hmn_data->dmg.percent = 0;
     Fighter_SetHUDDamage(hmn_data->ply, 0);
 
@@ -268,7 +272,7 @@ void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
 
 // Fighter functions
 void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
-    Fighter_Reset(event_data, hmn, cpu);
+    Fighter_Reset(event_data, hmn, cpu, 0);
 }
 
 // Init Function
@@ -405,14 +409,14 @@ void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 
         // if reset timer is up, go back to ledge
         if (event_data->reset_timer == 0) {
-            Fighter_Reset(event_data, hmn, cpu);
+            Fighter_Reset(event_data, hmn, cpu, 0);
         }
     } else if (Should_Reset_On_Timer(event_data, hmn_data, cpu_data)) {
         // check to set reset timer
         event_data->reset_timer = 30;
     } else if (Should_Reset_Instantly(hmn_data, cpu_data)) {
         // reset instantly
-        Fighter_Reset(event_data, hmn, cpu);
+        Fighter_Reset(event_data, hmn, cpu, 0);
     }
 }
 
@@ -451,20 +455,14 @@ int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data) {
     return hmn_data->flags.dead == 1 || cpu_data->flags.dead == 1;
 }
 
-void PivotFsmash_ChangeLedgeThink(PivotFsmashData *event_data, GOBJ *hmn) {
+void PivotFsmash_ManualResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     FighterData *hmn_data = hmn->userdata;
 
-    if (hmn_data->input.down & (HSD_BUTTON_DPAD_LEFT | HSD_BUTTON_DPAD_RIGHT)) {
-        // get current ledge position
-        CollVert *collvert = *stc_collvert;
-        CollLine *collline = *stc_collline;
-        CollLine *this_line = &collline[event_data->ledge_line];
-        float ledge_pos = 0;
-        if (event_data->ledge_dir == -1) {
-            ledge_pos = collvert[this_line->info->vert_next].pos_curr.X;
-        } else if (event_data->ledge_dir == 1) {
-            ledge_pos = collvert[this_line->info->vert_prev].pos_curr.X;
-        }
+    // reset to designated direction
+    if (hmn_data->input.down & HSD_BUTTON_DPAD_LEFT) {
+        Fighter_Reset(event_data, hmn, cpu, -1);
+    } else if (hmn_data->input.down & HSD_BUTTON_DPAD_RIGHT) {
+        Fighter_Reset(event_data, hmn, cpu, 1);
     }
 }
 
@@ -485,7 +483,7 @@ void Event_Think(GOBJ *event) {
 
     PivotFsmash_HUDThink(event_data, hmn_data);
     PivotFsmash_ResetThink(event_data, hmn, cpu);
-//    PivotFsmash_ChangeLedgeThink(event_data, hmn);
+    PivotFsmash_ManualResetThink(event_data, hmn, cpu);
 }
 
 // Menu Toggle functions
@@ -495,8 +493,5 @@ void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
     GOBJ *cpu = Fighter_GetGObj(1);
     PivotFsmashData *event_data = event_vars->event_gobj->userdata;
 
-    Fighter_Reset(event_data, hmn, cpu);
-}
-
-void PivotFsmash_ToggleAutoReset(GOBJ *menu_gobj, int value) {
+    Fighter_Reset(event_data, hmn, cpu, 0);
 }
