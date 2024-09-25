@@ -241,6 +241,10 @@ void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_
     cpu_data->dmg.percent = cpu_dmg;
     Fighter_SetHUDDamage(cpu_data->ply, cpu_dmg);
 
+    // Reset staling
+    int *staleMoveTable = Fighter_GetStaleMoveTable(hmn_data->ply);
+    memset(staleMoveTable, 0, 0x2C);
+
     // Set CPU behavior again
     cpu_data->cpu.ai = 15;
 
