@@ -1,10 +1,11 @@
 @echo off
 @rem Function that checks if a directory exists, and makes a new one if not
-@rem %1 = Directory to check/create
 
-if exist %1 (
-  echo Found %1.
+set "dir_to_check=%~1"
+
+if exist "%dir_to_check%" (
+  echo Found "%dir_to_check%".
 ) else (
-  mkdir %1
-  echo Created %1.
+  mkdir "%dir_to_check%"
+  echo Created "%dir_to_check%".
 )
