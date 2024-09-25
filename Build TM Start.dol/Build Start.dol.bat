@@ -12,7 +12,7 @@ echo.
 call "..\check-var.bat" TM_GCR_ROOT
 set "code=%ERRORLEVEL%"
 
-if %code% gtr 0 (
+if %code% neq 0 (
   echo Need to set TM_GCR_ROOT to the directory path of your TM root.
   exit
 )
@@ -23,7 +23,7 @@ echo.
 cd /d %~dp0
 
 call "..\patch\safe-mkdir.bat" "..\Additional ISO Files"
-call "..\patch\safe-mkdir.bat" "..\Additional ISO Files\&&systemdata"
+call "..\patch\safe-mkdir.bat" "..\Additional ISO Files\my^&&systemdata"
 
 xdelta.exe -d -f -s "%TM_GCR_ROOT%\&&systemdata\Start.dol" "patch.xdelta" "..\Additional ISO Files\&&systemdata\Start.dol"
 

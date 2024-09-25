@@ -1,25 +1,25 @@
 @echo off
 
 call "check-var.bat" TM_GCR_ROOT
-set "code=%ERRORLEVEL%"
 
-if %code% gtr 0 (
+set "code=%ERRORLEVEL%"
+if %code% neq 0 (
   echo Need to set TM_GCR_ROOT to the directory path of your TM root.
   exit
 )
 
 call "check-var.bat" TM_GCR_EXE
-set "code=%ERRORLEVEL%"
 
-if %code% gtr 0 (
+set "code=%ERRORLEVEL%"
+if %code% neq 0 (
   echo Need to set TM_GCR_EXE to the path of the GCRebuilder executable.
   exit
 )
 
 call "check-var.bat" TM_ISO_PATH
-set "code=%ERRORLEVEL%"
 
-if %code% gtr 0 (
+set "code=%ERRORLEVEL%"
+if %code% neq 0 (
   echo Need to set TM_ISO_PATH to the path of your new ISO.
   exit
 )
