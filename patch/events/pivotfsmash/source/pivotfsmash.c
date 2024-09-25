@@ -425,23 +425,31 @@ void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 }
 
 int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data) {
-    if (!event_data->hud.is_grab && cpu_data->dmg.hitlag_frames > 0) {
+    if (!event_data->hud.is_grab && cpu_data->flags.hitlag) {
         // CPU was damaged with something other than a grab
         OSReport("Reset due to non-grab damage\n");
         return true;
     }
-    if (event_data->hud.is_grab && (cpu_data->state == ASID_CAPTURECUT
-            || cpu_data->state == ASID_THROWNHI || cpu_data->state == ASID_THROWNLW || cpu_data->state == ASID_THROWNB)) {
+    if (event_data->hud.is_grab && !event_data->hud.is_throw && 
+            (cpu_data->state == ASID_CAPTURECUT || cpu_data->state == ASID_THROWNHI || cpu_data->state == ASID_THROWNLW || cpu_data->state == ASID_THROWNB)) {
         // CPU escaped the grab or was thrown the wrong way
         OSReport("Reset due to grab escape\n");
         return true;
     }
-    if (event_data->hud.is_throw && cpu_data->state != ASID_THROWNF && !cpu_data->flags.hitstun) {
+    if (event_data->hud.is_throw && !event_data->hud.is_dash && 
+            (cpu_data->state != ASID_THROWNF && !cpu_data->flags.hitstun || cpu_data->flags.hitlag)) {
         // CPU out of hitstun without player dashing
         OSReport("Reset due to not dashing\n");
         return true;
     }
-    if (event_data->hud.is_turn && hmn_data->state == ASID_DASH) {
+    if (event_data->hud.is_dash && !event_data->hud.is_turn && 
+            (cpu_data->flags.hitlag || !cpu_data->flags.hitstun)) {
+        // CPU is not hit with Fsmash)
+        OSReport("Reset due to not forward smashing\n");
+        return true;
+    }
+    if (event_data->hud.is_turn && !event_data->hud.is_smash && 
+            hmn_data->TM.state_frame > 1) {
         // Player missed pivot
         OSReport("Reset due to missing pivot\n");
         return true;
