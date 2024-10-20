@@ -84,6 +84,8 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     // Load jobj
     JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->assets->hud);
     event_data->hud.gobj = Setup_HUD(hud_jobj);
+    hud_jobj->trans.X = 0.0;
+    hud_jobj->trans.Y = PFSHJOBJ_BARTRANSY;
 
     // create text canvas
     event_data->hud.canvas = Default_Text_CreateCanvas(event_data->hud.gobj);
@@ -91,15 +93,16 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     // reset bar colors
     JOBJ *timingbar_parent = hud_jobj->child->sibling;
     timingbar_parent->trans.X = 0.0;
-    timingbar_parent->trans.Y = PFSHJOBJ_BARTRANSY;
-    timingbar_parent->scale.X = 24.0 * PFSHJOBJ_BARSCALE / PFSHJOBJ_BARNUM;
-    timingbar_parent->scale.Y = PFSHJOBJ_BARSCALE;
-    if (timingbar_parent->scale.X > PFSHJOBJ_BARSCALE) {
-        timingbar_parent->scale.X = PFSHJOBJ_BARSCALE;
+    timingbar_parent->trans.Y = 0.0;
+    timingbar_parent->scale.X = 24.0 * PFSHJOBJ_BARSCALEX / PFSHJOBJ_BARNUM;
+    timingbar_parent->scale.Y = PFSHJOBJ_BARSCALEY;
+    if (timingbar_parent->scale.X > PFSHJOBJ_BARSCALEX) {
+        timingbar_parent->scale.X = PFSHJOBJ_BARSCALEX;
     }
 
     JOBJ *timingbar_back = timingbar_parent->child;
     timingbar_back->scale.X = PFSHJOBJ_BARNUM;
+    timingbar_back->scale.Y = 1.0;
 
     JOBJ *timingbar_jobj = timingbar_back;
 
@@ -108,7 +111,7 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
         JOBJ_AddChild(timingbar_parent, timingbar_jobj);
 
         timingbar_jobj->trans.X = PFSHJOBJ_BARNUM * -1.0 / 2 + 0.5 + i;
-        timingbar_jobj->trans.Y = 0;
+        timingbar_jobj->trans.Y = 0.0;
         timingbar_jobj->scale.X = 0.9;
         timingbar_jobj->scale.Y = 0.9;
 
@@ -119,20 +122,20 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
 
     // create example bar colors
     JOBJ *timingbar_ex_parent = hud_jobj->child;
-    timingbar_ex_parent->trans.X = 0;
-    timingbar_ex_parent->trans.Y = 0;
-    timingbar_ex_parent->scale.X = 1;
-    timingbar_ex_parent->scale.Y = 1;
+    timingbar_ex_parent->trans.X = 0.0;
+    timingbar_ex_parent->trans.Y = 0.0;
+    timingbar_ex_parent->scale.X = 1.0;
+    timingbar_ex_parent->scale.Y = 1.0;
 
     for (int i = 0; i < PFSH_ACTIONNUM; ++i) {
         // Back square
         JOBJ *timingbar_ex_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
         JOBJ_AddChild(timingbar_ex_parent, timingbar_ex_jobj);
 
-        timingbar_ex_jobj->trans.X = 6 * (i - PFSH_ACTIONNUM / 2 + 0.5);
-        timingbar_ex_jobj->trans.Y = PFSHJOBJ_BARTRANSY + 4;
-        timingbar_ex_jobj->scale.X = 1.1 * PFSHJOBJ_BARSCALE;
-        timingbar_ex_jobj->scale.Y = 1.1 * PFSHJOBJ_BARSCALE;
+        timingbar_ex_jobj->trans.X = 4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
+        timingbar_ex_jobj->trans.Y = 3 * PFSHJOBJ_BARSCALEY;
+        timingbar_ex_jobj->scale.X = 1.1 * PFSHJOBJ_BARSCALEY;
+        timingbar_ex_jobj->scale.Y = 1.1 * PFSHJOBJ_BARSCALEY;
 
         HSD_Material *mat = timingbar_ex_jobj->child->dobj->mobj->mat;
         mat->alpha = 1.0;
@@ -142,10 +145,10 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
         timingbar_ex_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
         JOBJ_AddChild(timingbar_ex_parent, timingbar_ex_jobj);
 
-        timingbar_ex_jobj->trans.X = 6 * (i - PFSH_ACTIONNUM / 2 + 0.5);
-        timingbar_ex_jobj->trans.Y = PFSHJOBJ_BARTRANSY + 4;
-        timingbar_ex_jobj->scale.X = 0.9 * PFSHJOBJ_BARSCALE;
-        timingbar_ex_jobj->scale.Y = 0.9 * PFSHJOBJ_BARSCALE;
+        timingbar_ex_jobj->trans.X = 4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
+        timingbar_ex_jobj->trans.Y = 3 * PFSHJOBJ_BARSCALEY;
+        timingbar_ex_jobj->scale.X = 0.9 * PFSHJOBJ_BARSCALEY;
+        timingbar_ex_jobj->scale.Y = 0.9 * PFSHJOBJ_BARSCALEY;
 
         mat = timingbar_ex_jobj->child->dobj->mobj->mat;
         mat->alpha = 0.7;
@@ -159,12 +162,10 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
         text->align = true;
         text->use_aspect = true;
 
-        text->trans = hud_jobj->trans;
-        text->trans.X += 6 * (i - PFSH_ACTIONNUM / 2 + 0.5);
-        text->trans.Y -= PFSHJOBJ_BARTRANSY + 2.5;
-
-        text->scale.X = 0.01 * DEFTEXT_SCALE;
-        text->scale.Y = 0.01 * DEFTEXT_SCALE;
+        text->trans.X = 4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
+        text->trans.Y = -(PFSHJOBJ_BARTRANSY + (2 * PFSHJOBJ_BARSCALEY));
+        text->scale.X = 0.01 * DEFTEXT_SCALE * PFSHJOBJ_BARSCALEY;
+        text->scale.Y = 0.01 * DEFTEXT_SCALE * PFSHJOBJ_BARSCALEY;
 
         Text_AddSubtext(text, 0, 0, tmgbar_helptext[i]);
     }
