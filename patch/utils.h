@@ -58,3 +58,7 @@ void Init_Text(int canvas, Text **text_arr, JOBJ *hud_jobj, int num_objs, int of
 int Default_Text_CreateCanvas(GOBJ *hud_gobj);
 
 void Remove_Particles_And_CamShake();
+
+float Fighter_GetOpponentDir(FighterData *from, FighterData *to);
+
+void Remove_Particles_And_CamShake();

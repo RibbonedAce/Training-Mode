@@ -146,3 +146,65 @@ void Remove_Particles_And_CamShake() {
         gobj = gobj_next;
     }
 }
+
+float Fighter_GetOpponentDir(FighterData *from, FighterData *to) {
+    if (from->phys.pos.X <= to->phys.pos.X) {
+        return 1;
+    }
+
+    return -1;
+}
+
+void Remove_Particles_And_CamShake() {
+    // remove all particles
+    for (int i = 0; i < PTCL_LINKMAX; i++) {
+        Particle2 **ptcls = &stc_ptcl[i];
+        Particle2 *ptcl = *ptcls;
+        while (ptcl != 0) {
+            Particle2 *ptcl_next = ptcl->next;
+
+            // begin destroying this particle
+
+            // subtract some value, 8039c9f0
+            if (ptcl->x88 != 0) {
+                int *arr = ptcl->x88;
+                arr[0x50 / 4]--;
+            }
+            // remove from generator? 8039ca14
+            if (ptcl->gen != 0) {
+                psRemoveParticleAppSRT(ptcl);
+            }
+
+            // delete parent jobj, 8039ca48
+            psDeletePntJObjwithParticle(ptcl);
+
+            // update most recent ptcl pointer
+            *ptcls = ptcl->next;
+
+            // free alloc, 8039ca54
+            HSD_ObjFree((HSD_ObjAllocData *)0x804d0f60, ptcl);
+
+            // decrement ptcl total
+            u16 ptclnum = *stc_ptclnum;
+            ptclnum--;
+            *stc_ptclnum = ptclnum;
+
+            // get next
+            ptcl = ptcl_next;
+        }
+    }
+
+    // remove all camera shake gobjs (p_link 18, entity_class 3)
+    GOBJList *gobj_list = *stc_gobj_list;
+    GOBJ *gobj = gobj_list->match_cam;
+    while (gobj != 0) {
+        GOBJ *gobj_next = gobj->next;
+
+        // if entity class 3 (quake)
+        if (gobj->entity_class == 3) {
+            GObj_Destroy(gobj);
+        }
+
+        gobj = gobj_next;
+    }
+}

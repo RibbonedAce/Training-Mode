@@ -3,6 +3,7 @@
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 #include "../../../utils.h"
+#include "../../../cpu.h"
 
 // Labbing event
 // Custom TDI definitions
@@ -183,7 +184,6 @@ typedef struct InfoDisplayData InfoDisplayData;
 typedef struct DIDraw DIDraw;
 typedef struct DIDrawCalculate DIDrawCalculate;
 typedef struct TDIData TDIData;
-typedef struct CPUAction CPUAction;
 typedef struct RecInputs RecInputs;
 typedef struct RecInputData RecInputData;
 typedef struct RecData RecData;
@@ -264,19 +264,6 @@ struct TDIData {
     JOBJ *stick_curr[2];
     JOBJ *stick_prev[6][2];
     Text *text_curr;
-};
-
-struct CPUAction {
-    u16 state; // state to perform this action. -1 for last
-    u8 frameLow; // first possible frame to perform this action
-    u8 frameHi; // last possible frame to perfrom this action
-    s8 stickX; // left stick X value
-    s8 stickY; // left stick Y value
-    s8 cstickX; // c stick X value
-    s8 cstickY; // c stick Y value
-    int input; // button to input
-    unsigned char isLast: 1; // flag to indicate this was the final input
-    unsigned char stickDir: 3; // 0 = none, 1 = towards opponent, 2 = away from opponent, 3 = forward, 4 = backward
 };
 
 struct RecInputs {
@@ -480,37 +467,6 @@ enum buttons_enum {
     BTN_NUM,
 };
 
-enum CPU_ACTIONS {
-    CPUACT_NONE,
-    CPUACT_SHIELD,
-    CPUACT_GRAB,
-    CPUACT_UPB,
-    CPUACT_DOWNB,
-    CPUACT_SPOTDODGE,
-    CPUACT_ROLLAWAY,
-    CPUACT_ROLLTOWARDS,
-    CPUACT_ROLLRDM,
-    CPUACT_NAIR,
-    CPUACT_FAIR,
-    CPUACT_DAIR,
-    CPUACT_BAIR,
-    CPUACT_UAIR,
-    CPUACT_SHORTHOP,
-    CPUACT_FULLHOP,
-    CPUACT_JUMPAWAY,
-    CPUACT_JUMPTOWARDS,
-    CPUACT_AIRDODGE,
-    CPUACT_FFTUMBLE,
-    CPUACT_FFWIGGLE,
-    CPUACT_JAB,
-    CPUACT_FTILT,
-    CPUACT_UTILT,
-    CPUACT_DTILT,
-    CPUACT_USMASH,
-    CPUACT_DSMASH,
-    CPUACT_FSMASH,
-};
-
 // General Options
 enum gen_option {
     OPTGEN_FRAME,
@@ -613,16 +569,6 @@ enum cpu_mash {
     CPUMASH_MED,
     CPUMASH_HIGH,
     CPUMASH_PERFECT,
-};
-
-// Stick Direction Definitions
-enum STICKDIR {
-    STCKDIR_NONE,
-    STCKDIR_TOWARD,
-    STCKDIR_AWAY,
-    STCKDIR_FRONT,
-    STCKDIR_BACK,
-    STICKDIR_RDM,
 };
 
 enum ImportMenuStates {
@@ -776,15 +722,9 @@ void InfoDisplay_GX(GOBJ *gobj, int pass);
 
 void InfoDisplay_Think(GOBJ *gobj);
 
-float Fighter_GetOpponentDir(FighterData *from, FighterData *to);
-
-int CPUAction_CheckMultipleState(GOBJ *cpu, int group_kind);
-
 int CPU_IsThrown(GOBJ *cpu);
 
 int CPU_IsGrabbed(GOBJ *cpu);
-
-int LCancel_CPUPerformAction(GOBJ *cpu, int action_id, GOBJ *hmn);
 
 void Lab_CPUThink_Start(FighterData *cpu_data, GOBJ *hmn, GOBJ *cpu);
 

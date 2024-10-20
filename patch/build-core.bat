@@ -14,7 +14,7 @@ echo Copying base assets file %event_dir%\%assets_path% to %ISO_DIR%\%output_pat
 cp %event_dir%\%assets_path% "%ISO_DIR%\%output_path%"
 
 echo Injecting symbols from %event_dir%\%source_path% into "%ISO_DIR%\%output_path%" using %mex_symbol%.
-%MEX_DIR%\MexTK.exe -ff -i utils.c %event_dir%\%source_path% -s %mex_symbol% -dat "%ISO_DIR%\%output_path%" -t %MEX_DIR%\%mex_symbol%.txt -q -ow -w -c -l %MEX_DIR%\melee.link -op 1
+%MEX_DIR%\MexTK.exe -ff -i utils.c cpu.c %event_dir%\%source_path% -s %mex_symbol% -dat "%ISO_DIR%\%output_path%" -t %MEX_DIR%\%mex_symbol%.txt -q -ow -w -c -l %MEX_DIR%\melee.link -op 1
 
 set "code=%ERRORLEVEL%"
 if %code% neq 0 (
