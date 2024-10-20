@@ -3,6 +3,7 @@
 #include "../../../../MexTK/mex.h"
 #include "../../../tmdata/source/events.h"
 #include "../../../utils.h"
+#include "../../../cpu.h"
 
 #define LSDH_TIPDURATION 1.7 * 60
 #define PFSH_HITBOXNUM 30 * 4
@@ -46,8 +47,6 @@ struct PivotFsmashData {
         s16 refresh_num; // number of times refreshed
         u8 refresh_cond_num; // number of times tip condition has been met
         u8 refresh_displayed: 1;
-        u8 is_input_release: 1;
-        u8 is_input_jump: 1;
     } tip;
 };
 
@@ -90,11 +89,9 @@ void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
 void Event_Init(GOBJ *gobj);
 
-int Fighter_CheckFall(FighterData *hmn_data);
-
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
-void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data);
+void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn);
 
 void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
@@ -103,6 +100,8 @@ int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, Fi
 int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data);
 
 void PivotFsmash_ManualResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+
+void PivotFsmash_CPUThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
 void Event_Think(GOBJ *event);
 

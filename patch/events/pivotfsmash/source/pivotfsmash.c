@@ -42,7 +42,7 @@ static EventOption PfshOptions_Main[] = {
         .option_val = 0, // value of this option
         .menu = 0, // pointer to the menu that pressing A opens
         .option_name = "About", // pointer to a string
-        .desc = "You must forward throw puff, first. \nThen, dash forward, dash back for one frame, \nand hit the c-stick forward. If done correctly, you should \nbe able to hit puff before she can jump out.",
+        .desc = "First, you must forward throw puff. \nThen, dash forward, dash back for one frame, \nand hit the c-stick forward. If done correctly, you should \nbe able to hit puff before she can jump out.",
         .option_values = 0, // pointer to an array of strings
         .onOptionChange = 0,
     },
@@ -200,12 +200,10 @@ void Fighter_UpdatePosition(GOBJ *fighter) {
 void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     event_data->hud.timer = 0;
     event_data->reset_timer = 0;
-    event_data->tip.is_input_release = 0;
-    event_data->tip.is_input_jump = 0;
     event_data->tip.refresh_displayed = 0;
     event_data->hud.is_grab = false;
     event_data->hud.is_throw = false;
-    event_data->hud.is_turn = false;
+    event_data->hud.is_turn = false;    
     event_data->hud.is_dash = false;
     event_data->hud.is_smash = false;
 
@@ -296,24 +294,12 @@ void Event_Init(GOBJ *gobj) {
     PivotFsmash_FtInit(event_data, hmn, cpu);
 }
 
-int Fighter_CheckFall(FighterData *hmn_data) {
-    int is_fall = 0;
-
-    // look for Fall input
-    float stick_x = fabs(hmn_data->input.lstick_x);
-    float stick_y = hmn_data->input.lstick_y;
-    if (stick_x >= 0.2875 && hmn_data->input.timer_lstick_tilt_x < 2 ||
-        stick_y <= -0.2875 && hmn_data->input.timer_lstick_tilt_y < 2) {
-        is_fall = 1;
-    }
-
-    return is_fall;
-}
-
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
 }
 
-void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
+void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn) {
+    FighterData *hmn_data = hmn->userdata;
+
     // run tip logic
 //    Tips_Think(event_data, hmn_data);
 
@@ -340,7 +326,9 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, FighterData *hmn_data) {
             event_data->hud.action_log[curr_frame] = PFACT_GRAB;
         } else if (hmn_data->state == ASID_THROWF) {
             // look for throw
-            event_data->hud.is_throw = true;
+            if (event_data->hud.is_grab) {
+                event_data->hud.is_throw = true;
+            }
             event_data->hud.action_log[curr_frame] = PFACT_THROW;
         } else if (hmn_data->state == ASID_DASH) {
             // look for dash
@@ -444,7 +432,7 @@ int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, Fi
     }
     if (event_data->hud.is_dash && !event_data->hud.is_turn && 
             (cpu_data->flags.hitlag || !cpu_data->flags.hitstun)) {
-        // CPU is not hit with Fsmash)
+        // CPU is not hit with Fsmash
         OSReport("Reset due to not forward smashing\n");
         return true;
     }
@@ -478,6 +466,13 @@ void PivotFsmash_ManualResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *
     }
 }
 
+void PivotFsmash_CPUThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    FighterData *cpu_data = cpu->userdata;
+    if (event_data->hud.is_throw && cpu_data->state != ASID_THROWNF) {
+        CPUAction_PerformAction(cpu, CPUACT_JUMPAWAY, hmn);
+    }
+}
+
 // Think Function
 void Event_Think(GOBJ *event) {
     PivotFsmashData *event_data = event->userdata;
@@ -485,17 +480,11 @@ void Event_Think(GOBJ *event) {
     // get fighter data
     GOBJ *hmn = Fighter_GetGObj(0);
     GOBJ *cpu = Fighter_GetGObj(1);
-    FighterData *hmn_data = hmn->userdata;
 
-    // no ledgefall
-    FtCliffCatch *ft_state = (FtCliffCatch *)&hmn_data->state_var;
-    if (hmn_data->state == ASID_CLIFFWAIT) {
-        ft_state->fall_timer = 2;
-    }
-
-    PivotFsmash_HUDThink(event_data, hmn_data);
+    PivotFsmash_HUDThink(event_data, hmn);
     PivotFsmash_ResetThink(event_data, hmn, cpu);
     PivotFsmash_ManualResetThink(event_data, hmn, cpu);
+    PivotFsmash_CPUThink(event_data, hmn, cpu);
 }
 
 // Menu Toggle functions

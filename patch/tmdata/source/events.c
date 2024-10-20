@@ -277,19 +277,18 @@ static EventMatchData PivotFsmash_MatchData = {
 
 // Event Struct
 static EventDesc PivotFsmash = {
+    .eventName = "Pivot F-Smash Training\n",
+    .eventDescription = "Practice forward throw into forward smash aginst puff.\nUse D-Pad to change direction.\n",
+    .eventTutorial = "TvPfsh",
+    .eventFile = "EvPfsh",
     .isChooseCPU = false,
     .isSelectStage = true,
     .use_savestates = false,
     .disable_hazards = true,
     .scoreType = 0,
-    .callbackPriority = 15,
-    .defaultOSD = 0xFFFFFFFF,
-
-    .eventName = "Pivot F-Smash Training\n",
-    .eventDescription = "Practice forward throw into forward smash aginst puff.\nUse D-Pad to change direction.\n",
-    .eventTutorial = "TvPfsh",
-    .eventFile = "EvPfsh",
+    .callbackPriority = 3,
     .matchData = &PivotFsmash_MatchData,
+    .defaultOSD = 0xFFFFFFFF,
 };
 
 // Combo Training
