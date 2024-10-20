@@ -40,3 +40,7 @@ GOBJ *Setup_HUD(JOBJ *hud_jobj);
 void Init_Text(int canvas, Text **text_arr, JOBJ *hud_jobj, int num_objs, int offset, float text_scale);
 
 int Default_Text_CreateCanvas(GOBJ *hud_gobj);
+
+void Remove_Particles_And_CamShake();
+
+float Fighter_GetOpponentDir(FighterData *from, FighterData *to);
