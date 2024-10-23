@@ -26,8 +26,6 @@ struct PivotFsmashAssets {
 struct PivotFsmashData {
     EventDesc *event_desc;
     PivotFsmashAssets *assets;
-    s16 ledge_line;
-    s16 ledge_dir;
     s16 reset_timer;
     GOBJ *hitlog_gobj;
     CameraBox *cam;
@@ -43,6 +41,15 @@ struct PivotFsmashData {
         u8 is_smash: 1;
         u8 action_log[PFSHJOBJ_BARNUM];
     } hud;
+
+    struct {
+        Text *is_grab_text;
+        Text *is_throw_text;
+        Text *is_dash_text;
+        Text *is_turn_text;
+        Text *is_smash_text;
+        Text *reset_timer_text;
+    } debug;
 
     struct {
         s16 refresh_num; // number of times refreshed
@@ -72,12 +79,17 @@ enum PFSH_ACTION {
     PFACT_SMASH,
 };
 
+// Tips functions
 void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
 
+// HUD functions
 void PivotFsmash_HUDCamThink(GOBJ *gobj);
 
 void PivotFsmash_HUDInit(PivotFsmashData *event_data);
 
+Text *Debug_InitText(int canvas_id, int index);
+
+// Fighter functions
 void Fighter_UpdatePosition(GOBJ *fighter);
 
 void PivotFsmash_InitVariables(PivotFsmashData *event_data);
@@ -88,11 +100,15 @@ void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction);
 
 void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
+// Init function
 void Event_Init(GOBJ *gobj);
 
+// Think functions
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
 void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn);
+
+void Debug_UpdateText(Text *text, s16 data);
 
 void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
@@ -106,4 +122,5 @@ void PivotFsmash_CPUThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
 void Event_Think(GOBJ *event);
 
+// Menu Toggle functions
 void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value);

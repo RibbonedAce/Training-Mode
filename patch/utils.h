@@ -55,6 +55,8 @@ GOBJ *Setup_HUD(JOBJ *hud_jobj);
 
 void Init_Text(int canvas, Text **text_arr, JOBJ *hud_jobj, int num_objs, int offset, float text_scale);
 
+Text *Create_Simple_Text(int canvas_id, float trans_x, float trans_y, float scale, char *init_text);
+
 int Default_Text_CreateCanvas(GOBJ *hud_gobj);
 
 void Remove_Particles_And_CamShake();

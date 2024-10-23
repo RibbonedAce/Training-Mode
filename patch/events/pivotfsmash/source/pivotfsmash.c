@@ -18,11 +18,6 @@ static char *tmgbar_helptext[] = {
     "Smash",
 };
 
-// Tips Functions
-void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
-    Tips_Toggle(value);
-}
-
 // Main Menu
 static char **PfshOptions_HUD[] = {"On", "Off"};
 static EventOption PfshOptions_Main[] = {
@@ -73,11 +68,16 @@ static EventMenu PfshMenu_Main = {
 static EventMenu *Event_Menu = &PfshMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
+// Tips functions
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
+    Tips_Toggle(value);
+}
+
+// HUD functions
 void PivotFsmash_HUDCamThink(GOBJ *gobj) {
     HUDCamThink(PfshOptions_Main[0]);
 }
 
-// Pivot F-Smash functions
 void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     Create_HUDCam(PivotFsmash_HUDCamThink);
 
@@ -157,20 +157,31 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
 
     // init text
     for (int i = 0; i < PFSH_ACTIONNUM; ++i) {
-        Text *text = Text_CreateText(2, event_data->hud.canvas);
-        text->kerning = true;
-        text->align = true;
-        text->use_aspect = true;
-
-        text->trans.X = 4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
-        text->trans.Y = -(PFSHJOBJ_BARTRANSY + (2 * PFSHJOBJ_BARSCALEY));
-        text->scale.X = 0.01 * DEFTEXT_SCALE * PFSHJOBJ_BARSCALEY;
-        text->scale.Y = 0.01 * DEFTEXT_SCALE * PFSHJOBJ_BARSCALEY;
-
-        Text_AddSubtext(text, 0, 0, tmgbar_helptext[i]);
+        Create_Simple_Text(
+                event_data->hud.canvas, 
+                4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX,
+                -(PFSHJOBJ_BARTRANSY + (2 * PFSHJOBJ_BARSCALEY)),
+                0.01 * DEFTEXT_SCALE * PFSHJOBJ_BARSCALEY,
+                tmgbar_helptext[i]
+        );
     }
+
+    // debug text
+    #if TM_DEBUG > 0
+        event_data->debug.is_grab_text = Debug_InitText(event_data->hud.canvas, 0);
+        event_data->debug.is_throw_text = Debug_InitText(event_data->hud.canvas, 1);
+        event_data->debug.is_dash_text = Debug_InitText(event_data->hud.canvas, 2);
+        event_data->debug.is_turn_text = Debug_InitText(event_data->hud.canvas, 3);
+        event_data->debug.is_smash_text = Debug_InitText(event_data->hud.canvas, 4);
+        event_data->debug.reset_timer_text = Debug_InitText(event_data->hud.canvas, 5);
+    #endif
 }
 
+Text *Debug_InitText(int canvas_id, int index) {
+    return Create_Simple_Text(canvas_id, 15, -10 + 2 * index, 0.01 * DEFTEXT_SCALE, "-");
+}
+
+// Fighter functions
 void Fighter_UpdatePosition(GOBJ *fighter) {
     FighterData *fighter_data = fighter->userdata;
 
@@ -273,12 +284,11 @@ void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
     fighter_data->phys.self_vel.Y = 0;
 }
 
-// Fighter functions
 void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     Fighter_Reset(event_data, hmn, cpu, 0);
 }
 
-// Init Function
+// Init function
 void Event_Init(GOBJ *gobj) {
     PivotFsmashData *event_data = gobj->userdata;
     Init_Event_Vars("pfshData");
@@ -295,6 +305,7 @@ void Event_Init(GOBJ *gobj) {
     PivotFsmash_FtInit(event_data, hmn, cpu);
 }
 
+// Think functions
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
 }
 
@@ -387,8 +398,23 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn) {
         JOBJ_ReqAnimAll(hud_jobj, 0);
     }
 
+    // debug text
+    #if TM_DEBUG > 0
+        Debug_UpdateText(event_data->debug.is_grab_text, event_data->hud.is_grab);
+        Debug_UpdateText(event_data->debug.is_throw_text, event_data->hud.is_throw);
+        Debug_UpdateText(event_data->debug.is_dash_text, event_data->hud.is_dash);
+        Debug_UpdateText(event_data->debug.is_turn_text, event_data->hud.is_turn);
+        Debug_UpdateText(event_data->debug.is_smash_text, event_data->hud.is_smash);
+        Debug_UpdateText(event_data->debug.is_smash_text, event_data->hud.is_smash);
+        Debug_UpdateText(event_data->debug.reset_timer_text, event_data->reset_timer);
+    #endif
+
     // update HUD anim
     JOBJ_AnimAll(hud_jobj);
+}
+
+void Debug_UpdateText(Text *text, s16 data) {
+    Text_SetText(text, 0, "%2d", data);
 }
 
 void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
@@ -474,7 +500,6 @@ void PivotFsmash_CPUThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     }
 }
 
-// Think Function
 void Event_Think(GOBJ *event) {
     PivotFsmashData *event_data = event->userdata;
 
