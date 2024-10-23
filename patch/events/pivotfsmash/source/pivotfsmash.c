@@ -210,7 +210,6 @@ void Fighter_UpdatePosition(GOBJ *fighter) {
 }
 
 void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
-    event_data->hud.timer = 0;
     event_data->reset_timer = 0;
     event_data->tip.refresh_displayed = 0;
     event_data->hud.is_grab = false;
@@ -218,6 +217,12 @@ void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
     event_data->hud.is_turn = false;    
     event_data->hud.is_dash = false;
     event_data->hud.is_smash = false;
+
+    PivotFsmash_ResetHUDTimer(event_data);
+}
+
+void PivotFsmash_ResetHUDTimer(PivotFsmashData *event_data) {
+    event_data->hud.timer = 0;
 
     // init action log
     for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
@@ -322,8 +327,7 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn) {
 
     // check to initialize timer
     if ((hmn_data->state == ASID_CATCH || hmn_data->state == ASID_CATCHDASH) && hmn_data->TM.state_frame == 1) {
-        PivotFsmash_InitVariables(event_data);
-
+        PivotFsmash_ResetHUDTimer(event_data);
         event_data->tip.refresh_num++;
     }
 

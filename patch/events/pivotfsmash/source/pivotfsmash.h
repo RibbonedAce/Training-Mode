@@ -94,6 +94,8 @@ void Fighter_UpdatePosition(GOBJ *fighter);
 
 void PivotFsmash_InitVariables(PivotFsmashData *event_data);
 
+void PivotFsmash_ResetHUDTimer(PivotFsmashData *event_data);
+
 void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction);
 
 void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction);
