@@ -68,18 +68,9 @@ static EventMenu PfshMenu_Main = {
 static EventMenu *Event_Menu = &PfshMenu_Main;
 EventMenu **menu_start = &Event_Menu;
 
-// Tips functions
-void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
-    Tips_Toggle(value);
-}
-
 // HUD functions
-void PivotFsmash_HUDCamThink(GOBJ *gobj) {
-    HUDCamThink(PfshOptions_Main[0]);
-}
-
-void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
-    Create_HUDCam(PivotFsmash_HUDCamThink);
+void HUD_Init(PivotFsmashData *event_data) {
+    Create_HUDCam(HUD_CamThink);
 
     // Load jobj
     JOBJ *hud_jobj = JOBJ_LoadJoint(event_data->assets->hud);
@@ -177,144 +168,7 @@ void PivotFsmash_HUDInit(PivotFsmashData *event_data) {
     #endif
 }
 
-Text *Debug_InitText(int canvas_id, int index) {
-    return Create_Simple_Text(canvas_id, 15, -10 + 2 * index, 0.01 * DEFTEXT_SCALE, "-");
-}
-
-// Fighter functions
-void Fighter_UpdatePosition(GOBJ *fighter) {
-    FighterData *fighter_data = fighter->userdata;
-
-    // Update Position (Copy Physics XYZ into all ECB XYZ)
-    fighter_data->coll_data.topN_Curr.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_Curr.Y = fighter_data->phys.pos.Y;
-    fighter_data->coll_data.topN_Prev.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_Prev.Y = fighter_data->phys.pos.Y;
-    fighter_data->coll_data.topN_CurrCorrect.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_CurrCorrect.Y = fighter_data->phys.pos.Y;
-    fighter_data->coll_data.topN_Proj.X = fighter_data->phys.pos.X;
-    fighter_data->coll_data.topN_Proj.Y = fighter_data->phys.pos.Y;
-
-    // Update Collision Frame ID
-    fighter_data->coll_data.coll_test = *stc_colltest;
-
-    // Adjust JObj position (code copied from 8006c324)
-    JOBJ *fighter_jobj = fighter->hsd_object;
-    fighter_jobj->trans.X = fighter_data->phys.pos.X;
-    fighter_jobj->trans.Y = fighter_data->phys.pos.Y;
-    fighter_jobj->trans.Z = fighter_data->phys.pos.Z;
-    JOBJ_SetMtxDirtySub(fighter_jobj);
-
-    // Update Static Player Block Coords
-    Fighter_SetPosition(fighter_data->ply, fighter_data->flags.ms, &fighter_data->phys.pos);
-}
-
-void PivotFsmash_InitVariables(PivotFsmashData *event_data) {
-    event_data->reset_timer = 0;
-    event_data->tip.refresh_displayed = 0;
-    event_data->hud.is_grab = false;
-    event_data->hud.is_throw = false;
-    event_data->hud.is_turn = false;    
-    event_data->hud.is_dash = false;
-    event_data->hud.is_smash = false;
-
-    PivotFsmash_ResetHUDTimer(event_data);
-}
-
-void PivotFsmash_ResetHUDTimer(PivotFsmashData *event_data) {
-    event_data->hud.timer = 0;
-
-    // init action log
-    for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
-        event_data->hud.action_log[i] = 0;
-    }
-}
-
-void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction) {
-    FighterData *hmn_data = hmn->userdata;
-    FighterData *cpu_data = cpu->userdata;
-
-    // init refresh num
-    event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
-
-    // get random position if not already set
-    float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
-    if (hmn_direction != -1 && hmn_direction != 1) {
-        hmn_direction = -1 + 2 * HSD_Randi(2);
-    }
-    Fighter_PlaceOnStage(hmn, hmn_pos, hmn_direction);
-
-    float cpu_pos = hmn_pos + 10 * hmn_direction;
-    float cpu_direction = -hmn_direction;
-    Fighter_PlaceOnStage(cpu, cpu_pos, cpu_direction);
-
-    // Set damage
-    hmn_data->dmg.percent = 0;
-    Fighter_SetHUDDamage(hmn_data->ply, 0);
-
-    float cpu_dmg = 60 + HSD_Randi(20) + HSD_Randf();
-    cpu_data->dmg.percent = cpu_dmg;
-    Fighter_SetHUDDamage(cpu_data->ply, cpu_dmg);
-
-    // Reset staling
-    int *staleMoveTable = Fighter_GetStaleMoveTable(hmn_data->ply);
-    memset(staleMoveTable, 0, 0x2C);
-
-    // Set CPU behavior again
-    cpu_data->cpu.ai = 15;
-
-    PivotFsmash_InitVariables(event_data);
-
-    Remove_Particles_And_CamShake();
-}
-
-void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
-    FighterData *fighter_data = fighter->userdata;
-
-    // Sleep first
-    Fighter_EnterSleep(fighter, 0);
-    Fighter_EnterRebirth(fighter);
-    Match_CreateHUD(fighter_data->ply);
-
-    // place player in a random position in wait
-    fighter_data->facing_direction = facing_direction;
-    Fighter_EnterWait(fighter);
-
-    fighter_data->phys.pos.X = xpos;
-    fighter_data->phys.pos.Y = 0;
-    Fighter_UpdatePosition(fighter);
-
-    // remove velocity
-    fighter_data->phys.self_vel.X = 0;
-    fighter_data->phys.self_vel.Y = 0;
-}
-
-void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
-    Fighter_Reset(event_data, hmn, cpu, 0);
-}
-
-// Init function
-void Event_Init(GOBJ *gobj) {
-    PivotFsmashData *event_data = gobj->userdata;
-    Init_Event_Vars("pfshData");
-
-    GOBJ *hmn = Fighter_GetGObj(0);
-    FighterData *hmn_data = hmn->userdata;
-    GOBJ *cpu = Fighter_GetGObj(1);
-    FighterData *cpu_data = cpu->userdata;
-
-    // Init HUD
-    PivotFsmash_HUDInit(event_data);
-
-    // Init Fighters
-    PivotFsmash_FtInit(event_data, hmn, cpu);
-}
-
-// Think functions
-void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
-}
-
-void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn) {
+void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn) {
     FighterData *hmn_data = hmn->userdata;
 
     // run tip logic
@@ -327,7 +181,7 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn) {
 
     // check to initialize timer
     if ((hmn_data->state == ASID_CATCH || hmn_data->state == ASID_CATCHDASH) && hmn_data->TM.state_frame == 1) {
-        PivotFsmash_ResetHUDTimer(event_data);
+        HUD_ClearTimer(event_data);
         event_data->tip.refresh_num++;
     }
 
@@ -417,11 +271,82 @@ void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn) {
     JOBJ_AnimAll(hud_jobj);
 }
 
-void Debug_UpdateText(Text *text, s16 data) {
-    Text_SetText(text, 0, "%2d", data);
+void HUD_CamThink(GOBJ *gobj) {
+    HUDCamThink(PfshOptions_Main[0]);
 }
 
-void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+void HUD_ClearTimer(PivotFsmashData *event_data) {
+    event_data->hud.timer = 0;
+
+    // init action log
+    for (int i = 0; i < sizeof(event_data->hud.action_log) / sizeof(u8); i++) {
+        event_data->hud.action_log[i] = 0;
+    }
+}
+
+// Fighter functions
+void Fighter_Init(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    Reset_Fighter(event_data, hmn, cpu, 0);
+}
+
+void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
+    FighterData *fighter_data = fighter->userdata;
+
+    // Sleep first
+    Fighter_EnterSleep(fighter, 0);
+    Fighter_EnterRebirth(fighter);
+    Match_CreateHUD(fighter_data->ply);
+
+    // place player in a random position in wait
+    fighter_data->facing_direction = facing_direction;
+    Fighter_EnterWait(fighter);
+
+    fighter_data->phys.pos.X = xpos;
+    fighter_data->phys.pos.Y = 0;
+    Fighter_UpdatePosition(fighter);
+
+    // remove velocity
+    fighter_data->phys.self_vel.X = 0;
+    fighter_data->phys.self_vel.Y = 0;
+}
+
+void Fighter_UpdatePosition(GOBJ *fighter) {
+    FighterData *fighter_data = fighter->userdata;
+
+    // Update Position (Copy Physics XYZ into all ECB XYZ)
+    fighter_data->coll_data.topN_Curr.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_Curr.Y = fighter_data->phys.pos.Y;
+    fighter_data->coll_data.topN_Prev.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_Prev.Y = fighter_data->phys.pos.Y;
+    fighter_data->coll_data.topN_CurrCorrect.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_CurrCorrect.Y = fighter_data->phys.pos.Y;
+    fighter_data->coll_data.topN_Proj.X = fighter_data->phys.pos.X;
+    fighter_data->coll_data.topN_Proj.Y = fighter_data->phys.pos.Y;
+
+    // Update Collision Frame ID
+    fighter_data->coll_data.coll_test = *stc_colltest;
+
+    // Adjust JObj position (code copied from 8006c324)
+    JOBJ *fighter_jobj = fighter->hsd_object;
+    fighter_jobj->trans.X = fighter_data->phys.pos.X;
+    fighter_jobj->trans.Y = fighter_data->phys.pos.Y;
+    fighter_jobj->trans.Z = fighter_data->phys.pos.Z;
+    JOBJ_SetMtxDirtySub(fighter_jobj);
+
+    // Update Static Player Block Coords
+    Fighter_SetPosition(fighter_data->ply, fighter_data->flags.ms, &fighter_data->phys.pos);
+}
+
+// CPU functions
+void CPU_Think(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    FighterData *cpu_data = cpu->userdata;
+    if (event_data->hud.is_throw && cpu_data->state != ASID_THROWNF) {
+        CPUAction_PerformAction(cpu, CPUACT_JUMPAWAY, hmn);
+    }
+}
+
+// Reset functions
+void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     FighterData *hmn_data = hmn->userdata;
     FighterData *cpu_data = cpu->userdata;
 
@@ -432,18 +357,67 @@ void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 
         // if reset timer is up, go back to ledge
         if (event_data->reset_timer == 0) {
-            Fighter_Reset(event_data, hmn, cpu, 0);
+            Reset_Fighter(event_data, hmn, cpu, 0);
         }
-    } else if (Should_Reset_On_Timer(event_data, hmn_data, cpu_data)) {
+    } else if (Reset_ShouldOnTimer(event_data, hmn_data, cpu_data)) {
         // check to set reset timer
         event_data->reset_timer = 30;
-    } else if (Should_Reset_Instantly(hmn_data, cpu_data)) {
+    } else if (Rest_ShouldInstantly(hmn_data, cpu_data)) {
         // reset instantly
-        Fighter_Reset(event_data, hmn, cpu, 0);
+        Reset_Fighter(event_data, hmn, cpu, 0);
     }
 }
 
-int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data) {
+void Reset_ManualThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    FighterData *hmn_data = hmn->userdata;
+
+    // reset to designated direction
+    if (hmn_data->input.down & HSD_BUTTON_DPAD_LEFT) {
+        Reset_Fighter(event_data, hmn, cpu, -1);
+    } else if (hmn_data->input.down & HSD_BUTTON_DPAD_RIGHT) {
+        Reset_Fighter(event_data, hmn, cpu, 1);
+    }
+}
+
+void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction) {
+    FighterData *hmn_data = hmn->userdata;
+    FighterData *cpu_data = cpu->userdata;
+
+    // init refresh num
+    event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
+
+    // get random position if not already set
+    float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
+    if (hmn_direction != -1 && hmn_direction != 1) {
+        hmn_direction = -1 + 2 * HSD_Randi(2);
+    }
+    Fighter_PlaceOnStage(hmn, hmn_pos, hmn_direction);
+
+    float cpu_pos = hmn_pos + 10 * hmn_direction;
+    float cpu_direction = -hmn_direction;
+    Fighter_PlaceOnStage(cpu, cpu_pos, cpu_direction);
+
+    // Set damage
+    hmn_data->dmg.percent = 0;
+    Fighter_SetHUDDamage(hmn_data->ply, 0);
+
+    float cpu_dmg = 60 + HSD_Randi(20) + HSD_Randf();
+    cpu_data->dmg.percent = cpu_dmg;
+    Fighter_SetHUDDamage(cpu_data->ply, cpu_dmg);
+
+    // Reset staling
+    int *staleMoveTable = Fighter_GetStaleMoveTable(hmn_data->ply);
+    memset(staleMoveTable, 0, 0x2C);
+
+    // Set CPU behavior again
+    cpu_data->cpu.ai = 15;
+
+    Event_InitVariables(event_data);
+
+    Remove_Particles_And_CamShake();
+}
+
+int Reset_ShouldOnTimer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data) {
     if (!event_data->hud.is_grab && cpu_data->flags.hitlag) {
         // CPU was damaged with something other than a grab
         OSReport("Reset due to non-grab damage\n");
@@ -482,26 +456,43 @@ int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, Fi
     return false;
 }
 
-int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data) {
+int Rest_ShouldInstantly(FighterData *hmn_data, FighterData *cpu_data) {
     return hmn_data->flags.dead == 1 || cpu_data->flags.dead == 1;
 }
 
-void PivotFsmash_ManualResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
-    FighterData *hmn_data = hmn->userdata;
-
-    // reset to designated direction
-    if (hmn_data->input.down & HSD_BUTTON_DPAD_LEFT) {
-        Fighter_Reset(event_data, hmn, cpu, -1);
-    } else if (hmn_data->input.down & HSD_BUTTON_DPAD_RIGHT) {
-        Fighter_Reset(event_data, hmn, cpu, 1);
-    }
+// Tips functions
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
+    Tips_Toggle(value);
 }
 
-void PivotFsmash_CPUThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
+}
+
+// Menu Toggle functions
+void MenuToggle_StartPosition(GOBJ *menu_gobj, int value) {
+    // get fighter data
+    GOBJ *hmn = Fighter_GetGObj(0);
+    GOBJ *cpu = Fighter_GetGObj(1);
+    PivotFsmashData *event_data = event_vars->event_gobj->userdata;
+
+    Reset_Fighter(event_data, hmn, cpu, 0);
+}
+
+// Event functions
+void Event_Init(GOBJ *gobj) {
+    PivotFsmashData *event_data = gobj->userdata;
+    Init_Event_Vars("pfshData");
+
+    GOBJ *hmn = Fighter_GetGObj(0);
+    FighterData *hmn_data = hmn->userdata;
+    GOBJ *cpu = Fighter_GetGObj(1);
     FighterData *cpu_data = cpu->userdata;
-    if (event_data->hud.is_throw && cpu_data->state != ASID_THROWNF) {
-        CPUAction_PerformAction(cpu, CPUACT_JUMPAWAY, hmn);
-    }
+
+    // Init HUD
+    HUD_Init(event_data);
+
+    // Init Fighters
+    Fighter_Init(event_data, hmn, cpu);
 }
 
 void Event_Think(GOBJ *event) {
@@ -511,18 +502,29 @@ void Event_Think(GOBJ *event) {
     GOBJ *hmn = Fighter_GetGObj(0);
     GOBJ *cpu = Fighter_GetGObj(1);
 
-    PivotFsmash_HUDThink(event_data, hmn);
-    PivotFsmash_ResetThink(event_data, hmn, cpu);
-    PivotFsmash_ManualResetThink(event_data, hmn, cpu);
-    PivotFsmash_CPUThink(event_data, hmn, cpu);
+    HUD_Think(event_data, hmn);
+    Reset_AutoThink(event_data, hmn, cpu);
+    Reset_ManualThink(event_data, hmn, cpu);
+    CPU_Think(event_data, hmn, cpu);
 }
 
-// Menu Toggle functions
-void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value) {
-    // get fighter data
-    GOBJ *hmn = Fighter_GetGObj(0);
-    GOBJ *cpu = Fighter_GetGObj(1);
-    PivotFsmashData *event_data = event_vars->event_gobj->userdata;
+void Event_InitVariables(PivotFsmashData *event_data) {
+    event_data->reset_timer = 0;
+    event_data->tip.refresh_displayed = 0;
+    event_data->hud.is_grab = false;
+    event_data->hud.is_throw = false;
+    event_data->hud.is_turn = false;    
+    event_data->hud.is_dash = false;
+    event_data->hud.is_smash = false;
 
-    Fighter_Reset(event_data, hmn, cpu, 0);
+    HUD_ClearTimer(event_data);
+}
+
+// Debug functions
+Text *Debug_InitText(int canvas_id, int index) {
+    return Create_Simple_Text(canvas_id, 15, -10 + 2 * index, 0.01 * DEFTEXT_SCALE, "-");
+}
+
+void Debug_UpdateText(Text *text, s16 data) {
+    Text_SetText(text, 0, "%2d", data);
 }

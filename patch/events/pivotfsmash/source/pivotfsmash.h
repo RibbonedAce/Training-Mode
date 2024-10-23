@@ -79,50 +79,52 @@ enum PFSH_ACTION {
     PFACT_SMASH,
 };
 
-// Tips functions
-void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
-
 // HUD functions
-void PivotFsmash_HUDCamThink(GOBJ *gobj);
+void HUD_Init(PivotFsmashData *event_data);
 
-void PivotFsmash_HUDInit(PivotFsmashData *event_data);
+void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn);
 
-Text *Debug_InitText(int canvas_id, int index);
+void HUD_CamThink(GOBJ *gobj);
+
+void HUD_ClearTimer(PivotFsmashData *event_data);
 
 // Fighter functions
-void Fighter_UpdatePosition(GOBJ *fighter);
-
-void PivotFsmash_InitVariables(PivotFsmashData *event_data);
-
-void PivotFsmash_ResetHUDTimer(PivotFsmashData *event_data);
-
-void Fighter_Reset(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction);
+void Fighter_Init(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
 void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction);
 
-void PivotFsmash_FtInit(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+void Fighter_UpdatePosition(GOBJ *fighter);
 
-// Init function
-void Event_Init(GOBJ *gobj);
+// CPU functions
+void CPU_Think(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
-// Think functions
+// Reset functions
+void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+
+void Reset_ManualThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+
+void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction);
+
+int Reset_ShouldOnTimer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data);
+
+int Rest_ShouldInstantly(FighterData *hmn_data, FighterData *cpu_data);
+
+// Tips functions
+void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
+
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
-void PivotFsmash_HUDThink(PivotFsmashData *event_data, GOBJ *hmn);
+// Menu Toggle functions
+void MenuToggle_StartPosition(GOBJ *menu_gobj, int value);
 
-void Debug_UpdateText(Text *text, s16 data);
-
-void PivotFsmash_ResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
-
-int Should_Reset_On_Timer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data);
-
-int Should_Reset_Instantly(FighterData *hmn_data, FighterData *cpu_data);
-
-void PivotFsmash_ManualResetThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
-
-void PivotFsmash_CPUThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+// Event functionss
+void Event_Init(GOBJ *gobj);
 
 void Event_Think(GOBJ *event);
 
-// Menu Toggle functions
-void PivotFsmash_ToggleStartPosition(GOBJ *menu_gobj, int value);
+void Event_InitVariables(PivotFsmashData *event_data);
+
+// Debug functions
+Text *Debug_InitText(int canvas_id, int index);
+
+void Debug_UpdateText(Text *text, s16 data);
