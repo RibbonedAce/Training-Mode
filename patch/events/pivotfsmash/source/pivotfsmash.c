@@ -20,6 +20,7 @@ static char *tmgbar_helptext[] = {
 
 // Main Menu
 static char **PfshOptions_HUD[] = {"On", "Off"};
+static char **PfshOptions_Reset[] = {"Random", "Left", "Right", "Off"};
 static EventOption PfshOptions_Main[] = {
     /*HUD*/ {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
@@ -30,6 +31,16 @@ static EventOption PfshOptions_Main[] = {
         .desc = "Toggle visibility of the HUD.", // string describing what this option does
         .option_values = PfshOptions_HUD, // pointer to an array of strings
         .onOptionChange = 0,
+    },
+    /*Reset*/ {
+        .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
+        .value_num = sizeof(PfshOptions_Reset) / 4, // number of values for this option
+        .option_val = 0, // value of this option
+        .menu = 0, // pointer to the menu that pressing A opens
+        .option_name = "Auto Reset", // pointer to a string
+        .desc = "The direction to auto-reset after each iteration. \nDoes not override manual reset direction.",
+        .option_values = PfshOptions_Reset, // pointer to an array of strings
+        .onOptionChange = MenuToggle_AutoReset,
     },
     /*Help*/ {
         .option_kind = OPTKIND_FUNC, // the type of option this is; menu, string list, integers list, etc
@@ -286,7 +297,7 @@ void HUD_ClearTimer(PivotFsmashData *event_data) {
 
 // Fighter functions
 void Fighter_Init(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
-    Reset_Fighter(event_data, hmn, cpu, 0);
+    Reset_Fighter(event_data, hmn, cpu, DIR_RANDOM);
 }
 
 void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
@@ -347,6 +358,11 @@ void CPU_Think(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 
 // Reset functions
 void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    // No auto-reset
+    if (PfshOptions_Main[PFSHOPT_RESET].option_val == 3) {
+        return;
+    }
+
     FighterData *hmn_data = hmn->userdata;
     FighterData *cpu_data = cpu->userdata;
 
@@ -357,14 +373,14 @@ void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 
         // if reset timer is up, go back to ledge
         if (event_data->reset_timer == 0) {
-            Reset_Fighter(event_data, hmn, cpu, 0);
+            Reset_Fighter(event_data, hmn, cpu, DIR_RANDOM);
         }
     } else if (Reset_ShouldOnTimer(event_data, hmn_data, cpu_data)) {
         // check to set reset timer
         event_data->reset_timer = 30;
     } else if (Rest_ShouldInstantly(hmn_data, cpu_data)) {
         // reset instantly
-        Reset_Fighter(event_data, hmn, cpu, 0);
+        Reset_Fighter(event_data, hmn, cpu, DIR_RANDOM);
     }
 }
 
@@ -373,9 +389,9 @@ void Reset_ManualThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 
     // reset to designated direction
     if (hmn_data->input.down & HSD_BUTTON_DPAD_LEFT) {
-        Reset_Fighter(event_data, hmn, cpu, -1);
+        Reset_Fighter(event_data, hmn, cpu, DIR_LEFT);
     } else if (hmn_data->input.down & HSD_BUTTON_DPAD_RIGHT) {
-        Reset_Fighter(event_data, hmn, cpu, 1);
+        Reset_Fighter(event_data, hmn, cpu, DIR_RIGHT);
     }
 }
 
@@ -388,8 +404,21 @@ void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_
 
     // get random position if not already set
     float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
-    if (hmn_direction != -1 && hmn_direction != 1) {
-        hmn_direction = -1 + 2 * HSD_Randi(2);
+    if (hmn_direction == DIR_RANDOM) {
+        switch (PfshOptions_Main[PFSHOPT_RESET].option_val) {
+            case 1: {
+                hmn_direction = DIR_LEFT;
+                break;
+            }
+            case 2: {
+                hmn_direction = DIR_RIGHT;
+                break;
+            }
+            default: {
+                hmn_direction = -1 + 2 * HSD_Randi(2);
+            }
+
+        }
     }
     Fighter_PlaceOnStage(hmn, hmn_pos, hmn_direction);
 
@@ -469,13 +498,18 @@ void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
 }
 
 // Menu Toggle functions
-void MenuToggle_StartPosition(GOBJ *menu_gobj, int value) {
+void MenuToggle_AutoReset(GOBJ *menu_gobj, int value) {
+    // No auto-reset
+    if (value == 3) {
+        return;
+    }
+
     // get fighter data
     GOBJ *hmn = Fighter_GetGObj(0);
     GOBJ *cpu = Fighter_GetGObj(1);
     PivotFsmashData *event_data = event_vars->event_gobj->userdata;
 
-    Reset_Fighter(event_data, hmn, cpu, 0);
+    Reset_Fighter(event_data, hmn, cpu, DIR_RANDOM);
 }
 
 // Event functions

@@ -13,6 +13,10 @@
 #define PFSHJOBJ_BARSCALEY 1.5
 #define PFSHJOBJ_BARTRANSY 15
 #define PFSH_ACTIONNUM 6
+#define PFSHOPT_HUD 0
+#define PFSHOPT_RESET 1
+#define PFSHOPT_HELP 2
+#define PFSHOPT_EXIT 3
 
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;
@@ -115,7 +119,7 @@ void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
 // Menu Toggle functions
-void MenuToggle_StartPosition(GOBJ *menu_gobj, int value);
+void MenuToggle_AutoReset(GOBJ *menu_gobj, int value);
 
 // Event functionss
 void Event_Init(GOBJ *gobj);
