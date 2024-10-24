@@ -1,6 +1,10 @@
 #pragma once
 #include "../MexTK/mex.h"
 
+#define DIR_RANDOM 0
+#define DIR_LEFT -1
+#define DIR_RIGHT 1
+
 // there's got to be a better way to do this...
 // can't do an actual function since event_vars doesn't work properly across files
 #define Init_Event_Vars(param) { \
