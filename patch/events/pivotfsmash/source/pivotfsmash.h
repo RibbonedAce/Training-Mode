@@ -95,7 +95,7 @@ void HUD_ClearTimer(PivotFsmashData *event_data);
 // Fighter functions
 void Fighter_Init(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
-void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction);
+void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, Direction facing_direction);
 
 void Fighter_UpdatePosition(GOBJ *fighter);
 
@@ -107,7 +107,7 @@ void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
 void Reset_ManualThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
 
-void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction);
+void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, Direction hmn_direction);
 
 int Reset_ShouldOnTimer(PivotFsmashData *event_data, FighterData *hmn_data, FighterData *cpu_data);
 

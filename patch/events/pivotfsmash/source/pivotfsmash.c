@@ -300,7 +300,7 @@ void Fighter_Init(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     Reset_Fighter(event_data, hmn, cpu, DIR_RANDOM);
 }
 
-void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, float facing_direction) {
+void Fighter_PlaceOnStage(GOBJ *fighter, float xpos, Direction facing_direction) {
     FighterData *fighter_data = fighter->userdata;
 
     // Sleep first
@@ -395,7 +395,7 @@ void Reset_ManualThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     }
 }
 
-void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_direction) {
+void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, Direction hmn_direction) {
     FighterData *hmn_data = hmn->userdata;
     FighterData *cpu_data = cpu->userdata;
 
@@ -417,13 +417,12 @@ void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, float hmn_
             default: {
                 hmn_direction = -1 + 2 * HSD_Randi(2);
             }
-
         }
     }
     Fighter_PlaceOnStage(hmn, hmn_pos, hmn_direction);
 
     float cpu_pos = hmn_pos + 10 * hmn_direction;
-    float cpu_direction = -hmn_direction;
+    Direction cpu_direction = -hmn_direction;
     Fighter_PlaceOnStage(cpu, cpu_pos, cpu_direction);
 
     // Set damage
