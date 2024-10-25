@@ -5,23 +5,28 @@
 #include "../../../utils.h"
 #include "../../../cpu.h"
 
-#define LSDH_TIPDURATION 1.7 * 60
-#define PFSH_HITBOXNUM 30 * 4
-#define DEFTEXT_SCALE 3
+// HUD Proportions
+#define PFSHJOBJ_TEXTSCALE 3
 #define PFSHJOBJ_BARNUM 48
 #define PFSHJOBJ_BARSCALEX 1.5
 #define PFSHJOBJ_BARSCALEY 1.5
 #define PFSHJOBJ_BARTRANSY 15
-#define PFSH_ACTIONNUM 6
+#define PFSHJOBJ_ACTIONNUM 6
+
+// Menu Options
 #define PFSHOPT_HUD 0
 #define PFSHOPT_RESET 1
 #define PFSHOPT_HELP 2
 #define PFSHOPT_EXIT 3
 
+// Reset Definitions
+#define PFSHRESET_RANDOM 0
+#define PFSHRESET_LEFT 1
+#define PFSHRESET_RIGHT 2
+#define PFSHRESET_OFF 3
+
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;
-typedef struct PfshHitboxData PfshHitboxData;
-typedef struct PfshHitlogData PfshHitlogData;
 
 struct PivotFsmashAssets {
     JOBJDesc *hud;
@@ -60,18 +65,6 @@ struct PivotFsmashData {
         u8 refresh_cond_num; // number of times tip condition has been met
         u8 refresh_displayed: 1;
     } tip;
-};
-
-struct PfshHitboxData {
-    int kind;
-    float size;
-    Vec3 pos_curr;
-    Vec3 pos_prev;
-};
-
-struct PfshHitlogData {
-    int num;
-    PfshHitboxData hitlog[PFSH_HITBOXNUM];
 };
 
 enum PFSH_ACTION {

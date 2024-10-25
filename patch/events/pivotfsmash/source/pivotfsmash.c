@@ -129,12 +129,12 @@ void HUD_Init(PivotFsmashData *event_data) {
     timingbar_ex_parent->scale.X = 1.0;
     timingbar_ex_parent->scale.Y = 1.0;
 
-    for (int i = 0; i < PFSH_ACTIONNUM; ++i) {
+    for (int i = 0; i < PFSHJOBJ_ACTIONNUM; ++i) {
         // Back square
         JOBJ *timingbar_ex_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
         JOBJ_AddChild(timingbar_ex_parent, timingbar_ex_jobj);
 
-        timingbar_ex_jobj->trans.X = 4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
+        timingbar_ex_jobj->trans.X = 4 * (i - PFSHJOBJ_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
         timingbar_ex_jobj->trans.Y = 3 * PFSHJOBJ_BARSCALEY;
         timingbar_ex_jobj->scale.X = 1.1 * PFSHJOBJ_BARSCALEY;
         timingbar_ex_jobj->scale.Y = 1.1 * PFSHJOBJ_BARSCALEY;
@@ -147,7 +147,7 @@ void HUD_Init(PivotFsmashData *event_data) {
         timingbar_ex_jobj = JOBJ_LoadJoint(timingbar_jobj->desc);
         JOBJ_AddChild(timingbar_ex_parent, timingbar_ex_jobj);
 
-        timingbar_ex_jobj->trans.X = 4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
+        timingbar_ex_jobj->trans.X = 4 * (i - PFSHJOBJ_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX;
         timingbar_ex_jobj->trans.Y = 3 * PFSHJOBJ_BARSCALEY;
         timingbar_ex_jobj->scale.X = 0.9 * PFSHJOBJ_BARSCALEY;
         timingbar_ex_jobj->scale.Y = 0.9 * PFSHJOBJ_BARSCALEY;
@@ -158,12 +158,12 @@ void HUD_Init(PivotFsmashData *event_data) {
     }
 
     // init text
-    for (int i = 0; i < PFSH_ACTIONNUM; ++i) {
+    for (int i = 0; i < PFSHJOBJ_ACTIONNUM; ++i) {
         Create_Simple_Text(
                 event_data->hud.canvas, 
-                4 * (i - PFSH_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX,
+                4 * (i - PFSHJOBJ_ACTIONNUM / 2 + 0.5) * PFSHJOBJ_BARSCALEX,
                 -(PFSHJOBJ_BARTRANSY + (2 * PFSHJOBJ_BARSCALEY)),
-                0.01 * DEFTEXT_SCALE * PFSHJOBJ_BARSCALEY,
+                0.01 * PFSHJOBJ_TEXTSCALE * PFSHJOBJ_BARSCALEY,
                 tmgbar_helptext[i]
         );
     }
@@ -283,7 +283,7 @@ void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn) {
 }
 
 void HUD_CamThink(GOBJ *gobj) {
-    HUDCamThink(PfshOptions_Main[0]);
+    HUDCamThink(PfshOptions_Main[PFSHOPT_HUD]);
 }
 
 void HUD_ClearTimer(PivotFsmashData *event_data) {
@@ -359,7 +359,7 @@ void CPU_Think(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
 // Reset functions
 void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
     // No auto-reset
-    if (PfshOptions_Main[PFSHOPT_RESET].option_val == 3) {
+    if (PfshOptions_Main[PFSHOPT_RESET].option_val == PFSHRESET_OFF) {
         return;
     }
 
@@ -406,11 +406,11 @@ void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, Direction 
     float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
     if (hmn_direction == DIR_RANDOM) {
         switch (PfshOptions_Main[PFSHOPT_RESET].option_val) {
-            case 1: {
+            case PFSHRESET_LEFT: {
                 hmn_direction = DIR_LEFT;
                 break;
             }
-            case 2: {
+            case PFSHRESET_RIGHT: {
                 hmn_direction = DIR_RIGHT;
                 break;
             }
@@ -555,7 +555,7 @@ void Event_InitVariables(PivotFsmashData *event_data) {
 
 // Debug functions
 Text *Debug_InitText(int canvas_id, int index) {
-    return Create_Simple_Text(canvas_id, 15, -10 + 2 * index, 0.01 * DEFTEXT_SCALE, "-");
+    return Create_Simple_Text(canvas_id, 15, -10 + 2 * index, 0.01 * PFSHJOBJ_TEXTSCALE, "-");
 }
 
 void Debug_UpdateText(Text *text, s16 data) {
