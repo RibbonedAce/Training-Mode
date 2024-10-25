@@ -20,6 +20,7 @@ static char *tmgbar_helptext[] = {
 
 // Main Menu
 static char **PfshOptions_HUD[] = {"On", "Off"};
+static char **PfshOptions_TDI[] = {"Random", "In", "Out", "Down", "None"};
 static char **PfshOptions_Reset[] = {"Random", "Left", "Right", "Off"};
 static EventOption PfshOptions_Main[] = {
     /*HUD*/ {
@@ -30,6 +31,16 @@ static EventOption PfshOptions_Main[] = {
         .option_name = "HUD", // pointer to a string
         .desc = "Toggle visibility of the HUD.", // string describing what this option does
         .option_values = PfshOptions_HUD, // pointer to an array of strings
+        .onOptionChange = 0,
+    },
+    /*CPU TDI*/ {
+        .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
+        .value_num = sizeof(PfshOptions_TDI) / 4, // number of values for this option
+        .option_val = 0, // value of this option
+        .menu = 0, // pointer to the menu that pressing A opens
+        .option_name = "CPU TDI", // pointer to a string
+        .desc = "The way that the CPU DI's from your throws.",
+        .option_values = PfshOptions_TDI, // pointer to an array of strings
         .onOptionChange = 0,
     },
     /*Reset*/ {
@@ -350,9 +361,56 @@ void Fighter_UpdatePosition(GOBJ *fighter) {
 
 // CPU functions
 void CPU_Think(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu) {
+    FighterData *hmn_data = hmn->userdata;
     FighterData *cpu_data = cpu->userdata;
-    if (event_data->hud.is_throw && cpu_data->state != ASID_THROWNF) {
-        CPUAction_PerformAction(cpu, CPUACT_JUMPAWAY, hmn);
+
+    if (event_data->hud.is_throw) {
+        if (cpu_data->state == ASID_THROWNF) {
+            CPU_TDI(hmn_data, cpu_data);
+        } else {
+            CPUAction_PerformAction(cpu, CPUACT_JUMPAWAY, hmn);
+        }
+    }
+    
+}
+
+void CPU_TDI(FighterData *hmn_data, FighterData *cpu_data) {
+    // get knockback value
+    float kb_angle = (float) hmn_data->throw_hitbox[0].angle * hmn_data->facing_direction;
+
+    // perform TDI behavior
+    int tdi_kind = PfshOptions_Main[PFSHOPT_TDI].option_val;
+    if (tdi_kind == PFSHTDI_RANDOM) {
+        tdi_kind = HSD_Randi(PFSHTDI_NUM - 1) + 1;
+    }
+
+    switch (tdi_kind) {
+        case PFSHTDI_IN: {
+            // get optimal tdi
+            float tdi_angle = kb_angle + 90;
+
+            // convert to analog input
+            cpu_data->cpu.lstickX = cos(tdi_angle * M_1DEGREE) * 127;
+            cpu_data->cpu.lstickY = sin(tdi_angle * M_1DEGREE) * 127;
+            break;
+        }
+        case PFSHTDI_OUT: {
+            // get optimal tdi
+            float tdi_angle = kb_angle - 90;
+
+            // convert to analog input
+            cpu_data->cpu.lstickX = cos(tdi_angle * M_1DEGREE) * 127;
+            cpu_data->cpu.lstickY = sin(tdi_angle * M_1DEGREE) * 127;
+            break;
+        }
+        case PFSHTDI_DOWN: {
+            cpu_data->cpu.lstickX = 0;
+            cpu_data->cpu.lstickY = -127;
+            break;
+        }
+        default: {
+            Fighter_ZeroCPUInputs(cpu_data);
+        }
     }
 }
 

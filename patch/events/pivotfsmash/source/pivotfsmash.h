@@ -15,9 +15,18 @@
 
 // Menu Options
 #define PFSHOPT_HUD 0
-#define PFSHOPT_RESET 1
-#define PFSHOPT_HELP 2
-#define PFSHOPT_EXIT 3
+#define PFSHOPT_TDI 1
+#define PFSHOPT_RESET 2
+#define PFSHOPT_HELP 3
+#define PFSHOPT_EXIT 4
+
+// TDI Definitions
+#define PFSHTDI_RANDOM 0
+#define PFSHTDI_IN 1
+#define PFSHTDI_OUT 2
+#define PFSHTDI_DOWN 3
+#define PFSHTDI_NONE 4
+#define PFSHTDI_NUM 5
 
 // Reset Definitions
 #define PFSHRESET_RANDOM 0
@@ -94,6 +103,8 @@ void Fighter_UpdatePosition(GOBJ *fighter);
 
 // CPU functions
 void CPU_Think(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
+
+void CPU_TDI(FighterData *hmn_data, FighterData *cpu_data);
 
 // Reset functions
 void Reset_AutoThink(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu);
