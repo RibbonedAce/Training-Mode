@@ -1,6 +1,9 @@
 #pragma once
 #include "../MexTK/mex.h"
 
+#define OPTION_ON 0
+#define OPTION_OFF 1
+
 #define DIR_RANDOM 0
 #define DIR_LEFT -1
 #define DIR_RIGHT 1
@@ -43,6 +46,8 @@ static GXColor color_dark_cyan = {0, 255, 255, 255};
 static GXColor color_dark_blue = {0, 0, 255, 255};
 static GXColor color_dark_magenta = {255, 0, 255, 255};
 static GXColor color_black = {40, 40, 40, 255};
+
+static char **DefaultOptions_OnOff[] = {"On", "Off"};
 
 double Math_Sq(double x);
 
