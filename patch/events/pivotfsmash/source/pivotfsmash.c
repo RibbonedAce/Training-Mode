@@ -19,18 +19,17 @@ static char *tmgbar_helptext[] = {
 };
 
 // Main Menu
-static char **PfshOptions_HUD[] = {"On", "Off"};
 static char **PfshOptions_TDI[] = {"Random", "In", "Out", "Down", "None"};
 static char **PfshOptions_Reset[] = {"Random", "Left", "Right", "Off"};
 static EventOption PfshOptions_Main[] = {
     /*HUD*/ {
         .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
-        .value_num = sizeof(PfshOptions_HUD) / 4, // number of values for this option
+        .value_num = sizeof(DefaultOptions_OnOff) / 4, // number of values for this option
         .option_val = 0, // value of this option
         .menu = 0, // pointer to the menu that pressing A opens
         .option_name = "HUD", // pointer to a string
         .desc = "Toggle visibility of the HUD.", // string describing what this option does
-        .option_values = PfshOptions_HUD, // pointer to an array of strings
+        .option_values = DefaultOptions_OnOff, // pointer to an array of strings
         .onOptionChange = 0,
     },
     /*CPU TDI*/ {
@@ -52,6 +51,16 @@ static EventOption PfshOptions_Main[] = {
         .desc = "The direction to auto-reset after each iteration. \nDoes not override manual reset direction.",
         .option_values = PfshOptions_Reset, // pointer to an array of strings
         .onOptionChange = MenuToggle_AutoReset,
+    },
+    /*Tips*/ {
+        .option_kind = OPTKIND_STRING, // the type of option this is; menu, string list, integers list, etc
+        .value_num = sizeof(DefaultOptions_OnOff) / 4, // number of values for this option
+        .option_val = 0, // value of this option
+        .menu = 0, // pointer to the menu that pressing A opens
+        .option_name = "Tips", // pointer to a string
+        .desc = "Toggle visibility of tips that pop up \nupon failed pivot.", // string describing what this option does
+        .option_values = DefaultOptions_OnOff, // pointer to an array of strings
+        .onOptionChange = Tips_ToggleCallback,
     },
     /*Help*/ {
         .option_kind = OPTKIND_FUNC, // the type of option this is; menu, string list, integers list, etc
@@ -193,21 +202,15 @@ void HUD_Init(PivotFsmashData *event_data) {
 void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn) {
     FighterData *hmn_data = hmn->userdata;
 
-    // run tip logic
-//    Tips_Think(event_data, hmn_data);
-
-    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
-
-    // increment timer
     event_data->hud.timer++;
 
     // check to initialize timer
     if ((hmn_data->state == ASID_CATCH || hmn_data->state == ASID_CATCHDASH) && hmn_data->TM.state_frame == 1) {
         HUD_ClearTimer(event_data);
-        event_data->tip.refresh_num++;
     }
 
     int curr_frame = event_data->hud.timer;
+    JOBJ *hud_jobj = event_data->hud.gobj->hsd_object;
 
     // update action log
     if (curr_frame < sizeof(event_data->hud.action_log) / sizeof(u8)) {
@@ -250,8 +253,9 @@ void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn) {
         }
     }
 
+    Tips_Think(event_data, hmn_data);
+
     if (hmn_data->state == ASID_ATTACKS4S && hmn_data->TM.state_frame > 15) {
-        // destroy any tips
         event_vars->Tip_Destroy();
 
         // update bar colors
@@ -289,7 +293,6 @@ void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn) {
         Debug_UpdateText(event_data->debug.reset_timer_text, event_data->reset_timer);
     #endif
 
-    // update HUD anim
     JOBJ_AnimAll(hud_jobj);
 }
 
@@ -457,9 +460,6 @@ void Reset_Fighter(PivotFsmashData *event_data, GOBJ *hmn, GOBJ *cpu, Direction 
     FighterData *hmn_data = hmn->userdata;
     FighterData *cpu_data = cpu->userdata;
 
-    // init refresh num
-    event_data->tip.refresh_num = 0; // setting this to -1 because the per frame code will add 1 and make it 0
-
     // get random position if not already set
     float hmn_pos = -20 + HSD_Randi(40) + HSD_Randf();
     if (hmn_direction == DIR_RANDOM) {
@@ -547,11 +547,42 @@ int Rest_ShouldInstantly(FighterData *hmn_data, FighterData *cpu_data) {
 }
 
 // Tips functions
-void Tips_Toggle_Callback(GOBJ *menu_gobj, int value) {
+void Tips_ToggleCallback(GOBJ *menu_gobj, int value) {
     Tips_Toggle(value);
 }
 
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
+    // Update c-stick and smash vars
+    float curr_cstick = fabs(hmn_data->input.cstick_x);
+    if (event_data->hud.is_dash && curr_cstick >= PFSHTIP_CSTICKTHRESHOLD && event_data->tip.last_cstick < PFSHTIP_CSTICKTHRESHOLD) {
+        event_data->tip.last_smash_frame = event_vars->game_timer;
+    }
+    event_data->tip.last_cstick = curr_cstick;
+
+    if (PfshOptions_Main[PFSHOPT_TIPS].option_val == OPTION_OFF || event_data->tip.is_displayed) {
+        return;
+    }
+
+    // check for missed pivot input
+    if (event_data->hud.is_turn && !event_data->hud.is_smash && event_data->tip.last_smash_frame > 0) {
+        // early
+        if (hmn_data->state == ASID_TURN) {
+            event_data->tip.is_displayed = true;
+            event_vars->Tip_Destroy();
+
+            int frames_early = event_vars->game_timer - event_data->tip.last_smash_frame;
+            event_vars->Tip_Display(PFSHTIP_DURATION, "Misinput:\nF-smashed %d frames early.", frames_early + 1);
+        }
+
+        // late
+        else if (hmn_data->state == ASID_DASH) {
+            event_data->tip.is_displayed = true;
+            event_vars->Tip_Destroy();
+            
+            int frames_late = hmn_data->stateFrame;
+            event_vars->Tip_Display(PFSHTIP_DURATION, "Misinput:\nF-smashed %d frames late.", frames_late - 1);
+        }
+    }
 }
 
 // Menu Toggle functions
@@ -601,7 +632,9 @@ void Event_Think(GOBJ *event) {
 
 void Event_InitVariables(PivotFsmashData *event_data) {
     event_data->reset_timer = 0;
-    event_data->tip.refresh_displayed = 0;
+    event_data->tip.is_displayed = false;
+    event_data->tip.last_cstick = 0;
+    event_data->tip.last_smash_frame = 0;
     event_data->hud.is_grab = false;
     event_data->hud.is_throw = false;
     event_data->hud.is_turn = false;    

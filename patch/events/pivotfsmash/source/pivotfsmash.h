@@ -17,8 +17,9 @@
 #define PFSHOPT_HUD 0
 #define PFSHOPT_TDI 1
 #define PFSHOPT_RESET 2
-#define PFSHOPT_HELP 3
-#define PFSHOPT_EXIT 4
+#define PFSHOPT_TIPS 3
+#define PFSHOPT_HELP 4
+#define PFSHOPT_EXIT 5
 
 // TDI Definitions
 #define PFSHTDI_RANDOM 0
@@ -33,6 +34,10 @@
 #define PFSHRESET_LEFT 1
 #define PFSHRESET_RIGHT 2
 #define PFSHRESET_OFF 3
+
+// Tip Definitions
+#define PFSHTIP_DURATION 3 * 60
+#define PFSHTIP_CSTICKTHRESHOLD 0.8
 
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;
@@ -70,9 +75,9 @@ struct PivotFsmashData {
     } debug;
 
     struct {
-        s16 refresh_num; // number of times refreshed
-        u8 refresh_cond_num; // number of times tip condition has been met
-        u8 refresh_displayed: 1;
+        u8 is_displayed: 1;
+        int last_smash_frame;
+        float last_cstick;
     } tip;
 };
 
@@ -118,7 +123,7 @@ int Reset_ShouldOnTimer(PivotFsmashData *event_data, FighterData *hmn_data, Figh
 int Rest_ShouldInstantly(FighterData *hmn_data, FighterData *cpu_data);
 
 // Tips functions
-void Tips_Toggle_Callback(GOBJ *menu_gobj, int value);
+void Tips_ToggleCallback(GOBJ *menu_gobj, int value);
 
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data);
 
