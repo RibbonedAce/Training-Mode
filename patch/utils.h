@@ -1,6 +1,9 @@
 #pragma once
 #include "../MexTK/mex.h"
 
+#define OPTION_ON 0
+#define OPTION_OFF 1
+
 #define DIR_RANDOM 0
 #define DIR_LEFT -1
 #define DIR_RIGHT 1
@@ -27,6 +30,8 @@ typedef float Direction;
         CObjThink_Common(gobj); \
     } \
 }
+
+static char **DefaultOptions_OnOff[] = {"On", "Off"};
 
 double Math_Sq(double x);
 
