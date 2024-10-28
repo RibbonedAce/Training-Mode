@@ -31,6 +31,22 @@ typedef float Direction;
     } \
 }
 
+static GXColor color_white = {255, 255, 255, 255};
+static GXColor color_red = {255, 128, 128, 255};
+static GXColor color_yellow = {255, 255, 128, 255};
+static GXColor color_green = {128, 255, 128, 255};
+static GXColor color_cyan = {128, 255, 255, 255};
+static GXColor color_blue = {128, 128, 255, 255};
+static GXColor color_magenta = {255, 128, 255, 255};
+static GXColor color_grey = {80, 80, 80, 255};
+static GXColor color_dark_red = {255, 0, 0, 255};
+static GXColor color_dark_yellow = {255, 255, 0, 255};
+static GXColor color_dark_green = {0, 255, 0, 255};
+static GXColor color_dark_cyan = {0, 255, 255, 255};
+static GXColor color_dark_blue = {0, 0, 255, 255};
+static GXColor color_dark_magenta = {255, 0, 255, 255};
+static GXColor color_black = {40, 40, 40, 255};
+
 static char **DefaultOptions_OnOff[] = {"On", "Off"};
 
 double Math_Sq(double x);
