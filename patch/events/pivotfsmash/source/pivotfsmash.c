@@ -255,7 +255,7 @@ void HUD_Think(PivotFsmashData *event_data, GOBJ *hmn) {
 
     Tips_Think(event_data, hmn_data);
 
-    if (hmn_data->state == ASID_ATTACKS4S && hmn_data->TM.state_frame > 15) {
+    if (event_data->hud.is_smash && hmn_data->state == ASID_ATTACKS4S && hmn_data->TM.state_frame > 15) {
         event_vars->Tip_Destroy();
 
         // update bar colors
@@ -553,11 +553,23 @@ void Tips_ToggleCallback(GOBJ *menu_gobj, int value) {
 
 void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
     // Update c-stick and smash vars
-    float curr_cstick = fabs(hmn_data->input.cstick_x);
-    if (event_data->hud.is_dash && curr_cstick >= PFSHTIP_CSTICKTHRESHOLD && event_data->tip.last_cstick < PFSHTIP_CSTICKTHRESHOLD) {
-        event_data->tip.last_smash_frame = event_vars->game_timer;
+    if (event_data->hud.is_dash) {
+        float curr_cstick = fabs(hmn_data->input.cstick_x);
+        if (curr_cstick >= PFSHTIP_SMASHTHRESHOLD && event_data->tip.last_cstick < PFSHTIP_SMASHTHRESHOLD) {
+            event_data->tip.last_smash_frame = event_vars->game_timer;
+        }
+        event_data->tip.last_cstick = curr_cstick;
     }
-    event_data->tip.last_cstick = curr_cstick;
+    
+    // Update l-stick and smash vars
+    if (event_data->hud.is_throw) {
+        float curr_lstick = fabs(hmn_data->input.lstick_x);
+        if (curr_lstick >= PFSHTIP_SMASHTHRESHOLD && event_data->tip.lstick_minus_two < PFSHTIP_WALKTHRESHOLD && event_data->tip.lstick_minus_one < PFSHTIP_SMASHTHRESHOLD) {
+            event_data->tip.last_dash_frame = event_vars->game_timer;
+        }
+        event_data->tip.lstick_minus_two = event_data->tip.lstick_minus_one;
+        event_data->tip.lstick_minus_one = curr_lstick;
+    }
 
     if (PfshOptions_Main[PFSHOPT_TIPS].option_val == OPTION_OFF || event_data->tip.is_displayed) {
         return;
@@ -581,6 +593,35 @@ void Tips_Think(PivotFsmashData *event_data, FighterData *hmn_data) {
             
             int frames_late = hmn_data->stateFrame;
             event_vars->Tip_Display(PFSHTIP_DURATION, "Misinput:\nF-smashed %d frames late.", frames_late - 1);
+        }
+    }
+
+    // check for early/missed dash
+    else if (event_data->hud.is_throw && !event_data->hud.is_dash && hmn_data->state == ASID_WALKSLOW) {
+        // early
+        if (event_data->tip.last_dash_frame > 0) {
+            event_data->tip.is_displayed = true;
+            event_vars->Tip_Destroy();
+
+            int frames_early = event_vars->game_timer - event_data->tip.last_dash_frame;
+            event_vars->Tip_Display(PFSHTIP_DURATION, "Misinput:\nDashed %d frames early.", frames_early - 1); // Dash has a 2-frame buffer
+        } 
+        
+        // did not let go after throw
+        else if (event_data->tip.lstick_minus_two >= PFSHTIP_SMASHTHRESHOLD && event_data->tip.lstick_minus_one >= PFSHTIP_SMASHTHRESHOLD) {
+            event_data->tip.is_displayed = true;
+            event_vars->Tip_Destroy();
+
+            event_vars->Tip_Display(PFSHTIP_DURATION, "Misinput:\nDid not release stick after throw.");
+        } 
+        
+        // dashed too slowly
+        else if (event_data->tip.lstick_minus_two >= PFSHTIP_WALKTHRESHOLD && event_data->tip.lstick_minus_two < PFSHTIP_SMASHTHRESHOLD
+            && event_data->tip.lstick_minus_one >= PFSHTIP_WALKTHRESHOLD && event_data->tip.lstick_minus_one < PFSHTIP_SMASHTHRESHOLD) {
+            event_data->tip.is_displayed = true;
+            event_vars->Tip_Destroy();
+
+            event_vars->Tip_Display(PFSHTIP_DURATION, "Misinput:\nDash was input too slowly.");
         }
     }
 }
@@ -635,6 +676,9 @@ void Event_InitVariables(PivotFsmashData *event_data) {
     event_data->tip.is_displayed = false;
     event_data->tip.last_cstick = 0;
     event_data->tip.last_smash_frame = 0;
+    event_data->tip.lstick_minus_one = 1; // Start at max value so l-stick input from throw doesn't count as a dash attempt
+    event_data->tip.lstick_minus_two = 1; // Start at max value so l-stick input from throw doesn't count as a dash attempt
+    event_data->tip.last_dash_frame = 0;
     event_data->hud.is_grab = false;
     event_data->hud.is_throw = false;
     event_data->hud.is_turn = false;    

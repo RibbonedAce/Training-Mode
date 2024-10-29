@@ -37,7 +37,8 @@
 
 // Tip Definitions
 #define PFSHTIP_DURATION 3 * 60
-#define PFSHTIP_CSTICKTHRESHOLD 0.8
+#define PFSHTIP_SMASHTHRESHOLD 0.8
+#define PFSHTIP_WALKTHRESHOLD 0.2875
 
 typedef struct PivotFsmashAssets PivotFsmashAssets;
 typedef struct PivotFsmashData PivotFsmashData;
@@ -78,6 +79,9 @@ struct PivotFsmashData {
         u8 is_displayed: 1;
         int last_smash_frame;
         float last_cstick;
+        int last_dash_frame;
+        float lstick_minus_one;
+        float lstick_minus_two;
     } tip;
 };
 
