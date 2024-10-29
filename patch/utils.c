@@ -89,6 +89,21 @@ void Init_Text(int canvas, Text **text_arr, JOBJ *hud_jobj, int num_objs, int of
     }
 }
 
+Text *Create_Simple_Text(int canvas_id, float trans_x, float trans_y, float scale, char *init_text) {
+    Text *text = Text_CreateText(2, canvas_id);
+    text->kerning = true;
+    text->align = true;
+    text->use_aspect = true;
+
+    text->trans.X = trans_x;
+    text->trans.Y = trans_y;
+    text->scale.X = scale;
+    text->scale.Y = scale;
+
+    Text_AddSubtext(text, 0, 0, init_text);
+    return text;
+}
+
 int Default_Text_CreateCanvas(GOBJ *hud_gobj) {
     return Text_CreateCanvas(2, hud_gobj, 14, 15, 0, 18, 81, 19);
 }
