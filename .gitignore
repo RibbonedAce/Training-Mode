@@ -32,6 +32,7 @@ Additional\ ISO\ Files
 patch/**/output
 .vscode
 cmake-build-debug
+.idea
 
 # Mac files
 .DS_Store
